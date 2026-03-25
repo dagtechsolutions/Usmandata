@@ -96,77 +96,109 @@
     const db = getDatabase(app);
     const RENDER_URL = "https://usmandata.onrender.com";
 
-    let userRole = 'individual';
-
+    // --- FIX 1: USER STATE & UI UPDATES ---
     onAuthStateChanged(auth, (user) => {
         if (user) {
             onValue(ref(db, 'users/' + user.uid), (snapshot) => {
                 const data = snapshot.val();
-                userRole = data.role;
-                document.getElementById('userName').innerText = data.fullName;
-                document.getElementById('userBalance').innerText = data.balance.toFixed(2);
-                document.getElementById('roleBadge').innerText = userRole.toUpperCase();
+                if(data) {
+                    document.getElementById('userName').innerText = data.fullName;
+                    document.getElementById('userBalance').innerText = data.balance.toLocaleString('en-NG', { minimumFractionDigits: 2 });
+                    document.getElementById('roleBadge').innerText = data.role.toUpperCase();
+                }
             });
         } else { window.location.href = "login.html"; }
     });
 
+    // --- FIX 2: THE GLOBAL MODAL MANAGER (Ensures NO omission of services) ---
     window.openSrv = (type) => {
         const modal = new bootstrap.Modal(document.getElementById('srvModal'));
         const body = document.getElementById('srvBody');
         const title = document.getElementById('srvTitle');
         
-        if(type === 'data') {
-            title.innerText = "Buy Data";
-            body.innerHTML = `
-                <select id="net" class="form-select mb-3"><option value="mtn">MTN</option><option value="glo">GLO</option></select>
-                <input type="number" id="num" class="form-control mb-3" placeholder="Phone Number">
-                <select id="plan" class="form-select mb-3"><option value="PSPLAN_1">1GB SME - ₦250</option></select>
-                <button class="btn btn-primary w-100" onclick="processReq('data')">Purchase Now</button>`;
-        } else if(type === 'nin') {
-            title.innerText = "NIN Search";
-            const cost = userRole === 'agent' ? 100 : 150;
-            body.innerHTML = `
-                <input type="number" id="ninVal" class="form-control mb-3" placeholder="Enter NIN Number">
-                <p class="text-danger small">Cost: ₦${cost}</p>
-                <button class="btn btn-primary w-100" onclick="processReq('nin')">Search NIN</button>`;
-        } else if(type === 'power') {
-            title.innerText = "Electricity Bill";
-            body.innerHTML = `
-                <select id="disco" class="form-select mb-3"><option value="ikedc">Ikeja Electric</option><option value="aedc">Abuja Electric</option></select>
-                <input type="number" id="meter" class="form-control mb-3" placeholder="Meter Number">
-                <input type="number" id="amt" class="form-control mb-3" placeholder="Amount (Min ₦1000)">
-                <button class="btn btn-primary w-100" onclick="processReq('power')">Pay Bill</button>`;
+        let html = "";
+        switch(type) {
+            case 'data':
+                title.innerText = "Buy Cheap Data";
+                html = `<select id="net" class="form-select mb-3"><option value="mtn">MTN</option><option value="glo">GLO</option><option value="airtel">AIRTEL</option></select>
+                        <input type="number" id="phone" class="form-control mb-3" placeholder="Phone Number">
+                        <select id="plan" class="form-select mb-3"><option value="PSPLAN_1">1GB SME (₦250)</option><option value="PSPLAN_2">2GB SME (₦500)</option></select>`;
+                break;
+            case 'airtime':
+                title.innerText = "Buy Airtime";
+                html = `<select id="net" class="form-select mb-3"><option value="mtn">MTN</option><option value="glo">GLO</option></select>
+                        <input type="number" id="phone" class="form-control mb-3" placeholder="Phone Number">
+                        <input type="number" id="amt" class="form-control mb-3" placeholder="Amount (min ₦50)">`;
+                break;
+            case 'nin':
+                title.innerText = "NIN Demographic Search";
+                html = `<input type="number" id="ninVal" class="form-control mb-3" placeholder="Enter 11-digit NIN">`;
+                break;
+            case 'bvn':
+                title.innerText = "BVN Lookup";
+                html = `<input type="number" id="bvnVal" class="form-control mb-3" placeholder="Enter BVN Number">`;
+                break;
+            case 'tv':
+                title.innerText = "Cable TV Subscription";
+                html = `<select id="srv" class="form-select mb-3"><option value="gotv">GOTV</option><option value="dstv">DSTV</option></select>
+                        <input type="number" id="iuc" class="form-control mb-3" placeholder="IUC/SmartCard Number">`;
+                break;
+            case 'power':
+                title.innerText = "Electricity Bill";
+                html = `<select id="disco" class="form-select mb-3"><option value="ikedc">Ikeja Electric</option><option value="aedc">Abuja Electric</option></select>
+                        <input type="number" id="meter" class="form-control mb-3" placeholder="Meter Number">
+                        <input type="number" id="amt" class="form-control mb-3" placeholder="Amount (₦)">`;
+                break;
+            case 'exam':
+                title.innerText = "Exam Pin (WAEC/NECO)";
+                html = `<select id="examType" class="form-select mb-3"><option value="waec">WAEC</option><option value="neco">NECO</option></select>
+                        <input type="number" id="qty" class="form-control mb-3" value="1">`;
+                break;
         }
+        
+        body.innerHTML = html + `<button class="btn btn-primary w-100 py-2 shadow" id="procBtn">Process Transaction</button>`;
         modal.show();
+
+        // Attach the processing logic to the button inside the modal
+        document.getElementById('procBtn').onclick = () => processRequest(type);
     };
 
-    window.processReq = async (type) => {
+    // --- FIX 3: THE UNIVERSAL BACKEND CALLER ---
+    async function processRequest(type) {
         const uid = auth.currentUser.uid;
+        const btn = document.getElementById('procBtn');
+        btn.disabled = true; btn.innerText = "Processing... Please Wait";
+
+        // Collect data based on type
         let payload = { uid, type };
-
-        if(type === 'nin') payload.nin = document.getElementById('ninVal').value;
-        if(type === 'data') {
-            payload.network = document.getElementById('net').value;
-            payload.phone = document.getElementById('num').value;
-            payload.plan = document.getElementById('plan').value;
-        }
-
-        const btn = event.target;
-        btn.disabled = true; btn.innerText = "Processing...";
+        if(document.getElementById('net')) payload.network = document.getElementById('net').value;
+        if(document.getElementById('phone')) payload.phone = document.getElementById('phone').value;
+        if(document.getElementById('plan')) payload.plan = document.getElementById('plan').value;
+        if(document.getElementById('ninVal')) payload.nin = document.getElementById('ninVal').value;
+        if(document.getElementById('amt')) payload.amount = document.getElementById('amt').value;
 
         try {
-            const res = await fetch(`${RENDER_URL}/api/${type}`, {
+            const response = await fetch(`${RENDER_URL}/api/process`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(payload)
             });
-            const result = await res.json();
-            alert(result.message || "Request Sent!");
-        } catch (e) { alert("Error connecting to server."); }
-        btn.disabled = false; btn.innerText = "Purchase Now";
+            const result = await response.json();
+            alert(result.message || "Request Successful!");
+        } catch (e) {
+            alert("Connection Error: If this is the first request of the day, please wait 30 seconds for the server to wake up and try again.");
+        }
+        btn.disabled = false; btn.innerText = "Process Transaction";
+    }
+
+    // --- FIX 4: LOGOUT & FUNDING NAVIGATION ---
+    window.fundWallet = () => {
+        window.location.href = "fund.html";
     };
 
-    document.getElementById('btnLogout-side').onclick = () => signOut(auth);
+    document.getElementById('btn-logout').onclick = () => {
+        signOut(auth).then(() => window.location.href = "login.html");
+    };
 </script>
 </body>
 </html>
