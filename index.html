@@ -48,37 +48,86 @@
     </div>
 </header>
 
-<!-- Services -->
-<section class="container my-5">
-    <h2 class="text-center mb-5 fw-bold" id="services-title">Our Services</h2>
+<!-- Services Section Start -->
+<section class="container my-5" id="services">
+    <h2 class="text-center mb-5 fw-bold" id="services-main-title">Ayyukanmu / Our Services</h2>
     <div class="row g-4">
-        <!-- NIN Service -->
-        <div class="col-md-4">
-            <div class="card service-card p-4 text-center h-100">
+        
+        <!-- Service 1: NIN Search -->
+        <div class="col-6 col-md-3">
+            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
                 <i class="fas fa-id-card fa-3x text-primary mb-3"></i>
-                <h4 id="s1-title">NIN Services</h4>
-                <p class="text-muted" id="s1-desc">Demographic search, validation, and tracking ID status.</p>
+                <h5 id="s1-title" class="fw-bold">NIN Search</h5>
+                <p class="text-muted small mb-0" id="s1-desc">Instant demographic verification & validation.</p>
             </div>
         </div>
-        <!-- BVN Service -->
-        <div class="col-md-4">
-            <div class="card service-card p-4 text-center h-100">
+
+        <!-- Service 2: BVN Lookup -->
+        <div class="col-6 col-md-3">
+            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
                 <i class="fas fa-university fa-3x text-primary mb-3"></i>
-                <h4 id="s2-title">BVN Search</h4>
-                <p class="text-muted" id="s2-desc">Instant BVN search by number or phone number.</p>
+                <h5 id="s2-title" class="fw-bold">BVN Lookup</h5>
+                <p class="text-muted small mb-0" id="s2-desc">Verify Bank Verification Numbers instantly.</p>
             </div>
         </div>
-        <!-- Data/Airtime -->
-        <div class="col-md-4">
-            <div class="card service-card p-4 text-center h-100">
-                <i class="fas fa-mobile-alt fa-3x text-primary mb-3"></i>
-                <h4 id="s3-title">Data & Airtime</h4>
-                <p class="text-muted" id="s3-desc">Cheap data for MTN, Airtel, Glo and 9Mobile.</p>
+
+        <!-- Service 3: Cheap Data -->
+        <div class="col-6 col-md-3">
+            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
+                <i class="fas fa-wifi fa-3x text-primary mb-3"></i>
+                <h5 id="s3-title" class="fw-bold">Cheap Data</h5>
+                <p class="text-muted small mb-0" id="s3-desc">SME and Gifting for all Nigerian networks.</p>
             </div>
         </div>
+
+        <!-- Service 4: Airtime -->
+        <div class="col-6 col-md-3">
+            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
+                <i class="fas fa-phone-alt fa-3x text-primary mb-3"></i>
+                <h5 id="s4-title" class="fw-bold">Airtime</h5>
+                <p class="text-muted small mb-0" id="s4-desc">Instant recharge with discounts for agents.</p>
+            </div>
+        </div>
+
+        <!-- Service 5: Cable TV -->
+        <div class="col-6 col-md-3">
+            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
+                <i class="fas fa-tv fa-3x text-primary mb-3"></i>
+                <h5 id="s5-title" class="fw-bold">Cable TV</h5>
+                <p class="text-muted small mb-0" id="s5-desc">Renew GOTV, DSTV, and Startimes easily.</p>
+            </div>
+        </div>
+
+        <!-- Service 6: Electricity -->
+        <div class="col-6 col-md-3">
+            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
+                <i class="fas fa-lightbulb fa-3x text-primary mb-3"></i>
+                <h5 id="s6-title" class="fw-bold">Electricity</h5>
+                <p class="text-muted small mb-0" id="s6-desc">Pay all DisCos prepaid & postpaid bills.</p>
+            </div>
+        </div>
+
+        <!-- Service 7: Exam Pins -->
+        <div class="col-6 col-md-3">
+            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
+                <i class="fas fa-graduation-cap fa-3x text-primary mb-3"></i>
+                <h5 id="s7-title" class="fw-bold">Exam Pins</h5>
+                <p class="text-muted small mb-0" id="s7-desc">Buy WAEC, NECO, and JAMB result checkers.</p>
+            </div>
+        </div>
+
+        <!-- Service 8: Bulk SMS -->
+        <div class="col-6 col-md-3">
+            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
+                <i class="fas fa-envelope fa-3x text-primary mb-3"></i>
+                <h5 id="s8-title" class="fw-bold">Bulk SMS</h5>
+                <p class="text-muted small mb-0" id="s8-desc">Send mass messages at very low rates.</p>
+            </div>
+        </div>
+
     </div>
 </section>
-
+<!-- Services Section End -->
 <!-- Footer -->
 <footer class="bg-dark text-white py-4 mt-5">
     <div class="container text-center">
@@ -88,44 +137,46 @@
 
 <script>
     const translations = {
-        en: {
-            navLogin: "Login", navRegister: "Register",
-            heroTitle: "Reliable NIN & BVN Services",
-            heroSub: "Fastest way to verify NIN, BVN, and buy cheap Data/Airtime.",
-            heroBtn: "Get Started Now",
-            servicesTitle: "Our Services",
-            s1Title: "NIN Services", s1Desc: "Demographic search, validation, and tracking ID status.",
-            s2Title: "BVN Search", s2Desc: "Instant BVN search by number or phone number.",
-            s3Title: "Data & Airtime", s3Desc: "Cheap data for MTN, Airtel, Glo and 9Mobile."
-        },
-        ha: {
-            navLogin: "Shiga", navRegister: "Yi Rajista",
-            heroTitle: "Ingantaccen Sabis na NIN da BVN",
-            heroSub: "Hanya mafi sauri don tabbatar da NIN, BVN, da siyan Data/Airtime mai sauki.",
-            heroBtn: "Fara Yanzu",
-            servicesTitle: "Ayyukanmu",
-            s1Title: "Ayyukan NIN", s1Desc: "Neman bayanan mutum, tabbatarwa, da duba matsayin lambar bin kafa.",
-            s2Title: "Neman BVN", s2Desc: "Neman lambar BVN nan take ta lamba ko lambar waya.",
-            s3Title: "Data da Airtime", s3Desc: "Siyan Data mai sauki na MTN, Airtel, Glo da 9Mobile."
-        }
-    };
+    en: {
+        navLogin: "Login",
+        navRegister: "Register",
+        heroTitle: "Reliable NIN & Data Services",
+        s1Title: "NIN Search", s1Desc: "Instant demographic verification.",
+        s2Title: "BVN Lookup", s2Desc: "Verify bank numbers instantly.",
+        s3Title: "Cheap Data", s3Desc: "MTN, Glo, Airtel SME data.",
+        s4Title: "Airtime", s4Desc: "Instant recharge for all networks.",
+        s5Title: "Cable TV", s5Desc: "GOTV, DSTV & Startimes subscriptions.",
+        s6Title: "Electricity", s6Desc: "Pay all DisCo electric bills.",
+        s7Title: "Exam Pins", s7Desc: "WAEC, NECO & JAMB checkers.",
+        s8Title: "Bulk SMS", s8Desc: "Cheap mass messaging for agents."
+    },
+    ha: {
+        navLogin: "Shiga",
+        navRegister: "Yi Rajista",
+        heroTitle: "Ingantaccen Sabis na NIN da Data",
+        s1Title: "Neman NIN", s1Desc: "Nemo bayanan NIN nan take cikin sauki.",
+        s2Title: "Neman BVN", s2Desc: "Tabbatar da lambar BVN nan take.",
+        s3Title: "Data Mai Sauki", s3Desc: "Siyan Data na MTN, GLO, Airtel.",
+        s4Title: "Saka Kudi", s4Desc: "Recharge na dukkan layukan waya.",
+        s5Title: "Kallon TV", s5Desc: "Biyan kudin GOTV, DSTV da Startimes.",
+        s6Title: "Wutar Lantarki", s6Desc: "Biyan kudin wutar lantarki cikin sauri.",
+        s7Title: "Pin na Jarrabawa", s7Desc: "Siyan Pin na WAEC, NECO da JAMB.",
+        s8Title: "Sakon SMS", s8Desc: "Aika sakonni ga mutane da yawa."
+    }
+};
 
-    document.getElementById('langSwitcher').addEventListener('change', (e) => {
-        const lang = e.target.value;
-        const t = translations[lang];
-        document.getElementById('nav-login').innerText = t.navLogin;
-        document.getElementById('nav-register').innerText = t.navRegister;
-        document.getElementById('hero-title').innerText = t.heroTitle;
-        document.getElementById('hero-sub').innerText = t.heroSub;
-        document.getElementById('hero-btn').innerText = t.heroBtn;
-        document.getElementById('services-title').innerText = t.servicesTitle;
-        document.getElementById('s1-title').innerText = t.s1Title;
-        document.getElementById('s1-desc').innerText = t.s1Desc;
-        document.getElementById('s2-title').innerText = t.s2Title;
-        document.getElementById('s2-desc').innerText = t.s2Desc;
-        document.getElementById('s3-title').innerText = t.s3Title;
-        document.getElementById('s3-desc').innerText = t.s3Desc;
-    });
+document.getElementById('langSwitcher').addEventListener('change', (e) => {
+    const lang = e.target.value;
+    const t = translations[lang];
+    // Update labels using IDs
+    document.getElementById('nav-login').innerText = t.navLogin;
+    document.getElementById('nav-register').innerText = t.navRegister;
+    document.getElementById('hero-title').innerText = t.heroTitle;
+    for (let i = 1; i <= 8; i++) {
+        document.getElementById(`s${i}-title`).innerText = t[`s${i}Title`];
+        document.getElementById(`s${i}-desc`).innerText = t[`s${i}Desc`];
+    }
+});
 </script>
 </body>
 </html>

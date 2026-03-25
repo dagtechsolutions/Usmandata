@@ -43,7 +43,14 @@
   import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
   // PASTE THE SAME FIREBASE CONFIG HERE
-  const firebaseConfig = { /* ... same as above ... */ };
+  const firebaseConfig = {
+  apiKey: "AIzaSyAmJIfWsqFVHyP-F3W85u4UbbxANMQaOTw",
+  authDomain: "usmandatasub-7f93c.firebaseapp.com",
+  projectId: "usmandatasub-7f93c",
+  storageBucket: "usmandatasub-7f93c.firebasestorage.app",
+  messagingSenderId: "133797152161",
+  appId: "1:133797152161:web:18ac35c888c901695377e0"
+};
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
