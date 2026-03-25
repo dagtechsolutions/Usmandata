@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usman Data Sub | NIN, BVN & Data Services</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #004a99; --secondary: #ffd700; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f8f9fa; }
+        .navbar { background-color: var(--primary); }
+        .hero { background: linear-gradient(rgba(0,74,153,0.8), rgba(0,74,153,0.8)), url('https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80'); 
+                background-size: cover; color: white; padding: 100px 0; text-align: center; }
+        .service-card { border: none; transition: 0.3s; border-radius: 15px; }
+        .service-card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .btn-primary { background-color: var(--primary); border: none; }
+        .btn-warning { background-color: var(--secondary); color: #000; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="#">USMAN DATA SUB</a>
+        <div class="d-flex align-items-center">
+            <select id="langSwitcher" class="form-select form-select-sm me-3" style="width: auto;">
+                <option value="en">English</option>
+                <option value="ha">Hausa</option>
+            </select>
+            <a href="login.html" class="btn btn-outline-light btn-sm me-2" id="nav-login">Login</a>
+            <a href="register.html" class="btn btn-warning btn-sm" id="nav-register">Register</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<header class="hero">
+    <div class="container">
+        <h1 class="display-4 fw-bold" id="hero-title">Reliable NIN & BVN Services</h1>
+        <p class="lead" id="hero-sub">Fastest way to verify NIN, BVN, and buy cheap Data/Airtime.</p>
+        <div class="mt-4">
+            <a href="register.html" class="btn btn-warning btn-lg px-5 py-3 shadow" id="hero-btn">Get Started / Fara Yanzu</a>
+        </div>
+    </div>
+</header>
+
+<!-- Services -->
+<section class="container my-5">
+    <h2 class="text-center mb-5 fw-bold" id="services-title">Our Services</h2>
+    <div class="row g-4">
+        <!-- NIN Service -->
+        <div class="col-md-4">
+            <div class="card service-card p-4 text-center h-100">
+                <i class="fas fa-id-card fa-3x text-primary mb-3"></i>
+                <h4 id="s1-title">NIN Services</h4>
+                <p class="text-muted" id="s1-desc">Demographic search, validation, and tracking ID status.</p>
+            </div>
+        </div>
+        <!-- BVN Service -->
+        <div class="col-md-4">
+            <div class="card service-card p-4 text-center h-100">
+                <i class="fas fa-university fa-3x text-primary mb-3"></i>
+                <h4 id="s2-title">BVN Search</h4>
+                <p class="text-muted" id="s2-desc">Instant BVN search by number or phone number.</p>
+            </div>
+        </div>
+        <!-- Data/Airtime -->
+        <div class="col-md-4">
+            <div class="card service-card p-4 text-center h-100">
+                <i class="fas fa-mobile-alt fa-3x text-primary mb-3"></i>
+                <h4 id="s3-title">Data & Airtime</h4>
+                <p class="text-muted" id="s3-desc">Cheap data for MTN, Airtel, Glo and 9Mobile.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-4 mt-5">
+    <div class="container text-center">
+        <p>&copy; 2024 Usman Data Sub. All Rights Reserved.</p>
+    </div>
+</footer>
+
+<script>
+    const translations = {
+        en: {
+            navLogin: "Login", navRegister: "Register",
+            heroTitle: "Reliable NIN & BVN Services",
+            heroSub: "Fastest way to verify NIN, BVN, and buy cheap Data/Airtime.",
+            heroBtn: "Get Started Now",
+            servicesTitle: "Our Services",
+            s1Title: "NIN Services", s1Desc: "Demographic search, validation, and tracking ID status.",
+            s2Title: "BVN Search", s2Desc: "Instant BVN search by number or phone number.",
+            s3Title: "Data & Airtime", s3Desc: "Cheap data for MTN, Airtel, Glo and 9Mobile."
+        },
+        ha: {
+            navLogin: "Shiga", navRegister: "Yi Rajista",
+            heroTitle: "Ingantaccen Sabis na NIN da BVN",
+            heroSub: "Hanya mafi sauri don tabbatar da NIN, BVN, da siyan Data/Airtime mai sauki.",
+            heroBtn: "Fara Yanzu",
+            servicesTitle: "Ayyukanmu",
+            s1Title: "Ayyukan NIN", s1Desc: "Neman bayanan mutum, tabbatarwa, da duba matsayin lambar bin kafa.",
+            s2Title: "Neman BVN", s2Desc: "Neman lambar BVN nan take ta lamba ko lambar waya.",
+            s3Title: "Data da Airtime", s3Desc: "Siyan Data mai sauki na MTN, Airtel, Glo da 9Mobile."
+        }
+    };
+
+    document.getElementById('langSwitcher').addEventListener('change', (e) => {
+        const lang = e.target.value;
+        const t = translations[lang];
+        document.getElementById('nav-login').innerText = t.navLogin;
+        document.getElementById('nav-register').innerText = t.navRegister;
+        document.getElementById('hero-title').innerText = t.heroTitle;
+        document.getElementById('hero-sub').innerText = t.heroSub;
+        document.getElementById('hero-btn').innerText = t.heroBtn;
+        document.getElementById('services-title').innerText = t.servicesTitle;
+        document.getElementById('s1-title').innerText = t.s1Title;
+        document.getElementById('s1-desc').innerText = t.s1Desc;
+        document.getElementById('s2-title').innerText = t.s2Title;
+        document.getElementById('s2-desc').innerText = t.s2Desc;
+        document.getElementById('s3-title').innerText = t.s3Title;
+        document.getElementById('s3-desc').innerText = t.s3Desc;
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Usman Data Sub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; }
+        .auth-card { max-width: 400px; margin: 50px auto; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-primary { background-color: #004a99; border: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card auth-card p-4">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-primary">USMAN DATA</h2>
+            <p id="reg-title" class="text-muted">Create your Agent Account</p>
+        </div>
+
+        <div class="mb-3">
+            <label id="lbl-name" class="form-label">Full Name / Cikakken Suna</label>
+            <input type="text" id="regName" class="form-control" placeholder="Musa Ibrahim">
+        </div>
+        <div class="mb-3">
+            <label id="lbl-email" class="form-label">Email Address</label>
+            <input type="email" id="regEmail" class="form-control" placeholder="name@example.com">
+        </div>
+        <div class="mb-3">
+            <label id="lbl-pass" class="form-label">Password / Kalmar Sirri</label>
+            <input type="password" id="regPass" class="form-control">
+        </div>
+        
+        <button class="btn btn-primary w-100 py-2 mb-3" onclick="handleRegister()" id="btn-reg">Register / Yi Rajista</button>
+        
+        <div class="text-center">
+            <span id="txt-footer">Already have an account?</span> 
+            <a href="login.html" class="text-decoration-none" id="link-login">Login here</a>
+        </div>
+    </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+  // PASTE YOUR FIREBASE CONFIG HERE
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "YOUR_DATABASE_URL",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+
+  window.handleRegister = async () => {
+    const name = document.getElementById('regName').value;
+    const email = document.getElementById('regEmail').value;
+    const pass = document.getElementById('regPass').value;
+
+    if(!name || !email || pass.length < 6) {
+        alert("Please fill all fields. Password must be 6+ chars.");
+        return;
+    }
+
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        const user = userCredential.user;
+
+        // Create User Wallet in Database
+        await set(ref(db, 'users/' + user.uid), {
+            fullName: name,
+            email: email,
+            balance: 0,
+            role: "agent",
+            createdAt: new Date().toISOString()
+        });
+
+        alert("Success! Barka da zuwa.");
+        window.location.href = "dashboard.html";
+    } catch (error) {
+        alert("Error: " + error.message);
+    }
+  };
+</script>
+</body>
+</html>

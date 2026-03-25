@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Usman Data Sub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; }
+        .auth-card { max-width: 400px; margin: 80px auto; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-primary { background-color: #004a99; border: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card auth-card p-4">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-primary">WELCOME BACK</h2>
+            <p class="text-muted">Login to your dashboard</p>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="loginEmail" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Password / Kalmar Sirri</label>
+            <input type="password" id="loginPass" class="form-control">
+        </div>
+        
+        <button class="btn btn-primary w-100 py-2 mb-3" onclick="handleLogin()">Login / Shiga</button>
+        
+        <div class="text-center">
+            <span>Don't have an account?</span> 
+            <a href="register.html" class="text-decoration-none">Register here</a>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  // PASTE THE SAME FIREBASE CONFIG HERE
+  const firebaseConfig = { /* ... same as above ... */ };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  window.handleLogin = async () => {
+    const email = document.getElementById('loginEmail').value;
+    const pass = document.getElementById('loginPass').value;
+
+    try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        window.location.href = "dashboard.html";
+    } catch (error) {
+        alert("Login Failed: " + error.message);
+    }
+  };
+</script>
+</body>
+</html>
