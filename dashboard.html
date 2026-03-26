@@ -20,14 +20,21 @@
 </head>
 <body>
 
+<!-- Mobile Navbar -->
+<nav class="navbar navbar-dark bg-primary d-md-none px-3">
+    <span class="navbar-brand fw-bold mb-0 h1">USMAN DATA</span>
+    <button class="btn btn-outline-light btn-sm" id="btn-logout-mobile"><i class="fas fa-sign-out-alt"></i> Logout</button>
+</nav>
+
 <div class="container-fluid">
     <div class="row">
+        <!-- Desktop Sidebar -->
         <div class="col-md-2 sidebar d-none d-md-block">
             <h4 class="fw-bold mb-4">USMAN DATA</h4>
             <hr>
             <nav class="nav flex-column">
                 <a class="nav-link text-white active" href="#"><i class="fas fa-home me-2"></i> Dashboard</a>
-                <a class="nav-link text-white" href="#" id="btn-logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+                <button class="btn btn-danger mt-4 w-100 fw-bold" id="btn-logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</button>
             </nav>
         </div>
 
@@ -75,7 +82,7 @@
       <div class="modal-body">
           <div id="srvBody"></div>
           <div class="loader" id="srvLoader"><i class="fas fa-spinner fa-spin fa-2x"></i></div>
-          <div id="srvExtra"></div> <!-- Used for validation results -->
+          <div id="srvExtra"></div>
       </div>
       <div class="modal-footer border-0">
           <button class="btn btn-primary w-100 fw-bold py-2" id="procBtn" style="display:none;">Proceed</button>
@@ -106,7 +113,6 @@
     // IMPORTANT: Change this if your render URL is different!
     const RENDER_URL = "https://usmandata.onrender.com";
 
-    // Global variables to hold active transaction data
     window.activeService = {};
 
     onAuthStateChanged(auth, (user) => {
@@ -121,7 +127,20 @@
                     if(data.virtual_account) {
                         document.getElementById('vAccDisplay').innerHTML = `<h5 class="text-primary mb-0">${data.bank_name}</h5><h4 class="fw-bold">${data.virtual_account}</h4>`;
                     } else {
-                        document.getElementById('vAccDisplay').innerHTML = `<button class="btn btn-sm btn-primary" onclick="window.genAcc()">Generate Funding Account</button>`;
+                        // NEW: Inject KYC form instead of just a button
+                        document.getElementById('vAccDisplay').innerHTML = `
+                            <p class="text-danger small mb-2"><i class="fas fa-shield-alt"></i> CBN Policy requires NIN or BVN to generate an account.</p>
+                            <div class="input-group mb-2">
+                                <select id="kycType" class="form-select" style="max-width: 100px;">
+                                    <option value="nin">NIN</option>
+                                    <option value="bvn">BVN</option>
+                                </select>
+                                <input type="number" id="kycNumber" class="form-control" placeholder="Enter 11-digit number">
+                            </div>
+                            <button class="btn btn-sm btn-primary w-100" id="btn-gen-acc" onclick="window.genAcc()">
+                                <i class="fas fa-plus"></i> Generate Funding Account
+                            </button>
+                        `;
                     }
                 }
             });
@@ -200,7 +219,7 @@
         else if (type === 'exam') {
             title.innerText = "Exam Pins";
             body.innerHTML = `
-                <select id="inp_exam_id" class="form-select mb-3" onchange="window.fetchExamPins()">
+                <select id="inp_exam_id" class="form-select mb-3">
                     <option value="">Loading Exams...</option>
                 </select>
                 <input type="number" id="inp_qty" class="form-control mb-3" placeholder="Quantity (e.g. 1)" value="1">
@@ -217,79 +236,83 @@
         modal.show();
     };
 
-    // --- DYNAMIC FETCHERS (FIXED) ---
+    const getArraySafely = (apiResponse) => {
+        if (!apiResponse) return [];
+        let payload = apiResponse.data || apiResponse;
+        if (Array.isArray(payload)) return payload;
+        if (payload.message) {
+            if (Array.isArray(payload.message.details)) return payload.message.details;
+            if (Array.isArray(payload.message)) return payload.message;
+        }
+        if (payload.details && Array.isArray(payload.details)) return payload.details;
+        return [];
+    };
+
     window.fetchDataPlans = async () => {
         const network = document.getElementById('inp_network').value;
         if(!network) return;
-        
         const planSelect = document.getElementById('inp_plan');
-        planSelect.innerHTML = "<option>Loading plans...</option>";
+        planSelect.innerHTML = "<option>Loading plans... <i class='fas fa-spinner fa-spin'></i></option>";
         
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=data_plans&network=${network}`);
             const data = await res.json();
+            if (!data.success) throw new Error(data.message);
+
             const plans = getArraySafely(data);
-            
             planSelect.innerHTML = "<option value=''>Select Plan...</option>";
             plans.forEach(p => {
-                // Safely grab the properties regardless of what Payscribe names them
                 const name = p.name || p.description || p.title || "Data Plan";
                 const price = p.amount || p.price || 0;
                 const code = p.plan_code || p.id || p.code || "";
-                
-                planSelect.innerHTML += `<option value="${code}" data-price="${price}">
-                    ${name} - ₦${price}
-                </option>`;
+                planSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
-        } catch(e) { planSelect.innerHTML = "<option>Error loading plans</option>"; }
+        } catch(e) { 
+            planSelect.innerHTML = `<option>Error: ${e.message}</option>`; 
+        }
     };
 
     window.fetchTVPlans = async () => {
         const service = document.getElementById('inp_service').value;
         if(!service) return;
-        
         const planSelect = document.getElementById('inp_plan');
-        planSelect.innerHTML = "<option>Loading bouquets...</option>";
+        planSelect.innerHTML = "<option>Loading bouquets... <i class='fas fa-spinner fa-spin'></i></option>";
         
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=tv_bouquets&service=${service}`);
             const data = await res.json();
-            const plans = getArraySafely(data);
+            if (!data.success) throw new Error(data.message);
 
+            const plans = getArraySafely(data);
             planSelect.innerHTML = "<option value=''>Select Bouquet...</option>";
             plans.forEach(p => {
                 const name = p.name || p.description || "Bouquet";
                 const price = p.amount || p.price || 0;
                 const code = p.plan_code || p.id || p.code || "";
-
-                planSelect.innerHTML += `<option value="${code}" data-price="${price}">
-                    ${name} - ₦${price}
-                </option>`;
+                planSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
-        } catch(e) { planSelect.innerHTML = "<option>Error loading bouquets</option>"; }
+        } catch(e) { planSelect.innerHTML = `<option>Error: ${e.message}</option>`; }
     };
 
     window.fetchExamPins = async () => {
         const examSelect = document.getElementById('inp_exam_id');
+        examSelect.innerHTML = "<option>Loading Exams... <i class='fas fa-spinner fa-spin'></i></option>";
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
             const data = await res.json();
-            const plans = getArraySafely(data);
+            if (!data.success) throw new Error(data.message);
 
+            const plans = getArraySafely(data);
             examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
             plans.forEach(p => {
                 const name = p.name || p.description || "Exam Pin";
                 const price = p.amount || p.price || 0;
                 const code = p.id || p.plan_code || p.code || "";
-
-                examSelect.innerHTML += `<option value="${code}" data-price="${price}">
-                    ${name} - ₦${price}
-                </option>`;
+                examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
-        } catch(e) { examSelect.innerHTML = "<option>Error loading exams</option>"; }
+        } catch(e) { examSelect.innerHTML = `<option>Error: ${e.message}</option>`; }
     };
 
-    // --- VALIDATORS (TV & POWER) ---
     window.validateMeterOrTV = async () => {
         const type = window.activeService.type;
         const loader = document.getElementById('srvLoader');
@@ -298,7 +321,6 @@
         
         const account = document.getElementById('inp_account').value;
         const service = document.getElementById('inp_service').value;
-        
         if(!account || !service) return alert("Please fill all details to validate.");
 
         const payload = { type, account, service };
@@ -318,38 +340,30 @@
             loader.style.display = "none";
 
             if (out.success) {
-                // Customer Name found!
-                const custName = out.data.message.details.customer_name || out.data.message.details.name;
+                const custName = out.data.message?.details?.customer_name || out.data.message?.details?.name || "Customer Verified";
                 window.activeService.customer_name = custName;
-                window.activeService.address = out.data.message.details.address || "Nigeria"; // specific to power
+                window.activeService.address = out.data.message?.details?.address || "Nigeria"; 
                 
-                extra.innerHTML = `
-                    <div class="alert alert-success mt-3">
-                        <strong>Verified Name:</strong> ${custName}
-                    </div>
-                `;
-                // Change button to Proceed to Pay
+                extra.innerHTML = `<div class="alert alert-success mt-3"><strong>Verified Name:</strong> ${custName}</div>`;
                 btn.innerText = "Pay Now";
                 btn.disabled = false;
                 btn.onclick = () => window.executeTransaction();
             } else {
-                alert("Validation Failed: " + (out.message || "Invalid details."));
+                alert("Validation Failed: " + out.message);
                 btn.disabled = false;
             }
         } catch(e) {
             loader.style.display = "none";
             btn.disabled = false;
-            alert("Server Error during validation.");
+            alert("Network Error during validation.");
         }
     };
 
-    // --- FINAL EXECUTION ROUTINE ---
     window.executeTransaction = async () => {
         const uid = auth.currentUser.uid;
         const type = window.activeService.type;
         const btn = document.getElementById('procBtn');
         
-        // Build Payload dynamically
         const payload = { uid, type, customer_name: window.activeService.customer_name, address: window.activeService.address };
         let costAmount = 0;
 
@@ -359,17 +373,17 @@
             payload.network = document.getElementById('inp_network').value;
             payload.plan = planEl.value;
             payload.phone = document.getElementById('inp_phone').value;
-            costAmount = parseFloat(planEl.options[planEl.selectedIndex].getAttribute('data-price')) + 10; // Added ₦10 profit markup
+            costAmount = parseFloat(planEl.options[planEl.selectedIndex].getAttribute('data-price')) + 10; 
         } 
         else if (type === 'airtime') {
             payload.network = document.getElementById('inp_network').value;
             payload.phone = document.getElementById('inp_phone').value;
             payload.amount = document.getElementById('inp_amount').value;
-            costAmount = parseFloat(payload.amount); // You can add markup or discount here
+            costAmount = parseFloat(payload.amount); 
         }
         else if (type === 'nin') {
             payload.nin = document.getElementById('inp_nin').value;
-            costAmount = 150; // Fixed price for NIN
+            costAmount = 150; 
         }
         else if (type === 'tv') {
             const planEl = document.getElementById('inp_plan');
@@ -377,7 +391,7 @@
             payload.plan_id = planEl.value;
             payload.account = document.getElementById('inp_account').value;
             payload.phone = document.getElementById('inp_phone').value;
-            costAmount = parseFloat(planEl.options[planEl.selectedIndex].getAttribute('data-price')) + 30; // ₦30 markup
+            costAmount = parseFloat(planEl.options[planEl.selectedIndex].getAttribute('data-price')) + 30; 
         }
         else if (type === 'power') {
             payload.service = document.getElementById('inp_service').value;
@@ -385,22 +399,22 @@
             payload.meter_type = document.getElementById('inp_meter_type').value;
             payload.amount = document.getElementById('inp_amount').value;
             payload.phone = document.getElementById('inp_phone').value;
-            costAmount = parseFloat(payload.amount) + 50; // ₦50 markup for electricity
+            costAmount = parseFloat(payload.amount) + 50; 
         }
         else if (type === 'exam') {
             const examEl = document.getElementById('inp_exam_id');
             payload.exam_id = examEl.value;
             payload.qty = document.getElementById('inp_qty').value;
             const unitPrice = parseFloat(examEl.options[examEl.selectedIndex].getAttribute('data-price'));
-            costAmount = (unitPrice * parseFloat(payload.qty)) + 50; // ₦50 markup per transaction
+            costAmount = (unitPrice * parseFloat(payload.qty)) + 50; 
         }
 
-        payload.costAmount = costAmount; // Send the final cost to the server to deduct
+        payload.costAmount = costAmount; 
 
         if(!confirm(`You are about to be charged ₦${costAmount}. Proceed?`)) return;
 
         btn.disabled = true; 
-        btn.innerText = "Processing Transaction...";
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
         document.getElementById('srvLoader').style.display = "block";
 
         try {
@@ -418,47 +432,63 @@
                         ${out.message}
                     </div>
                 `;
-                btn.style.display = "none"; // Hide button on success
+                btn.style.display = "none"; 
             } else {
                 alert(out.message || "Transaction Failed.");
                 btn.disabled = false; btn.innerText = "Try Again";
             }
         } catch(e) { 
             document.getElementById('srvLoader').style.display = "none";
-            alert("Network Error. Please check balance and try again."); 
+            alert("Network Error. Check your balance."); 
             btn.disabled = false; btn.innerText = "Process Transaction";
         }
     };
 
-    // --- VIRTUAL ACCOUNT GENERATION (FIXED ERROR DISPLAY) ---
+    // --- VIRTUAL ACCOUNT GENERATION (WITH KYC) ---
     window.genAcc = async () => {
-        const accDisplay = document.getElementById('vAccDisplay');
-        const originalHtml = accDisplay.innerHTML;
-        accDisplay.innerHTML = "Generating Account... Please wait.";
+        const kycType = document.getElementById('kycType').value;
+        const kycNumber = document.getElementById('kycNumber').value.trim();
+
+        if (kycNumber.length !== 11) {
+            return alert(`Please enter a valid 11-digit ${kycType.toUpperCase()}.`);
+        }
+
+        const btn = document.getElementById('btn-gen-acc');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Verifying details...`;
+        btn.disabled = true;
         
         try {
             const res = await fetch(`${RENDER_URL}/api/gen-account`, {
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({ uid: auth.currentUser.uid })
+                body: JSON.stringify({ 
+                    uid: auth.currentUser.uid, 
+                    kycType: kycType, 
+                    kycNumber: kycNumber 
+                })
             });
             const out = await res.json();
             
             if(!out.success) {
-                // Shows EXACTLY why Payscribe rejected it (e.g., "Email already registered")
                 alert(out.message); 
-                accDisplay.innerHTML = `<button class="btn btn-sm btn-primary" onclick="window.genAcc()">Try Again</button>`;
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
             } else {
                 alert(out.message);
-                // Firebase listener will automatically update the UI with the new account
+                // The Firebase listener will automatically replace the form with the new account numbers!
             }
         } catch(e) {
+            console.error(e);
             alert("Network Error: Could not connect to server.");
-            accDisplay.innerHTML = `<button class="btn btn-sm btn-primary" onclick="window.genAcc()">Try Again</button>`;
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
         }
     };
 
-    document.getElementById('btn-logout').onclick = () => signOut(auth).then(() => window.location.href="login.html");
+    const logout = () => signOut(auth).then(() => window.location.href="login.html");
+    document.getElementById('btn-logout').onclick = logout;
+    document.getElementById('btn-logout-mobile').onclick = logout;
 </script>
 </body>
 </html>
