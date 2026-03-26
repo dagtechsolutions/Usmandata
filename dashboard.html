@@ -127,17 +127,19 @@
                     if(data.virtual_account) {
                         document.getElementById('vAccDisplay').innerHTML = `<h5 class="text-primary mb-0">${data.bank_name}</h5><h4 class="fw-bold">${data.virtual_account}</h4>`;
                     } else {
-                        // NEW: Inject KYC form instead of just a button
+                        // NEW: Inject KYC form with a STRICT WARNING about name matching
                         document.getElementById('vAccDisplay').innerHTML = `
-                            <p class="text-danger small mb-2"><i class="fas fa-shield-alt"></i> CBN Policy requires NIN or BVN to generate an account.</p>
-                            <div class="input-group mb-2">
-                                <select id="kycType" class="form-select" style="max-width: 100px;">
+                            <div class="alert alert-warning p-2 mb-3" style="font-size:0.85rem; border-left: 4px solid #ffc107;">
+                                <i class="fas fa-info-circle text-danger"></i> <b>CBN Policy:</b> To generate an account, your registered name <b>(${data.fullName})</b> MUST exactly match the name on your BVN or NIN.
+                            </div>
+                            <div class="input-group mb-2 shadow-sm">
+                                <select id="kycType" class="form-select bg-light" style="max-width: 90px; font-weight:bold;">
                                     <option value="nin">NIN</option>
                                     <option value="bvn">BVN</option>
                                 </select>
                                 <input type="number" id="kycNumber" class="form-control" placeholder="Enter 11-digit number">
                             </div>
-                            <button class="btn btn-sm btn-primary w-100" id="btn-gen-acc" onclick="window.genAcc()">
+                            <button class="btn btn-primary w-100 fw-bold shadow-sm" id="btn-gen-acc" onclick="window.genAcc()">
                                 <i class="fas fa-plus"></i> Generate Funding Account
                             </button>
                         `;
@@ -236,15 +238,36 @@
         modal.show();
     };
 
+    // --- SMART ARRAY EXTRACTOR (GUARANTEES NO MORE UNDEFINED DROPDOWNS) ---
     const getArraySafely = (apiResponse) => {
+        console.log("RAW PAYSCRIBE RESPONSE:", apiResponse); // Check F12 Console to see exactly what came back!
+        
         if (!apiResponse) return [];
         let payload = apiResponse.data || apiResponse;
+        
+        // 1. Direct Array
         if (Array.isArray(payload)) return payload;
+        
+        // 2. Standard Payscribe Format
         if (payload.message) {
             if (Array.isArray(payload.message.details)) return payload.message.details;
             if (Array.isArray(payload.message)) return payload.message;
         }
+        
+        // 3. Fallback Format
         if (payload.details && Array.isArray(payload.details)) return payload.details;
+        
+        // 4. Aggressive Search: Loop through everything to find ANY array
+        for (let key in payload) {
+            if (Array.isArray(payload[key])) return payload[key];
+            if (payload[key] && typeof payload[key] === 'object') {
+                for (let subKey in payload[key]) {
+                    if (Array.isArray(payload[key][subKey])) return payload[key][subKey];
+                }
+            }
+        }
+        
+        console.warn("Could not locate any valid array in the response.");
         return [];
     };
 
