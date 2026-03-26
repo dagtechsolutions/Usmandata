@@ -217,7 +217,7 @@
         modal.show();
     };
 
-    // --- DYNAMIC FETCHERS ---
+    // --- DYNAMIC FETCHERS (FIXED) ---
     window.fetchDataPlans = async () => {
         const network = document.getElementById('inp_network').value;
         if(!network) return;
@@ -228,11 +228,17 @@
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=data_plans&network=${network}`);
             const data = await res.json();
+            const plans = getArraySafely(data);
+            
             planSelect.innerHTML = "<option value=''>Select Plan...</option>";
-            // Mapping Payscribe response to dropdown
-            data.data.message.details.forEach(p => {
-                planSelect.innerHTML += `<option value="${p.plan_code}" data-price="${p.amount}">
-                    ${p.name} - ₦${p.amount}
+            plans.forEach(p => {
+                // Safely grab the properties regardless of what Payscribe names them
+                const name = p.name || p.description || p.title || "Data Plan";
+                const price = p.amount || p.price || 0;
+                const code = p.plan_code || p.id || p.code || "";
+                
+                planSelect.innerHTML += `<option value="${code}" data-price="${price}">
+                    ${name} - ₦${price}
                 </option>`;
             });
         } catch(e) { planSelect.innerHTML = "<option>Error loading plans</option>"; }
@@ -248,10 +254,16 @@
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=tv_bouquets&service=${service}`);
             const data = await res.json();
+            const plans = getArraySafely(data);
+
             planSelect.innerHTML = "<option value=''>Select Bouquet...</option>";
-            data.data.message.details.forEach(p => {
-                planSelect.innerHTML += `<option value="${p.plan_code}" data-price="${p.amount}">
-                    ${p.name} - ₦${p.amount}
+            plans.forEach(p => {
+                const name = p.name || p.description || "Bouquet";
+                const price = p.amount || p.price || 0;
+                const code = p.plan_code || p.id || p.code || "";
+
+                planSelect.innerHTML += `<option value="${code}" data-price="${price}">
+                    ${name} - ₦${price}
                 </option>`;
             });
         } catch(e) { planSelect.innerHTML = "<option>Error loading bouquets</option>"; }
@@ -262,10 +274,16 @@
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
             const data = await res.json();
+            const plans = getArraySafely(data);
+
             examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
-            data.data.message.details.forEach(p => {
-                examSelect.innerHTML += `<option value="${p.id}" data-price="${p.amount}">
-                    ${p.name} - ₦${p.amount}
+            plans.forEach(p => {
+                const name = p.name || p.description || "Exam Pin";
+                const price = p.amount || p.price || 0;
+                const code = p.id || p.plan_code || p.code || "";
+
+                examSelect.innerHTML += `<option value="${code}" data-price="${price}">
+                    ${name} - ₦${price}
                 </option>`;
             });
         } catch(e) { examSelect.innerHTML = "<option>Error loading exams</option>"; }
@@ -412,17 +430,31 @@
         }
     };
 
-    // --- VIRTUAL ACCOUNT GENERATION ---
+    // --- VIRTUAL ACCOUNT GENERATION (FIXED ERROR DISPLAY) ---
     window.genAcc = async () => {
-        document.getElementById('vAccDisplay').innerHTML = "Generating...";
+        const accDisplay = document.getElementById('vAccDisplay');
+        const originalHtml = accDisplay.innerHTML;
+        accDisplay.innerHTML = "Generating Account... Please wait.";
+        
         try {
             const res = await fetch(`${RENDER_URL}/api/gen-account`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ uid: auth.currentUser.uid })
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({ uid: auth.currentUser.uid })
             });
             const out = await res.json();
-            if(!out.success) alert(out.message);
+            
+            if(!out.success) {
+                // Shows EXACTLY why Payscribe rejected it (e.g., "Email already registered")
+                alert(out.message); 
+                accDisplay.innerHTML = `<button class="btn btn-sm btn-primary" onclick="window.genAcc()">Try Again</button>`;
+            } else {
+                alert(out.message);
+                // Firebase listener will automatically update the UI with the new account
+            }
         } catch(e) {
-            document.getElementById('vAccDisplay').innerHTML = `<button class="btn btn-sm btn-primary" onclick="window.genAcc()">Try Again</button>`;
+            alert("Network Error: Could not connect to server.");
+            accDisplay.innerHTML = `<button class="btn btn-sm btn-primary" onclick="window.genAcc()">Try Again</button>`;
         }
     };
 
