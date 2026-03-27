@@ -467,8 +467,7 @@
         }
     };
 
-    // --- VIRTUAL ACCOUNT GENERATION (WITH KYC) ---
-
+// --- VIRTUAL ACCOUNT GENERATION (WITH KYC) ---
     window.genAcc = async () => {
         const kycType = document.getElementById('kycType').value;
         const kycNumber = document.getElementById('kycNumber').value.trim();
@@ -493,7 +492,6 @@
                 })
             });
 
-            // Catch 404s before trying to parse JSON
             if (!res.ok && res.status === 404) {
                 throw new Error("Server not found. Please check RENDER_URL.");
             }
@@ -506,8 +504,10 @@
                 btn.disabled = false;
             } else {
                 alert(out.message);
-                btn.innerHTML = `<i class="fas fa-check"></i> Processing...`;
-                // The Firebase listener will automatically replace the form with the new account numbers once the webhook fires!
+                // Keep the button spinning because the webhook is working in the background
+                btn.innerHTML = `<i class="fas fa-cog fa-spin"></i> Awaiting Bank...`;
+                // The Firebase listener (onAuthStateChanged) will automatically replace the entire form 
+                // with the new account numbers the exact second the webhook saves them to the database!
             }
         } catch(e) {
             console.error(e);
