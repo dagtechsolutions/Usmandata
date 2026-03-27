@@ -468,6 +468,7 @@
     };
 
     // --- VIRTUAL ACCOUNT GENERATION (WITH KYC) ---
+
     window.genAcc = async () => {
         const kycType = document.getElementById('kycType').value;
         const kycNumber = document.getElementById('kycNumber').value.trim();
@@ -478,7 +479,7 @@
 
         const btn = document.getElementById('btn-gen-acc');
         const originalHtml = btn.innerHTML;
-        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Verifying details...`;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
         btn.disabled = true;
         
         try {
@@ -491,6 +492,12 @@
                     kycNumber: kycNumber 
                 })
             });
+
+            // Catch 404s before trying to parse JSON
+            if (!res.ok && res.status === 404) {
+                throw new Error("Server not found. Please check RENDER_URL.");
+            }
+
             const out = await res.json();
             
             if(!out.success) {
@@ -499,16 +506,16 @@
                 btn.disabled = false;
             } else {
                 alert(out.message);
-                // The Firebase listener will automatically replace the form with the new account numbers!
+                btn.innerHTML = `<i class="fas fa-check"></i> Processing...`;
+                // The Firebase listener will automatically replace the form with the new account numbers once the webhook fires!
             }
         } catch(e) {
             console.error(e);
-            alert("Network Error: Could not connect to server.");
+            alert("Connection Error: " + e.message);
             btn.innerHTML = originalHtml;
             btn.disabled = false;
         }
     };
-
     const logout = () => signOut(auth).then(() => window.location.href="login.html");
     document.getElementById('btn-logout').onclick = logout;
     document.getElementById('btn-logout-mobile').onclick = logout;
