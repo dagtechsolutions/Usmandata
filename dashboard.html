@@ -239,62 +239,105 @@
     };
 
     // --- SMART ARRAY EXTRACTOR (GUARANTEES NO MORE UNDEFINED DROPDOWNS) ---
-    const getArraySafely = (apiResponse) => {
-        console.log("RAW PAYSCRIBE RESPONSE:", apiResponse); // Check F12 Console to see exactly what came back!
+    // Replace the getArraySafely function in dashboard.html with this:
+
+const getArraySafely = (apiResponse) => {
+    console.log("RAW API RESPONSE:", apiResponse);
+    
+    if (!apiResponse) return [];
+    
+    // Try to get the data from different structures
+    let payload = apiResponse.data || apiResponse;
+    
+    // Payscribe standard format
+    if (payload.message) {
+        if (Array.isArray(payload.message.details)) return payload.message.details;
+        if (Array.isArray(payload.message)) return payload.message;
+    }
+    
+    // Direct array
+    if (Array.isArray(payload)) return payload;
+    
+    // Details array
+    if (payload.details && Array.isArray(payload.details)) return payload.details;
+    
+    // Try to find any array in the response
+    for (let key in payload) {
+        if (Array.isArray(payload[key]) && payload[key].length > 0) {
+            return payload[key];
+        }
+    }
+    
+    console.warn("No array found in response. Response structure:", Object.keys(payload));
+    return [];
+};
+
+// Also fix the fetchDataPlans function:
+window.fetchDataPlans = async () => {
+    const network = document.getElementById('inp_network').value;
+    if(!network) return;
+    const planSelect = document.getElementById('inp_plan');
+    planSelect.innerHTML = "<option>Loading plans...</option>";
+    
+    try {
+        const res = await fetch(`${RENDER_URL}/api/fetch-data?action=data_plans&network=${network}`);
+        const data = await res.json();
         
-        if (!apiResponse) return [];
-        let payload = apiResponse.data || apiResponse;
+        if (!data.success) throw new Error(data.message);
+
+        const plans = getArraySafely(data);
         
-        // 1. Direct Array
-        if (Array.isArray(payload)) return payload;
-        
-        // 2. Standard Payscribe Format
-        if (payload.message) {
-            if (Array.isArray(payload.message.details)) return payload.message.details;
-            if (Array.isArray(payload.message)) return payload.message;
+        if (plans.length === 0) {
+            throw new Error("No plans found for this network");
         }
         
-        // 3. Fallback Format
-        if (payload.details && Array.isArray(payload.details)) return payload.details;
-        
-        // 4. Aggressive Search: Loop through everything to find ANY array
-        for (let key in payload) {
-            if (Array.isArray(payload[key])) return payload[key];
-            if (payload[key] && typeof payload[key] === 'object') {
-                for (let subKey in payload[key]) {
-                    if (Array.isArray(payload[key][subKey])) return payload[key][subKey];
-                }
-            }
-        }
-        
-        console.warn("Could not locate any valid array in the response.");
-        return [];
-    };
-
-    window.fetchDataPlans = async () => {
-        const network = document.getElementById('inp_network').value;
-        if(!network) return;
-        const planSelect = document.getElementById('inp_plan');
-        planSelect.innerHTML = "<option>Loading plans... <i class='fas fa-spinner fa-spin'></i></option>";
-        
-        try {
-            const res = await fetch(`${RENDER_URL}/api/fetch-data?action=data_plans&network=${network}`);
-            const data = await res.json();
-            if (!data.success) throw new Error(data.message);
-
-            const plans = getArraySafely(data);
-            planSelect.innerHTML = "<option value=''>Select Plan...</option>";
-            plans.forEach(p => {
-                const name = p.name || p.description || p.title || "Data Plan";
-                const price = p.amount || p.price || 0;
-                const code = p.plan_code || p.id || p.code || "";
+        planSelect.innerHTML = "<option value=''>Select Plan...</option>";
+        plans.forEach(p => {
+            const name = p.name || p.title || p.description || "Data Plan";
+            const price = p.amount || p.price || 0;
+            const code = p.plan_code || p.id || p.code;
+            
+            if (code) {
                 planSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
-            });
-        } catch(e) { 
-            planSelect.innerHTML = `<option>Error: ${e.message}</option>`; 
-        }
-    };
+            }
+        });
+    } catch(e) { 
+        console.error("Fetch plans error:", e);
+        planSelect.innerHTML = `<option>Error: ${e.message}</option>`; 
+    }
+};
 
+// Fix fetchExamPins:
+window.fetchExamPins = async () => {
+    const examSelect = document.getElementById('inp_exam_id');
+    examSelect.innerHTML = "<option>Loading Exams...</option>";
+    try {
+        const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
+        const data = await res.json();
+        
+        if (!data.success) throw new Error(data.message);
+
+        const pins = getArraySafely(data);
+        
+        if (pins.length === 0) {
+            throw new Error("No exam pins available");
+        }
+        
+        examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
+        pins.forEach(p => {
+            const name = p.name || p.title || "Exam Pin";
+            const price = p.amount || p.price || 0;
+            const code = p.id || p.plan_code || p.code;
+            
+            if (code) {
+                examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
+            }
+        });
+    } catch(e) { 
+        console.error("Fetch exam pins error:", e);
+        examSelect.innerHTML = `<option>Error: ${e.message}</option>`; 
+    }
+};
     window.fetchTVPlans = async () => {
         const service = document.getElementById('inp_service').value;
         if(!service) return;
@@ -317,24 +360,7 @@
         } catch(e) { planSelect.innerHTML = `<option>Error: ${e.message}</option>`; }
     };
 
-    window.fetchExamPins = async () => {
-        const examSelect = document.getElementById('inp_exam_id');
-        examSelect.innerHTML = "<option>Loading Exams... <i class='fas fa-spinner fa-spin'></i></option>";
-        try {
-            const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
-            const data = await res.json();
-            if (!data.success) throw new Error(data.message);
-
-            const plans = getArraySafely(data);
-            examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
-            plans.forEach(p => {
-                const name = p.name || p.description || "Exam Pin";
-                const price = p.amount || p.price || 0;
-                const code = p.id || p.plan_code || p.code || "";
-                examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
-            });
-        } catch(e) { examSelect.innerHTML = `<option>Error: ${e.message}</option>`; }
-    };
+    
 
     window.validateMeterOrTV = async () => {
         const type = window.activeService.type;
