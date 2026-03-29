@@ -246,8 +246,8 @@ if (type === 'data') {
     };
 
     // --- SMART ARRAY EXTRACTOR (GUARANTEES NO MORE UNDEFINED DROPDOWNS) ---
-    // ==========================================
-    // DYNAMIC FETCHERS (PERFECTLY MAPPED TO PAYSCRIBE)
+// ==========================================
+    // DYNAMIC FETCHERS (STRICT PATHS)
     // ==========================================
     window.fetchDataPlans = async () => {
         const network = document.getElementById('inp_network').value;
@@ -262,8 +262,14 @@ if (type === 'data') {
             
             if (!result.success) throw new Error(result.message);
 
-            // EXACT PATH from your working Postman demo
-            const plans = result.data?.message?.details?.[0]?.plans || [];
+            // EXACT PATH from Payscribe Demo
+            const details = result.data?.message?.details;
+            let plans = [];
+            if (details && details[0] && details[0].plans) {
+                plans = details[0].plans; // This bypasses the "MTN Data" wrapper!
+            } else if (Array.isArray(details)) {
+                plans = details;
+            }
 
             if (plans.length === 0) {
                 planSelect.innerHTML = "<option value=''>No plans available</option>";
@@ -272,9 +278,9 @@ if (type === 'data') {
 
             planSelect.innerHTML = "<option value=''>Select Plan...</option>";
             plans.forEach(plan => {
-                const name = plan.name || "Data Plan";
-                const price = plan.amount || 0;
-                const code = plan.plan_code || ""; 
+                const name = plan.name || plan.description || "Data Plan";
+                const price = plan.amount || plan.price || 0;
+                const code = plan.plan_code || plan.id || ""; 
                 
                 planSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
@@ -297,7 +303,7 @@ if (type === 'data') {
             
             if (!result.success) throw new Error(result.message);
 
-            // EXACT PATH for TV Bouquets
+            // EXACT PATH for TV
             const bouquets = result.data?.message?.details || [];
 
             if (bouquets.length === 0) {
@@ -309,19 +315,18 @@ if (type === 'data') {
             bouquets.forEach(b => {
                 const name = b.name || "Bouquet";
                 const price = b.amount || 0;
-                const code = b.id || b.plan_code || ""; // TV uses 'id' 
+                const code = b.id || b.plan_code || ""; // TV uses 'id'
                 
                 planSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
         } catch(e) { 
-            console.error(e);
             planSelect.innerHTML = `<option value="">Error connecting to server</option>`; 
         }
     };
 
     window.fetchExamPins = async () => {
         const examSelect = document.getElementById('inp_exam_id');
-        examSelect.innerHTML = "<option>Loading Exams... <i class='fas fa-spinner fa-spin'></i></option>";
+        examSelect.innerHTML = "<option>Loading Exams...</option>";
         
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
@@ -329,7 +334,7 @@ if (type === 'data') {
             
             if (!result.success) throw new Error(result.message);
 
-            // EXACT PATH for Exam Pins
+            // EXACT PATH for Exams
             const pins = result.data?.message?.details || [];
 
             if (pins.length === 0) {
@@ -339,17 +344,17 @@ if (type === 'data') {
 
             examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
             pins.forEach(pin => {
-                const name = pin.title || pin.name || "Exam Pin"; // Exam uses 'title'
+                const name = pin.title || pin.name || "Exam Pin"; // Exams use 'title'
                 const price = pin.amount || 0;
-                const code = pin.id || ""; // Exam uses 'id'
+                const code = pin.id || ""; 
                 
                 examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
         } catch(e) { 
-            console.error(e);
             examSelect.innerHTML = `<option value="">Error connecting to server</option>`; 
         }
     };
+
 
     // --- VALIDATORS (TV & POWER FIXED) ---
     window.validateMeterOrTV = async () => {
@@ -513,7 +518,9 @@ if (type === 'data') {
         }
     };
 
-// --- VIRTUAL ACCOUNT GENERATION (FIXED ROUTING ERROR) ---
+    // ===================================
+    // VIRTUAL ACCOUNT (WITH ACCURATE ERROR LOGGING)
+    // ===================================
     window.genAcc = async () => {
         const kycType = document.getElementById('kycType').value;
         const kycNumber = document.getElementById('kycNumber').value.trim();
@@ -528,17 +535,9 @@ if (type === 'data') {
         btn.disabled = true;
         
         try {
-            // FIX: Removed any accidental trailing slashes that cause 301 Redirects to GET
-            const endpoint = `${RENDER_URL}/api/gen-account`;
-            
-            console.log(`Sending POST request to: ${endpoint}`); // Debugging check
-            
-            const res = await fetch(endpoint, {
+            const res = await fetch(`${RENDER_URL}/api/gen-account`, {
                 method: 'POST', 
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }, 
+                headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
                     uid: auth.currentUser.uid, 
                     kycType: kycType, 
@@ -546,24 +545,20 @@ if (type === 'data') {
                 })
             });
 
-            // If the server still says "Not Found", it's a deployment issue
-            if (res.status === 404) {
-                throw new Error(`Endpoint not found. Make sure server.js is fully deployed to ${RENDER_URL}`);
-            }
+            if (!res.ok && res.status === 404) throw new Error("Backend server not found.");
 
             const out = await res.json();
             
             if(!out.success) {
+                // Shows the EXACT reason Payscribe rejected it
                 alert(out.message); 
                 btn.innerHTML = originalHtml;
                 btn.disabled = false;
             } else {
                 alert(out.message);
                 btn.innerHTML = `<i class="fas fa-cog fa-spin"></i> Awaiting Bank...`;
-                // Firebase will auto-update the UI when the webhook fires
             }
         } catch(e) {
-            console.error("Connection Error:", e);
             alert("Connection Error: " + e.message);
             btn.innerHTML = originalHtml;
             btn.disabled = false;
