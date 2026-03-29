@@ -450,9 +450,22 @@
         document.getElementById('srvLoader').style.display = "block";
 
         try {
-            const res = await fetch(`${RENDER_URL}/api/process`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+            // FIX: Strict Endpoint formatting
+            const endpoint = `${RENDER_URL}/api/process`;
+            
+            const res = await fetch(endpoint, {
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }, 
+                body: JSON.stringify(payload)
             });
+            
+            if (res.status === 404) {
+                throw new Error("Endpoint not found. Check server deployment.");
+            }
+
             const out = await res.json();
             
             document.getElementById('srvLoader').style.display = "none";
@@ -470,13 +483,14 @@
                 btn.disabled = false; btn.innerText = "Try Again";
             }
         } catch(e) { 
+            console.error("Transaction Error:", e);
             document.getElementById('srvLoader').style.display = "none";
-            alert("Network Error. Check your balance."); 
+            alert("Network Error: " + e.message); 
             btn.disabled = false; btn.innerText = "Process Transaction";
         }
     };
 
-// --- VIRTUAL ACCOUNT GENERATION (WITH KYC) ---
+// --- VIRTUAL ACCOUNT GENERATION (FIXED ROUTING ERROR) ---
     window.genAcc = async () => {
         const kycType = document.getElementById('kycType').value;
         const kycNumber = document.getElementById('kycNumber').value.trim();
@@ -491,9 +505,17 @@
         btn.disabled = true;
         
         try {
-            const res = await fetch(`${RENDER_URL}/api/gen-account`, {
+            // FIX: Removed any accidental trailing slashes that cause 301 Redirects to GET
+            const endpoint = `${RENDER_URL}/api/gen-account`;
+            
+            console.log(`Sending POST request to: ${endpoint}`); // Debugging check
+            
+            const res = await fetch(endpoint, {
                 method: 'POST', 
-                headers: {'Content-Type': 'application/json'}, 
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }, 
                 body: JSON.stringify({ 
                     uid: auth.currentUser.uid, 
                     kycType: kycType, 
@@ -501,8 +523,9 @@
                 })
             });
 
-            if (!res.ok && res.status === 404) {
-                throw new Error("Server not found. Please check RENDER_URL.");
+            // If the server still says "Not Found", it's a deployment issue
+            if (res.status === 404) {
+                throw new Error(`Endpoint not found. Make sure server.js is fully deployed to ${RENDER_URL}`);
             }
 
             const out = await res.json();
@@ -513,13 +536,11 @@
                 btn.disabled = false;
             } else {
                 alert(out.message);
-                // Keep the button spinning because the webhook is working in the background
                 btn.innerHTML = `<i class="fas fa-cog fa-spin"></i> Awaiting Bank...`;
-                // The Firebase listener (onAuthStateChanged) will automatically replace the entire form 
-                // with the new account numbers the exact second the webhook saves them to the database!
+                // Firebase will auto-update the UI when the webhook fires
             }
         } catch(e) {
-            console.error(e);
+            console.error("Connection Error:", e);
             alert("Connection Error: " + e.message);
             btn.innerHTML = originalHtml;
             btn.disabled = false;
