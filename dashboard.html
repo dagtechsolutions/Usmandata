@@ -336,6 +336,7 @@
         } catch(e) { examSelect.innerHTML = `<option>Error: ${e.message}</option>`; }
     };
 
+    // --- VALIDATORS (TV & POWER FIXED) ---
     window.validateMeterOrTV = async () => {
         const type = window.activeService.type;
         const loader = document.getElementById('srvLoader');
@@ -344,12 +345,20 @@
         
         const account = document.getElementById('inp_account').value;
         const service = document.getElementById('inp_service').value;
+        
         if(!account || !service) return alert("Please fill all details to validate.");
 
         const payload = { type, account, service };
+        
         if(type === 'power') {
             payload.meter_type = document.getElementById('inp_meter_type').value;
             payload.amount = document.getElementById('inp_amount').value;
+        } else if (type === 'tv') {
+            // FIX: TV Validation Requires plan_id and month
+            const planEl = document.getElementById('inp_plan');
+            if(!planEl.value) return alert("Please select a Bouquet plan first.");
+            payload.plan_id = planEl.value;
+            payload.month = 1;
         }
 
         loader.style.display = "block";
