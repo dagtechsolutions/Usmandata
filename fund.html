@@ -2,27 +2,69 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fund Wallet | Usman Data</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Inter', sans-serif; }
+        .fund-card { max-width: 450px; margin: 60px auto; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: none; overflow: hidden; }
+        .bank-box { background: linear-gradient(135deg, #004a99, #007bff); color: white; padding: 30px 20px; text-align: center; position: relative; }
+        .bank-box::after { content: ''; position: absolute; bottom: -15px; left: 0; width: 100%; height: 30px; background: white; transform: skewY(-3deg); }
+        .acc-number { font-size: 2.8rem; font-weight: 900; letter-spacing: 4px; font-family: monospace; margin: 15px 0 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .acc-name { font-size: 1.1rem; font-weight: 600; text-transform: uppercase; color: #e2e8f0; letter-spacing: 1px; }
+        .copy-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 8px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; }
+        .copy-btn:hover { background: white; color: #004a99; }
+        .info-list { padding: 30px 20px 20px; }
+        .info-item { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; color: #475569; font-size: 0.95rem; }
+        .info-icon { background: #eff6ff; color: #004a99; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+    </style>
 </head>
-<body class="bg-light">
-    <div class="container py-5 text-center">
-        <div class="card shadow-sm border-0 mx-auto" style="max-width: 400px; border-radius: 20px;">
-            <div class="card-body">
-                <h4 class="fw-bold">Wallet Funding</h4>
-                <p class="text-muted">Pay to the account below for instant funding.</p>
-                <div id="accBox" class="bg-primary text-white p-4 rounded-4 mb-3">
-                    <h2 id="accNo">---</h2>
-                    <h5 id="bankName">Loading Bank...</h5>
+<body>
+
+    <div class="container">
+        <div class="card fund-card">
+            
+            <div class="bank-box" id="accBox">
+                <div style="font-size: 0.9rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #bae6fd;">
+                    <i class="fas fa-university"></i> <span id="bankName">Loading Bank...</span>
                 </div>
-                <button class="btn btn-dark w-100" onclick="window.location.href='dashboard.html'">Back</button>
+                
+                <div class="acc-number" id="accNo">------</div>
+                <div class="acc-name" id="accName">Loading Name...</div>
+                
+                <button class="copy-btn" id="copyBtn" onclick="copyAccount()">
+                    <i class="fas fa-copy"></i> Copy Account Number
+                </button>
             </div>
+
+            <div class="info-list">
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-bolt"></i></div>
+                    <div>Transfers to this account are credited to your wallet <b>instantly</b>.</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-coins"></i></div>
+                    <div>A standard bank fee of <b>₦50</b> is deducted for deposits below ₦10,000.</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div>This account is strictly dedicated to your wallet. Do not share it.</div>
+                </div>
+
+                <button class="btn btn-dark w-100 py-3 mt-4 fw-bold" style="border-radius: 12px;" onclick="window.location.href='dashboard.html'">
+                    <i class="fas fa-arrow-left"></i> Return to Dashboard
+                </button>
+            </div>
+
         </div>
     </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
         const firebaseConfig = {
             apiKey: "AIzaSyAmJIfWsqFVHyP-F3W85u4UbbxANMQaOTw",
             authDomain: "usmandatasub-7f93c.firebaseapp.com",
@@ -40,11 +82,38 @@
             if (user) {
                 onValue(ref(db, 'users/' + user.uid), (snapshot) => {
                     const data = snapshot.val();
-                    document.getElementById('accNo').innerText = data.virtual_account || "NOT GENERATED";
-                    document.getElementById('bankName').innerText = data.bank_name || "Go to Dashboard to generate";
+                    if (data.virtual_account) {
+                        document.getElementById('accNo').innerText = data.virtual_account;
+                        document.getElementById('bankName').innerText = data.bank_name || "9PSB Bank";
+                        document.getElementById('accName').innerText = data.fullName;
+                        document.getElementById('copyBtn').style.display = "inline-block";
+                    } else {
+                        document.getElementById('accNo').innerText = "NOT GENERATED";
+                        document.getElementById('bankName').innerText = "Action Required";
+                        document.getElementById('accName').innerText = "Please generate an account on the Dashboard.";
+                        document.getElementById('copyBtn').style.display = "none";
+                    }
                 });
+            } else {
+                window.location.href = "login.html";
             }
         });
+
+        window.copyAccount = () => {
+            const accNo = document.getElementById('accNo').innerText;
+            if (accNo && accNo !== "NOT GENERATED" && accNo !== "------") {
+                navigator.clipboard.writeText(accNo);
+                const btn = document.getElementById('copyBtn');
+                btn.innerHTML = `<i class="fas fa-check"></i> Copied!`;
+                btn.style.background = "white";
+                btn.style.color = "#004a99";
+                setTimeout(() => {
+                    btn.innerHTML = `<i class="fas fa-copy"></i> Copy Account Number`;
+                    btn.style.background = "rgba(255,255,255,0.2)";
+                    btn.style.color = "white";
+                }, 2000);
+            }
+        };
     </script>
 </body>
 </html>
