@@ -239,101 +239,109 @@
     };
 
     // --- SMART ARRAY EXTRACTOR (GUARANTEES NO MORE UNDEFINED DROPDOWNS) ---
-    const getArraySafely = (apiResponse) => {
-        console.log("RAW PAYSCRIBE RESPONSE:", apiResponse); // Check F12 Console to see exactly what came back!
-        
-        if (!apiResponse) return [];
-        let payload = apiResponse.data || apiResponse;
-        
-        // 1. Direct Array
-        if (Array.isArray(payload)) return payload;
-        
-        // 2. Standard Payscribe Format
-        if (payload.message) {
-            if (Array.isArray(payload.message.details)) return payload.message.details;
-            if (Array.isArray(payload.message)) return payload.message;
-        }
-        
-        // 3. Fallback Format
-        if (payload.details && Array.isArray(payload.details)) return payload.details;
-        
-        // 4. Aggressive Search: Loop through everything to find ANY array
-        for (let key in payload) {
-            if (Array.isArray(payload[key])) return payload[key];
-            if (payload[key] && typeof payload[key] === 'object') {
-                for (let subKey in payload[key]) {
-                    if (Array.isArray(payload[key][subKey])) return payload[key][subKey];
-                }
-            }
-        }
-        
-        console.warn("Could not locate any valid array in the response.");
-        return [];
-    };
-
+    // ==========================================
+    // DYNAMIC FETCHERS (PERFECTLY MAPPED TO PAYSCRIBE)
+    // ==========================================
     window.fetchDataPlans = async () => {
         const network = document.getElementById('inp_network').value;
         if(!network) return;
+        
         const planSelect = document.getElementById('inp_plan');
         planSelect.innerHTML = "<option>Loading plans... <i class='fas fa-spinner fa-spin'></i></option>";
         
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=data_plans&network=${network}`);
-            const data = await res.json();
-            if (!data.success) throw new Error(data.message);
+            const result = await res.json();
+            
+            if (!result.success) throw new Error(result.message);
 
-            const plans = getArraySafely(data);
+            // EXACT PATH from your working Postman demo
+            const plans = result.data?.message?.details?.[0]?.plans || [];
+
+            if (plans.length === 0) {
+                planSelect.innerHTML = "<option value=''>No plans available</option>";
+                return;
+            }
+
             planSelect.innerHTML = "<option value=''>Select Plan...</option>";
-            plans.forEach(p => {
-                const name = p.name || p.description || p.title || "Data Plan";
-                const price = p.amount || p.price || 0;
-                const code = p.plan_code || p.id || p.code || "";
+            plans.forEach(plan => {
+                const name = plan.name || "Data Plan";
+                const price = plan.amount || 0;
+                const code = plan.plan_code || ""; 
+                
                 planSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
         } catch(e) { 
-            planSelect.innerHTML = `<option>Error: ${e.message}</option>`; 
+            console.error(e);
+            planSelect.innerHTML = `<option value="">Error connecting to server</option>`; 
         }
     };
 
     window.fetchTVPlans = async () => {
         const service = document.getElementById('inp_service').value;
         if(!service) return;
+        
         const planSelect = document.getElementById('inp_plan');
         planSelect.innerHTML = "<option>Loading bouquets... <i class='fas fa-spinner fa-spin'></i></option>";
         
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=tv_bouquets&service=${service}`);
-            const data = await res.json();
-            if (!data.success) throw new Error(data.message);
+            const result = await res.json();
+            
+            if (!result.success) throw new Error(result.message);
 
-            const plans = getArraySafely(data);
+            // EXACT PATH from your working Postman demo
+            const bouquets = result.data?.message?.details || [];
+
+            if (bouquets.length === 0) {
+                planSelect.innerHTML = "<option value=''>No bouquets available</option>";
+                return;
+            }
+
             planSelect.innerHTML = "<option value=''>Select Bouquet...</option>";
-            plans.forEach(p => {
-                const name = p.name || p.description || "Bouquet";
-                const price = p.amount || p.price || 0;
-                const code = p.plan_code || p.id || p.code || "";
+            bouquets.forEach(b => {
+                const name = b.name || "Bouquet";
+                const price = b.amount || 0;
+                const code = b.id || b.plan_code || ""; // TV uses 'id' instead of plan_code
+                
                 planSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
-        } catch(e) { planSelect.innerHTML = `<option>Error: ${e.message}</option>`; }
+        } catch(e) { 
+            console.error(e);
+            planSelect.innerHTML = `<option value="">Error connecting to server</option>`; 
+        }
     };
 
     window.fetchExamPins = async () => {
         const examSelect = document.getElementById('inp_exam_id');
         examSelect.innerHTML = "<option>Loading Exams... <i class='fas fa-spinner fa-spin'></i></option>";
+        
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
-            const data = await res.json();
-            if (!data.success) throw new Error(data.message);
+            const result = await res.json();
+            
+            if (!result.success) throw new Error(result.message);
 
-            const plans = getArraySafely(data);
+            // EXACT PATH from your working Postman demo
+            const pins = result.data?.message?.details || [];
+
+            if (pins.length === 0) {
+                examSelect.innerHTML = "<option value=''>No exams available</option>";
+                return;
+            }
+
             examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
-            plans.forEach(p => {
-                const name = p.name || p.description || "Exam Pin";
-                const price = p.amount || p.price || 0;
-                const code = p.id || p.plan_code || p.code || "";
+            pins.forEach(pin => {
+                const name = pin.title || pin.name || "Exam Pin"; // Exam uses 'title'
+                const price = pin.amount || 0;
+                const code = pin.id || ""; // Exam uses 'id'
+                
                 examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
-        } catch(e) { examSelect.innerHTML = `<option>Error: ${e.message}</option>`; }
+        } catch(e) { 
+            console.error(e);
+            examSelect.innerHTML = `<option value="">Error connecting to server</option>`; 
+        }
     };
 
     // --- VALIDATORS (TV & POWER FIXED) ---
