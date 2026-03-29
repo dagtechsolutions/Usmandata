@@ -7,233 +7,89 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- SHEETJS FOR EXCEL UPLOADS -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
-
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #f5f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; min-height: 100vh; }
-        .main-content { flex: 1; }
-        
-        /* SIDEBAR */
-        .sidebar { background: linear-gradient(135deg, #004a99, #0066cc); color: white; min-height: 100vh; padding: 25px; position: sticky; top: 0; box-shadow: 0 4px 12px rgba(0,74,153,0.15); }
-        .sidebar h4 { font-weight: 800; letter-spacing: 1px; margin-bottom: 30px; }
-        .sidebar .nav-link { color: rgba(255,255,255,0.8); transition: 0.3s; border-radius: 8px; padding: 12px 15px; margin-bottom: 10px; }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.15); color: white; }
-        
-        /* BALANCE CARD */
-        .balance-card { background: linear-gradient(135deg, #004a99, #0066cc); color: white; border-radius: 20px; padding: 35px; margin-bottom: 30px; box-shadow: 0 8px 20px rgba(0,74,153,0.25); }
-        .balance-card h1 { font-size: 2.5rem; font-weight: 900; margin: 15px 0; }
-        .balance-card p { opacity: 0.9; font-size: 0.95rem; }
-        .balance-card .btn { border-radius: 10px; padding: 10px 20px; font-weight: 600; transition: 0.3s; }
-        .balance-card .btn:hover { transform: translateY(-2px); }
-        
-        /* SERVICE BUTTONS GRID */
-        .service-btn { 
-            background: white; border: none; border-radius: 15px; padding: 25px 15px; 
-            text-align: center; transition: 0.3s; width: 100%; height: 100%; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer; 
-        }
-        .service-btn:hover { 
-            transform: translateY(-8px); box-shadow: 0 12px 25px rgba(0,74,153,0.15); 
-            border: 2px solid #004a99; 
-        }
-        .service-btn i { font-size: 2.2rem; color: #004a99; margin-bottom: 12px; }
-        .srv-name { font-weight: 700; font-size: 0.9rem; color: #333; }
-        .loader { display: none; text-align: center; margin: 20px 0; color: #004a99; }
-        
-        /* VIRTUAL ACCOUNT */
-        .vacc-box { 
-            background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid #004a99; 
-        }
-        .vacc-display { 
-            background: linear-gradient(135deg, #f0f4fa, #e8f0fb); 
-            padding: 20px; border-radius: 12px; border: 1px solid #d0dce8; 
-            position: relative; overflow: hidden; 
-        }
-        .vacc-bank { font-size: 0.85rem; color: #666; font-weight: bold; text-transform: uppercase; }
-        .vacc-number { color: #004a99; font-weight: 900; font-size: 1.4rem; letter-spacing: 2px; font-family: 'Courier New', monospace; }
-        .vacc-name { color: #555; font-weight: 600; margin-top: 8px; font-size: 0.95rem; }
-        .vacc-badge { background: #dcfce7; color: #166534; font-size: 0.7rem; padding: 5px 12px; border-radius: 20px; font-weight: bold; }
-        
-        /* MODAL & PLAN CARDS */
-        .modal-content { border-radius: 20px; border: none; }
-        .modal-header { border-bottom: 1px solid #e2e8f0; padding: 25px; }
-        .modal-title { font-weight: 800; color: #004a99; }
-        .modal-body { padding: 25px; }
-        .modal-footer { border-top: 1px solid #e2e8f0; padding: 20px; }
-        
-        /* CATEGORY TABS FOR DATA PLANS */
-        .category-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .category-tab { 
-            background: white; border: 2px solid #e2e8f0; border-radius: 10px; 
-            padding: 10px 20px; cursor: pointer; transition: 0.3s; font-weight: 600; 
-            color: #666; font-size: 0.9rem; 
-        }
-        .category-tab:hover, .category-tab.active { 
-            background: #004a99; color: white; border-color: #004a99; 
-        }
-        
-        /* PLAN CARDS */
-        .plan-card {
-            background: white; border: 1px solid #e2e8f0; border-radius: 12px; 
-            padding: 18px 12px; text-align: center; cursor: pointer; transition: 0.3s; 
-            height: 100%; display: flex; flex-direction: column; justify-content: center; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
-        }
-        .plan-card:hover { 
-            border-color: #004a99; transform: translateY(-4px); 
-            box-shadow: 0 8px 16px rgba(0,74,153,0.12); 
-        }
-        .plan-card.active { 
-            background: #004a99; color: white; border-color: #004a99; 
-            box-shadow: 0 6px 16px rgba(0,74,153,0.25); 
-        }
-        .plan-title { font-weight: 800; font-size: 1rem; margin-bottom: 5px; }
-        .plan-desc { font-size: 0.75rem; color: #999; margin-bottom: 8px; }
-        .plan-price { font-weight: 700; color: #004a99; font-size: 1.1rem; }
-        .plan-card.active .plan-desc, .plan-card.active .plan-price { color: #e2e8f0; }
-        
-        /* INPUT STYLING */
-        .form-control, .form-select { 
-            border-radius: 10px; border: 1px solid #e2e8f0; 
-            padding: 12px 15px; font-size: 0.95rem; 
-        }
-        .form-control:focus, .form-select:focus { 
-            border-color: #004a99; box-shadow: 0 0 0 3px rgba(0,74,153,0.1); 
-        }
-        
-        /* BUTTONS */
-        .btn-primary { background: #004a99; border: none; border-radius: 10px; font-weight: 600; }
-        .btn-primary:hover { background: #003366; }
-        
-        /* FOOTER & WHATSAPP */
-        .whatsapp-float { 
-            position: fixed; bottom: 20px; right: 20px; background: #25D366; 
-            color: white; width: 55px; height: 55px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; font-size: 30px; 
-            box-shadow: 0 4px 15px rgba(37,211,102,0.4); z-index: 1000; transition: 0.3s; 
-            text-decoration: none; 
-        }
-        .whatsapp-float:hover { transform: scale(1.1); }
-        .footer-premium { 
-            background: #1e293b; color: #94a3b8; padding: 25px; 
-            text-align: center; font-size: 0.85rem; margin-top: auto; 
-        }
-        .footer-premium a { color: #fbbf24; text-decoration: none; font-weight: bold; }
-        
-        /* MOBILE RESPONSIVE */
-        @media (max-width: 768px) {
-            .sidebar { position: relative; min-height: auto; }
-            .balance-card { padding: 25px; }
-            .balance-card h1 { font-size: 2rem; }
-            .service-btn { padding: 18px 10px; }
-            .service-btn i { font-size: 1.8rem; }
-        }
+        body { background: #f4f6f9; font-family: 'Inter', sans-serif; }
+        .sidebar { background: #004a99; color: white; min-height: 100vh; padding: 20px; position: sticky; top: 0; }
+        .balance-card { background: linear-gradient(45deg, #004a99, #007bff); color: white; border-radius: 15px; padding: 30px; margin-bottom: 25px; box-shadow: 0 10px 20px rgba(0,74,153,0.2); }
+        .service-btn { background: white; border: none; border-radius: 15px; padding: 20px; text-align: center; transition: 0.3s; width: 100%; height: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; }
+        .service-btn:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); border: 2px solid #004a99;}
+        .service-btn i { font-size: 2rem; color: #004a99; margin-bottom: 10px; }
+        .srv-name { font-weight: 600; font-size: 0.9rem; color: #333; }
+        .loader { display: none; text-align: center; margin: 10px 0; color: #004a99; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <!-- Mobile Navbar -->
-<nav class="navbar navbar-dark bg-dark d-md-none px-3" style="background: linear-gradient(135deg, #004a99, #0066cc) !important;">
-    <span class="navbar-brand fw-bold mb-0 h6">USMAN DATA</span>
-    <button class="btn btn-outline-light btn-sm" id="btn-logout-mobile"><i class="fas fa-sign-out-alt"></i></button>
+<nav class="navbar navbar-dark bg-primary d-md-none px-3">
+    <span class="navbar-brand fw-bold mb-0 h1">USMAN DATA</span>
+    <button class="btn btn-outline-light btn-sm" id="btn-logout-mobile"><i class="fas fa-sign-out-alt"></i> Logout</button>
 </nav>
 
-<div class="container-fluid main-content">
-    <div class="row h-100">
+<div class="container-fluid">
+    <div class="row">
         <!-- Desktop Sidebar -->
         <div class="col-md-2 sidebar d-none d-md-block">
-            <h4><i class="fas fa-cube me-2"></i>USMAN DATA</h4>
-            <hr style="opacity: 0.3;">
+            <h4 class="fw-bold mb-4">USMAN DATA</h4>
+            <hr>
             <nav class="nav flex-column">
-                <a class="nav-link active" href="#"><i class="fas fa-home me-2"></i> Dashboard</a>
+                <a class="nav-link text-white active" href="#"><i class="fas fa-home me-2"></i> Dashboard</a>
+                <button class="btn btn-danger mt-4 w-100 fw-bold" id="btn-logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</button>
             </nav>
-            <button class="btn btn-light mt-4 w-100 fw-bold" id="btn-logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</button>
         </div>
 
         <div class="col-md-10 p-4">
-            <!-- GREETING & BALANCE -->
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h3 class="mb-0">Hello, <span id="userName" class="text-primary text-capitalize">User</span> 👋</h3>
-                </div>
-                <div>
-                    <span id="roleBadge" class="badge bg-dark px-3 py-2">LOADING...</span>
+                <h3>Hello, <span id="userName" class="text-primary text-capitalize">User</span></h3>
+                <div class="d-flex gap-2">
+                    <span id="roleBadge" class="badge bg-dark d-flex align-items-center">LOADING...</span>
                 </div>
             </div>
 
-            <!-- BALANCE CARD -->
             <div class="balance-card">
-                <p class="mb-1">Available Balance</p>
-                <h1>₦<span id="userBalance">0.00</span></h1>
-                <div>
-                    <button class="btn btn-warning fw-bold me-2" onclick="window.location.href='fund.html'">
-                        <i class="fas fa-plus me-1"></i> Add Money
-                    </button>
-                    <button class="btn btn-light fw-bold" onclick="location.reload()">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
-                </div>
+                <p>Available Balance</p>
+                <h1 class="fw-bold">₦<span id="userBalance">0.00</span></h1>
+                <button class="btn btn-warning mt-2 fw-bold" onclick="window.location.href='fund.html'">+ Add Money</button>
             </div>
 
-            <!-- VIRTUAL ACCOUNT DISPLAY -->
-            <div class="vacc-box" id="vAccCard">
-                <h6 class="fw-bold mb-3"><i class="fas fa-university me-2" style="color:#004a99;"></i>Funding Account (Instant Auto-Funding)</h6>
+            <!-- Virtual Account Display -->
+            <div class="card mb-4 border-0 shadow-sm p-3" id="vAccCard" style="border-radius: 15px;">
+                <h6 class="fw-bold">Funding Account (Instant Auto-Funding)</h6>
                 <div id="vAccDisplay" class="text-muted small">Checking for account...</div>
             </div>
 
-            <!-- SERVICE BUTTONS -->
-            <div class="row g-3 mt-2">
-                <div class="col-6 col-md-3"><button class="service-btn" onclick="window.openSrv('data')"><i class="fas fa-wifi"></i><br><span class="srv-name">Buy Data</span></button></div>
-                <div class="col-6 col-md-3"><button class="service-btn" onclick="window.openSrv('airtime')"><i class="fas fa-phone"></i><br><span class="srv-name">Airtime</span></button></div>
-                <div class="col-6 col-md-3"><button class="service-btn" onclick="window.openSrv('tv')"><i class="fas fa-tv"></i><br><span class="srv-name">Cable TV</span></button></div>
-                <div class="col-6 col-md-3"><button class="service-btn" onclick="window.openSrv('power')"><i class="fas fa-lightbulb"></i><br><span class="srv-name">Electricity</span></button></div>
-                <div class="col-6 col-md-3"><button class="service-btn" onclick="window.openSrv('exam')"><i class="fas fa-graduation-cap"></i><br><span class="srv-name">Exam Pins</span></button></div>
-                <div class="col-6 col-md-3"><button class="service-btn" onclick="window.openSrv('sms')"><i class="fas fa-envelope"></i><br><span class="srv-name">Bulk SMS</span></button></div>
-                <div class="col-6 col-md-3"><button class="service-btn" onclick="window.openSrv('nin')"><i class="fas fa-id-card"></i><br><span class="srv-name">NIN Search</span></button></div>
-                <div class="col-6 col-md-3"><button class="service-btn" onclick="window.openSrv('bvn')"><i class="fas fa-university"></i><br><span class="srv-name">BVN Lookup</span></button></div>
+            <div class="row g-3">
+                <div class="col-6 col-md-3"><button class="service-btn" onclick="openSrv('data')"><i class="fas fa-wifi"></i><br><span class="srv-name">Buy Data</span></button></div>
+                <div class="col-6 col-md-3"><button class="service-btn" onclick="openSrv('airtime')"><i class="fas fa-phone"></i><br><span class="srv-name">Airtime</span></button></div>
+                <div class="col-6 col-md-3"><button class="service-btn" onclick="openSrv('tv')"><i class="fas fa-tv"></i><br><span class="srv-name">Cable TV</span></button></div>
+                <div class="col-6 col-md-3"><button class="service-btn" onclick="openSrv('power')"><i class="fas fa-lightbulb"></i><br><span class="srv-name">Electricity</span></button></div>
+                <div class="col-6 col-md-3"><button class="service-btn" onclick="openSrv('exam')"><i class="fas fa-graduation-cap"></i><br><span class="srv-name">Exam Pins</span></button></div>
+                <div class="col-6 col-md-3"><button class="service-btn" onclick="openSrv('sms')"><i class="fas fa-envelope"></i><br><span class="srv-name">Bulk SMS</span></button></div>
+                <div class="col-6 col-md-3"><button class="service-btn" onclick="openSrv('nin')"><i class="fas fa-id-card"></i><br><span class="srv-name">NIN Search</span></button></div>
+                <div class="col-6 col-md-3"><button class="service-btn" onclick="openSrv('bvn')"><i class="fas fa-university"></i><br><span class="srv-name">BVN Lookup</span></button></div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- FOOTER -->
-<footer class="footer-premium">
-    <div>&copy; 2024 Usman Data Sub. All Rights Reserved.</div>
-    <div style="font-size: 0.75rem; margin-top: 8px; opacity: 0.7;">
-        Designed by <a href="https://primebit.page.gd" target="_blank">PrimeBit Tech</a>
+<!-- Dynamic Modal -->
+<div class="modal fade" id="srvModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0" style="border-radius: 20px;">
+      <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold" id="srvTitle">Service</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+          <div id="srvBody"></div>
+          <div class="loader" id="srvLoader"><i class="fas fa-spinner fa-spin fa-2x"></i></div>
+          <div id="srvExtra"></div>
+      </div>
+      <div class="modal-footer border-0">
+          <button class="btn btn-primary w-100 fw-bold py-2" id="procBtn" style="display:none;">Proceed</button>
+      </div>
     </div>
-</footer>
-
-<!-- WHATSAPP FLOAT -->
-<a href="https://wa.me/2349163474166?text=Hello%20Usman%20Data%2C%20I%20need%20assistance" class="whatsapp-float" target="_blank" title="Contact Support">
-    <i class="fab fa-whatsapp"></i>
-</a>
-
-<!-- MODAL -->
-<div class="modal fade" id="srvModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="srvTitle">Service</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div id="srvBody"></div>
-                <div id="categoryTabs" class="category-tabs"></div>
-                <div id="planGrid" class="row g-2 mt-3"></div>
-                <div class="loader mt-3" id="srvLoader"><i class="fas fa-spinner fa-spin fa-2x"></i></div>
-                <div id="srvExtra"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button class="btn btn-primary fw-bold py-2 px-4" style="display:none;" id="procBtn">Process</button>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 
 <script type="module">
@@ -255,319 +111,209 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
     
+    // IMPORTANT: Change this if your render URL is different!
     const RENDER_URL = "https://usmandata.onrender.com";
 
-    // Global variables
     window.activeService = {};
-    window.selectedPlanCode = null;
-    window.selectedPlanPrice = 0;
-    window.selectedCategory = null;
-    window.allPlans = [];
 
-    // ===== AUTH & USER DATA =====
     onAuthStateChanged(auth, (user) => {
         if (user) {
             onValue(ref(db, 'users/' + user.uid), (snapshot) => {
                 const data = snapshot.val();
                 if(data) {
-                    document.getElementById('userName').innerText = data.fullName || 'User';
-                    document.getElementById('userBalance').innerText = parseFloat(data.balance || 0).toLocaleString('en-NG', {minimumFractionDigits: 2});
-                    document.getElementById('roleBadge').innerText = (data.role || 'USER').toUpperCase();
+                    document.getElementById('userName').innerText = data.fullName;
+                    document.getElementById('userBalance').innerText = data.balance.toLocaleString('en-NG', {minimumFractionDigits: 2});
+                    document.getElementById('roleBadge').innerText = data.role.toUpperCase();
                     
-                    // Virtual Account
-                    const vAccDisplay = document.getElementById('vAccDisplay');
                     if(data.virtual_account) {
-                        vAccDisplay.innerHTML = `
-                            <div class="vacc-display">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div style="flex:1;">
-                                        <div class="vacc-bank">${data.bank_name || '9PSB Bank'}</div>
-                                        <div class="vacc-number mt-2">${data.virtual_account}</div>
-                                        <div class="vacc-name">${data.fullName}</div>
-                                    </div>
-                                    <span class="vacc-badge"><i class="fas fa-bolt me-1"></i>Auto-Funding</span>
+                        // BEAUTIFUL PREMIUM ACCOUNT DISPLAY
+                        document.getElementById('vAccDisplay').innerHTML = `
+                            <div style="background: linear-gradient(135deg, #f8fafc, #e2e8f0); padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; position: relative; overflow: hidden;">
+                                <div style="position: absolute; right: -10px; top: -10px; opacity: 0.1;">
+                                    <i class="fas fa-university" style="font-size: 5rem; color: #004a99;"></i>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: relative; z-index: 2;">
+                                    <span style="font-size: 0.85rem; color: #64748b; font-weight: bold; text-transform: uppercase;">${data.bank_name || "9PSB Bank"}</span>
+                                    <span style="background: #dcfce7; color: #166534; font-size: 0.7rem; padding: 3px 8px; border-radius: 20px; font-weight: bold;"><i class="fas fa-bolt"></i> Auto-Funding</span>
+                                </div>
+                                <h3 style="color: #004a99; font-weight: 900; letter-spacing: 2px; margin: 0; font-family: monospace; position: relative; z-index: 2;">
+                                    ${data.virtual_account}
+                                </h3>
+                                <div style="margin-top: 5px; font-size: 0.85rem; color: #334155; font-weight: 600; text-transform: uppercase; position: relative; z-index: 2;">
+                                    ${data.fullName}
                                 </div>
                             </div>
                         `;
                     } else {
-                        vAccDisplay.innerHTML = `
-                            <div class="alert alert-warning mb-3 py-2" style="font-size:0.9rem; border-left: 4px solid #ffc107; border-radius: 8px;">
-                                <i class="fas fa-exclamation-circle me-2"></i>
-                                <b>CBN Policy:</b> Your registered name <b>"${data.fullName}"</b> must match your BVN or NIN exactly.
+                        // NEW: Inject KYC form with a STRICT WARNING about name matching
+                        document.getElementById('vAccDisplay').innerHTML = `
+                            <div class="alert alert-warning p-2 mb-3" style="font-size:0.85rem; border-left: 4px solid #ffc107;">
+                                <i class="fas fa-info-circle text-danger"></i> <b>CBN Policy:</b> To generate an account, your registered name <b>(${data.fullName})</b> MUST exactly match the name on your BVN or NIN.
                             </div>
-                            <div class="row g-2 mb-3">
-                                <div class="col-auto">
-                                    <select id="kycType" class="form-select form-select-sm" style="min-width: 100px;">
-                                        <option value="nin">NIN</option>
-                                        <option value="bvn">BVN</option>
-                                    </select>
-                                </div>
-                                <div class="col">
-                                    <input type="number" id="kycNumber" class="form-control form-control-sm" placeholder="11-digit number" maxlength="11">
-                                </div>
-                                <div class="col-auto">
-                                    <button class="btn btn-primary btn-sm" id="btn-gen-acc" onclick="window.genAcc()">
-                                        <i class="fas fa-plus me-1"></i> Generate
-                                    </button>
-                                </div>
+                            <div class="input-group mb-2 shadow-sm">
+                                <select id="kycType" class="form-select bg-light" style="max-width: 90px; font-weight:bold;">
+                                    <option value="nin">NIN</option>
+                                    <option value="bvn">BVN</option>
+                                </select>
+                                <input type="number" id="kycNumber" class="form-control" placeholder="Enter 11-digit number">
                             </div>
+                            <button class="btn btn-primary w-100 fw-bold shadow-sm" id="btn-gen-acc" onclick="window.genAcc()">
+                                <i class="fas fa-plus"></i> Generate Funding Account
+                            </button>
                         `;
                     }
                 }
             });
-        } else { 
-            window.location.href = "login.html"; 
-        }
+        } else { window.location.href = "login.html"; }
     });
 
-    // ===== OPEN SERVICE MODAL =====
     window.openSrv = (type) => {
         const modal = new bootstrap.Modal(document.getElementById('srvModal'));
         const body = document.getElementById('srvBody');
-        const tabsDiv = document.getElementById('categoryTabs');
-        const grid = document.getElementById('planGrid');
         const extra = document.getElementById('srvExtra');
         const title = document.getElementById('srvTitle');
         const btn = document.getElementById('procBtn');
         
-        // Reset
-        tabsDiv.innerHTML = "";
-        grid.innerHTML = "";
         extra.innerHTML = "";
-        window.selectedPlanCode = null;
-        window.selectedPlanPrice = 0;
-        window.activeService = { type };
         btn.style.display = "block";
         btn.innerText = "Process Transaction";
-        btn.disabled = false;
+        window.activeService = { type };
 
         if (type === 'data') {
             title.innerText = "Buy Data";
             body.innerHTML = `
-                <label class="form-label fw-bold mb-2">Select Network</label>
-                <select id="inp_network" class="form-select form-select-lg mb-4" onchange="window.fetchDataPlans()">
-                    <option value="">-- Choose Network --</option>
-                    <option value="mtn">MTN Nigeria</option>
-                    <option value="airtel">Airtel Nigeria</option>
-                    <option value="glo">Globacom (GLO)</option>
-                    <option value="9mobile">9Mobile</option>
+                <select id="inp_network" class="form-select mb-3" onchange="window.fetchDataPlans()">
+                    <option value="">Select Network...</option>
+                    <option value="mtn">MTN</option><option value="airtel">Airtel</option>
+                    <option value="glo">GLO</option><option value="9mobile">9Mobile</option>
                 </select>
-                <label class="form-label fw-bold mb-2">Phone Number</label>
-                <input type="tel" id="inp_phone" class="form-control form-control-lg" placeholder="08012345678" pattern="[0-9]{11}">
+                <select id="inp_plan" class="form-select mb-3"><option value="">Select Plan (Pick network first)</option></select>
+                <input type="number" id="inp_phone" class="form-control mb-3" placeholder="Recipient Phone Number">
             `;
             btn.onclick = () => window.executeTransaction();
         } 
         else if (type === 'airtime') {
             title.innerText = "Buy Airtime";
             body.innerHTML = `
-                <label class="form-label fw-bold mb-2">Select Network</label>
-                <select id="inp_network" class="form-select form-select-lg mb-3">
-                    <option value="">-- Choose Network --</option>
-                    <option value="mtn">MTN Nigeria</option>
-                    <option value="airtel">Airtel Nigeria</option>
-                    <option value="glo">Globacom (GLO)</option>
-                    <option value="9mobile">9Mobile</option>
+                <select id="inp_network" class="form-select mb-3">
+                    <option value="mtn">MTN</option><option value="airtel">Airtel</option>
+                    <option value="glo">GLO</option><option value="9mobile">9Mobile</option>
                 </select>
-                <label class="form-label fw-bold mb-2 mt-3">Amount (₦)</label>
-                <input type="number" id="inp_amount" class="form-control form-control-lg mb-3" placeholder="500" min="100">
-                <label class="form-label fw-bold mb-2">Phone Number</label>
-                <input type="tel" id="inp_phone" class="form-control form-control-lg" placeholder="08012345678" pattern="[0-9]{11}">
+                <input type="number" id="inp_amount" class="form-control mb-3" placeholder="Amount (₦)">
+                <input type="number" id="inp_phone" class="form-control mb-3" placeholder="Phone Number">
             `;
             btn.onclick = () => window.executeTransaction();
         }
         else if (type === 'tv') {
             title.innerText = "Cable TV Subscription";
             body.innerHTML = `
-                <label class="form-label fw-bold mb-2">Select Provider</label>
-                <select id="inp_service" class="form-select form-select-lg mb-3" onchange="window.fetchTVPlans()">
-                    <option value="">-- Choose Provider --</option>
-                    <option value="dstv">DSTV</option>
-                    <option value="gotv">GOTV</option>
-                    <option value="startimes">Startimes</option>
+                <select id="inp_service" class="form-select mb-3" onchange="window.fetchTVPlans()">
+                    <option value="">Select Provider...</option>
+                    <option value="dstv">DSTV</option><option value="gotv">GOTV</option><option value="startimes">Startimes</option>
                 </select>
-                <label class="form-label fw-bold mb-2 mt-3">IUC / Smartcard Number</label>
-                <input type="number" id="inp_account" class="form-control form-control-lg mb-3" placeholder="Enter 10-12 digit number">
-                <label class="form-label fw-bold mb-2">Customer Phone</label>
-                <input type="tel" id="inp_phone" class="form-control form-control-lg" placeholder="08012345678" pattern="[0-9]{11}">
+                <select id="inp_plan" class="form-select mb-3"><option value="">Select Bouquet (Pick provider first)</option></select>
+                <input type="number" id="inp_account" class="form-control mb-3" placeholder="IUC / Smartcard Number">
+                <input type="number" id="inp_phone" class="form-control mb-3" placeholder="Customer Phone Number">
             `;
-            btn.innerText = "Validate & Proceed";
+            btn.innerText = "Validate Smartcard";
             btn.onclick = () => window.validateMeterOrTV();
         }
         else if (type === 'power') {
             title.innerText = "Electricity Bill";
             body.innerHTML = `
-                <label class="form-label fw-bold mb-2">Select Provider</label>
-                <select id="inp_service" class="form-select form-select-lg mb-3">
-                    <option value="">-- Choose Provider --</option>
-                    <option value="ikedc">Ikeja Electric</option>
-                    <option value="ekedc">Eko Electric</option>
-                    <option value="kano">Kano Electric</option>
-                    <option value="phedc">Port Harcourt</option>
-                    <option value="ibedc">Ibadan Electric</option>
-                    <option value="abuja">Abuja Electric</option>
+                <select id="inp_service" class="form-select mb-3">
+                    <option value="ikedc">Ikeja Electric</option><option value="ekedc">Eko Electric</option>
+                    <option value="kano">Kano Electric</option><option value="phedc">Port Harcourt</option>
+                    <option value="ibedc">Ibadan Electric</option><option value="abuja">Abuja Electric</option>
                 </select>
-                <label class="form-label fw-bold mb-2 mt-3">Meter Type</label>
-                <select id="inp_meter_type" class="form-select form-select-lg mb-3">
-                    <option value="prepaid">Prepaid</option>
-                    <option value="postpaid">Postpaid</option>
+                <select id="inp_meter_type" class="form-select mb-3">
+                    <option value="prepaid">Prepaid</option><option value="postpaid">Postpaid</option>
                 </select>
-                <label class="form-label fw-bold mb-2">Meter Number</label>
-                <input type="text" id="inp_account" class="form-control form-control-lg mb-3" placeholder="0123456789">
-                <label class="form-label fw-bold mb-2">Amount (₦)</label>
-                <input type="number" id="inp_amount" class="form-control form-control-lg mb-3" placeholder="5000" min="100">
-                <label class="form-label fw-bold mb-2">Customer Phone</label>
-                <input type="tel" id="inp_phone" class="form-control form-control-lg" placeholder="08012345678" pattern="[0-9]{11}">
+                <input type="number" id="inp_account" class="form-control mb-3" placeholder="Meter Number">
+                <input type="number" id="inp_amount" class="form-control mb-3" placeholder="Amount (₦)">
+                <input type="number" id="inp_phone" class="form-control mb-3" placeholder="Customer Phone Number">
             `;
-            btn.innerText = "Validate & Proceed";
+            btn.innerText = "Validate Meter";
             btn.onclick = () => window.validateMeterOrTV();
         }
         else if (type === 'exam') {
             title.innerText = "Exam Pins";
             body.innerHTML = `
-                <label class="form-label fw-bold mb-2">Quantity</label>
-                <input type="number" id="inp_qty" class="form-control form-control-lg" placeholder="1" value="1" min="1">
+                <select id="inp_exam_id" class="form-select mb-3">
+                    <option value="">Loading Exams...</option>
+                </select>
+                <input type="number" id="inp_qty" class="form-control mb-3" placeholder="Quantity (e.g. 1)" value="1">
             `;
+            // Trigger fetch instantly when modal opens
             window.fetchExamPins();
             btn.onclick = () => window.executeTransaction();
         }
         else if (type === 'sms') {
+            // FIX: Added dedicated Bulk SMS UI
             title.innerText = "Send Bulk SMS";
             body.innerHTML = `
-                <label class="form-label fw-bold mb-2">Sender ID</label>
-                <input type="text" id="inp_sender" class="form-control form-control-lg mb-3" placeholder="Your Company Name" maxlength="11">
-                
-                <div class="card border-0 bg-light p-3 mb-3">
-                    <label class="form-label fw-bold mb-2">Upload Phone List (Excel/CSV)</label>
-                    <input type="file" id="smsExcel" accept=".xlsx,.xls,.csv" class="form-control form-control-sm" onchange="window.handleExcelUpload(event)">
-                    <small class="text-muted mt-2 d-block">Or paste numbers below separated by commas</small>
-                </div>
-
-                <label class="form-label fw-bold mb-2">Phone Numbers</label>
-                <textarea id="inp_phone" class="form-control mb-3" rows="2" placeholder="08012345678, 09087654321, 07012345678"></textarea>
-                
-                <label class="form-label fw-bold mb-2">Message</label>
+                <input type="text" id="inp_sender" class="form-control mb-3" placeholder="Sender ID (e.g. MySchool)" maxlength="11">
+                <input type="number" id="inp_phone" class="form-control mb-3" placeholder="Recipient Phone Numbers">
                 <textarea id="inp_message" class="form-control mb-3" rows="4" placeholder="Type your message here..."></textarea>
-                
-                <div class="alert alert-info py-2"><i class="fas fa-info-circle"></i> Cost: ~₦3.50 per message</div>
+                <small class="text-muted">Cost is usually ₦6 per page.</small>
             `;
             btn.onclick = () => window.executeTransaction();
         }
-        else if (type === 'nin' || type === 'bvn') {
-            title.innerText = type === 'nin' ? "NIN Search" : "BVN Lookup";
-            body.innerHTML = `
-                <label class="form-label fw-bold mb-2">Enter ${type.toUpperCase()} Number</label>
-                <input type="number" id="inp_kyc_num" class="form-control form-control-lg" placeholder="11-digit number" maxlength="11">
-            `;
+        else if (type === 'nin') {
+            title.innerText = "NIN Search";
+            body.innerHTML = `<input type="number" id="inp_nin" class="form-control mb-3" placeholder="11 Digit NIN Number">`;
+            btn.onclick = () => window.executeTransaction();
+        }
+        else if (type === 'bvn') {
+            title.innerText = "BVN Lookup";
+            body.innerHTML = `<input type="number" id="inp_bvn" class="form-control mb-3" placeholder="11 Digit BVN Number">`;
             btn.onclick = () => window.executeTransaction();
         }
 
         modal.show();
     };
-
-    // ===== PLAN SELECTION & RENDERING =====
-    window.selectPlan = (code, price, element) => {
-        document.querySelectorAll('.plan-card').forEach(el => el.classList.remove('active'));
-        element.classList.add('active');
-        window.selectedPlanCode = code;
-        window.selectedPlanPrice = parseFloat(price);
-    };
-
-    const renderGrid = (plans, isExam = false) => {
-        const grid = document.getElementById('planGrid');
-        grid.innerHTML = "";
-        
-        if (!plans || plans.length === 0) {
-            grid.innerHTML = `<div class="col-12 text-center text-muted"><i class="fas fa-inbox"></i> No plans available</div>`;
-            return;
-        }
-
-        plans.forEach(p => {
-            const nameRaw = p.name || p.title || p.description || "Plan";
-            const price = p.amount || p.price || 0;
-            const code = p.plan_code || p.id || p.code || "";
-            
-            if(!code) return;
-
-            let mainTitle = nameRaw;
-            let subDesc = "Valid";
-            
-            const sizeMatch = nameRaw.match(/(\d+(\.\d+)?)\s*(MB|GB|TB)/i);
-            if (sizeMatch && !isExam) {
-                mainTitle = sizeMatch[0];
-                subDesc = nameRaw.replace(sizeMatch[0], '').trim();
-            }
-
-            grid.innerHTML += `
-                <div class="col-6 col-md-4 col-lg-3">
-                    <div class="plan-card" onclick="window.selectPlan('${code}', ${price}, this)">
-                        <div class="plan-title">${mainTitle}</div>
-                        <div class="plan-desc text-truncate">${subDesc}</div>
-                        <div class="plan-price">₦${price}</div>
-                    </div>
-                </div>
-            `;
-        });
-    };
-
-    // ===== DATA PLANS WITH CATEGORIES =====
+    // --- SMART ARRAY EXTRACTOR (GUARANTEES NO MORE UNDEFINED DROPDOWNS) ---
+// ==========================================
+    // DYNAMIC FETCHERS (STRICT PATHS)
+    // ==========================================
     window.fetchDataPlans = async () => {
         const network = document.getElementById('inp_network').value;
         if(!network) return;
         
-        document.getElementById('srvLoader').style.display = "block";
-        document.getElementById('planGrid').innerHTML = "";
-        document.getElementById('categoryTabs').innerHTML = "";
+        const planSelect = document.getElementById('inp_plan');
+        planSelect.innerHTML = "<option>Loading plans... <i class='fas fa-spinner fa-spin'></i></option>";
         
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=data_plans&network=${network}`);
             const result = await res.json();
-            document.getElementById('srvLoader').style.display = "none";
             
-            if (!result.success) throw new Error(result.message || "Failed to fetch plans");
+            if (!result.success) throw new Error(result.message);
 
+            // EXACT PATH from Payscribe Demo
+            const details = result.data?.message?.details;
             let plans = [];
-            if (result.data?.message?.details?.[0]?.plans) plans = result.data.message.details[0].plans;
-            else if (Array.isArray(result.data?.message?.details)) plans = result.data.message.details;
+            if (details && details[0] && details[0].plans) {
+                plans = details[0].plans; // This bypasses the "MTN Data" wrapper!
+            } else if (Array.isArray(details)) {
+                plans = details;
+            }
 
-            if(plans.length === 0) {
-                document.getElementById('planGrid').innerHTML = `<div class="col-12 text-center text-muted">No plans available for this network</div>`;
+            if (plans.length === 0) {
+                planSelect.innerHTML = "<option value=''>No plans available</option>";
                 return;
             }
 
-            window.allPlans = plans;
-
-            // CATEGORIZE PLANS
-            const categories = {};
-            plans.forEach(p => {
-                const name = p.name || p.title || "";
-                let cat = "Standard";
-                if(name.includes("SME") || name.includes("sme")) cat = "SME";
-                else if(name.includes("Awoof") || name.includes("awoof")) cat = "Awoof";
-                else if(name.includes("Corporate") || name.includes("corporate")) cat = "Corporate";
-                else if(name.includes("Student") || name.includes("student")) cat = "Student";
+            planSelect.innerHTML = "<option value=''>Select Plan...</option>";
+            plans.forEach(plan => {
+                const name = plan.name || plan.description || "Data Plan";
+                const price = plan.amount || plan.price || 0;
+                const code = plan.plan_code || plan.id || ""; 
                 
-                if(!categories[cat]) categories[cat] = [];
-                categories[cat].push(p);
+                planSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
-
-            const tabsDiv = document.getElementById('categoryTabs');
-            Object.keys(categories).forEach((cat, idx) => {
-                const tabBtn = document.createElement('button');
-                tabBtn.className = `category-tab ${idx === 0 ? 'active' : ''}`;
-                tabBtn.innerText = cat;
-                tabBtn.onclick = () => {
-                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
-                    tabBtn.classList.add('active');
-                    renderGrid(categories[cat]);
-                };
-                tabsDiv.appendChild(tabBtn);
-            });
-
-            renderGrid(categories[Object.keys(categories)[0]]);
-
         } catch(e) { 
-            document.getElementById('srvLoader').style.display = "none";
-            document.getElementById('planGrid').innerHTML = `<div class="col-12 text-danger text-center"><i class="fas fa-exclamation-circle"></i> ${e.message}</div>`;
+            console.error(e);
+            planSelect.innerHTML = `<option value="">Error connecting to server</option>`; 
         }
     };
 
@@ -575,86 +321,74 @@
         const service = document.getElementById('inp_service').value;
         if(!service) return;
         
-        document.getElementById('srvLoader').style.display = "block";
-        document.getElementById('planGrid').innerHTML = "";
+        const planSelect = document.getElementById('inp_plan');
+        planSelect.innerHTML = "<option>Loading bouquets... <i class='fas fa-spinner fa-spin'></i></option>";
         
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=tv_bouquets&service=${service}`);
             const result = await res.json();
-            document.getElementById('srvLoader').style.display = "none";
             
-            if (!result.success) throw new Error(result.message || "Failed to fetch TV plans");
+            if (!result.success) throw new Error(result.message);
 
+            // EXACT PATH for TV
             const bouquets = result.data?.message?.details || [];
-            renderGrid(bouquets);
+
+            if (bouquets.length === 0) {
+                planSelect.innerHTML = "<option value=''>No bouquets available</option>";
+                return;
+            }
+
+            planSelect.innerHTML = "<option value=''>Select Bouquet...</option>";
+            bouquets.forEach(b => {
+                const name = b.name || "Bouquet";
+                const price = b.amount || 0;
+                const code = b.id || b.plan_code || ""; // TV uses 'id'
+                
+                planSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
+            });
         } catch(e) { 
-            document.getElementById('srvLoader').style.display = "none";
-            document.getElementById('planGrid').innerHTML = `<div class="col-12 text-danger text-center"><i class="fas fa-exclamation-circle"></i> ${e.message}</div>`;
+            planSelect.innerHTML = `<option value="">Error connecting to server</option>`; 
         }
     };
 
+    // --- EXAM PINS FETCHER (FIXED PATH) ---
     window.fetchExamPins = async () => {
-        document.getElementById('srvLoader').style.display = "block";
-        document.getElementById('planGrid').innerHTML = "";
+        const examSelect = document.getElementById('inp_exam_id');
+        if (!examSelect) return;
+        
+        examSelect.innerHTML = "<option>Loading Exams... <i class='fas fa-spinner fa-spin'></i></option>";
         
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
             const result = await res.json();
-            document.getElementById('srvLoader').style.display = "none";
             
-            if (!result.success) throw new Error(result.message || "Failed to fetch exams");
+            if (!result.success) throw new Error(result.message);
 
-            let pins = [];
-            if (Array.isArray(result.data?.message?.details)) pins = result.data.message.details;
-            else if (typeof result.data?.message?.details === 'object') pins = Object.values(result.data.message.details);
+            // FIX: Path must be result.data.message.details
+            const pins = result.data?.message?.details || result.data?.details || [];
 
-            renderGrid(pins, true);
+            if (pins.length === 0) {
+                examSelect.innerHTML = "<option value=''>No exams available</option>";
+                return;
+            }
+
+            examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
+            pins.forEach(pin => {
+                const name = pin.title || pin.name || "Exam Pin"; 
+                const price = pin.amount || 0;
+                const code = pin.id || ""; 
+                
+                if(code) {
+                    examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
+                }
+            });
         } catch(e) { 
-            document.getElementById('srvLoader').style.display = "none";
-            document.getElementById('planGrid').innerHTML = `<div class="col-12 text-danger text-center"><i class="fas fa-exclamation-circle"></i> ${e.message}</div>`;
+            console.error(e);
+            examSelect.innerHTML = `<option value="">Error connecting to server</option>`; 
         }
     };
 
-    // ===== EXCEL UPLOAD =====
-    window.handleExcelUpload = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-            try {
-                const data = new Uint8Array(evt.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-                let numbers = [];
-                jsonData.forEach(row => {
-                    row.forEach(cell => {
-                        const str = String(cell).replace(/\D/g, '');
-                        if (str.length >= 10 && str.length <= 15) {
-                            numbers.push(str);
-                        }
-                    });
-                });
-
-                if (numbers.length > 0) {
-                    const uniqueNumbers = [...new Set(numbers)];
-                    const phoneInput = document.getElementById('inp_phone');
-                    const existing = phoneInput.value.trim();
-                    phoneInput.value = existing ? existing + ",\n" + uniqueNumbers.join(",\n") : uniqueNumbers.join(",\n");
-                    alert(`✅ Extracted ${uniqueNumbers.length} phone numbers!`);
-                } else {
-                    alert("❌ No valid phone numbers found.");
-                }
-            } catch(err) {
-                alert("❌ Error reading file: " + err.message);
-            }
-        };
-        reader.readAsArrayBuffer(file);
-    };
-
-    // ===== VALIDATION =====
+    // --- VALIDATORS (TV & POWER FIXED) ---
     window.validateMeterOrTV = async () => {
         const type = window.activeService.type;
         const loader = document.getElementById('srvLoader');
@@ -664,18 +398,18 @@
         const account = document.getElementById('inp_account').value;
         const service = document.getElementById('inp_service').value;
         
-        if(!account || !service) return alert("Please fill all required fields.");
+        if(!account || !service) return alert("Please fill all details to validate.");
 
         const payload = { type, account, service };
         
         if(type === 'power') {
-            const amount = document.getElementById('inp_amount').value;
-            if(!amount) return alert("Please enter amount.");
             payload.meter_type = document.getElementById('inp_meter_type').value;
-            payload.amount = amount;
+            payload.amount = document.getElementById('inp_amount').value;
         } else if (type === 'tv') {
-            if(!window.selectedPlanCode) return alert("Please select a TV plan first.");
-            payload.plan_id = window.selectedPlanCode;
+            // FIX: TV Validation Requires plan_id and month
+            const planEl = document.getElementById('inp_plan');
+            if(!planEl.value) return alert("Please select a Bouquet plan first.");
+            payload.plan_id = planEl.value;
             payload.month = 1;
         }
 
@@ -690,116 +424,118 @@
             loader.style.display = "none";
 
             if (out.success) {
-                const custName = out.data.message?.details?.customer_name || out.data.message?.details?.name || "Verified";
+                const custName = out.data.message?.details?.customer_name || out.data.message?.details?.name || "Customer Verified";
                 window.activeService.customer_name = custName;
                 window.activeService.address = out.data.message?.details?.address || "Nigeria"; 
                 
-                extra.innerHTML = `<div class="alert alert-success mt-3"><i class="fas fa-check-circle me-2"></i><strong>Verified:</strong> ${custName}</div>`;
-                btn.innerText = "Confirm & Pay";
+                extra.innerHTML = `<div class="alert alert-success mt-3"><strong>Verified Name:</strong> ${custName}</div>`;
+                btn.innerText = "Pay Now";
                 btn.disabled = false;
                 btn.onclick = () => window.executeTransaction();
             } else {
-                alert("❌ " + (out.message || "Validation failed"));
+                alert("Validation Failed: " + out.message);
                 btn.disabled = false;
             }
         } catch(e) {
             loader.style.display = "none";
             btn.disabled = false;
-            alert("❌ Network error: " + e.message);
+            alert("Network Error during validation.");
         }
     };
 
-    // ===== EXECUTE TRANSACTION =====
     window.executeTransaction = async () => {
         const uid = auth.currentUser.uid;
         const type = window.activeService.type;
         const btn = document.getElementById('procBtn');
         
-        const payload = { uid, type, customer_name: window.activeService.customer_name || "", address: window.activeService.address || "" };
+        const payload = { uid, type, customer_name: window.activeService.customer_name, address: window.activeService.address };
         let costAmount = 0;
 
+        if (type === 'data') {
+            const planEl = document.getElementById('inp_plan');
+            if(!planEl.value) return alert("Select a plan.");
+            payload.network = document.getElementById('inp_network').value;
+            payload.plan = planEl.value;
+            payload.phone = document.getElementById('inp_phone').value;
+            costAmount = parseFloat(planEl.options[planEl.selectedIndex].getAttribute('data-price')) + 10; 
+        } 
+        else if (type === 'airtime') {
+            payload.network = document.getElementById('inp_network').value;
+            payload.phone = document.getElementById('inp_phone').value;
+            payload.amount = document.getElementById('inp_amount').value;
+            costAmount = parseFloat(payload.amount); 
+        }
+        else if (type === 'nin') {
+            payload.nin = document.getElementById('inp_nin').value;
+            costAmount = 150; 
+        }
+        else if (type === 'nin') {
+            payload.nin = document.getElementById('inp_nin').value;
+            costAmount = 150; // Fixed price for NIN
+        }
+        else if (type === 'bvn') {
+            payload.bvn = document.getElementById('inp_bvn').value;
+            costAmount = 150; // Fixed price for BVN
+        }
+        else if (type === 'tv') {
+            const planEl = document.getElementById('inp_plan');
+            payload.service = document.getElementById('inp_service').value;
+            payload.plan_id = planEl.value;
+            payload.account = document.getElementById('inp_account').value;
+            payload.phone = document.getElementById('inp_phone').value;
+            costAmount = parseFloat(planEl.options[planEl.selectedIndex].getAttribute('data-price')) + 30; 
+        }
+        else if (type === 'power') {
+            payload.service = document.getElementById('inp_service').value;
+            payload.meter_number = document.getElementById('inp_account').value;
+            payload.meter_type = document.getElementById('inp_meter_type').value;
+            payload.amount = document.getElementById('inp_amount').value;
+            payload.phone = document.getElementById('inp_phone').value;
+            costAmount = parseFloat(payload.amount) + 50; 
+        }
+        else if (type === 'sms') {
+            payload.sender_id = document.getElementById('inp_sender').value || "Update";
+            payload.phone = document.getElementById('inp_phone').value;
+            payload.message = document.getElementById('inp_message').value;
+            
+            if(!payload.phone || !payload.message) return alert("Phone and message are required.");
+            
+            // Assume ₦6 per page for SMS markup
+            costAmount = 6; 
+        }
+        else if (type === 'exam') {
+            const examEl = document.getElementById('inp_exam_id');
+            payload.exam_id = examEl.value;
+            payload.qty = document.getElementById('inp_qty').value;
+            const unitPrice = parseFloat(examEl.options[examEl.selectedIndex].getAttribute('data-price'));
+            costAmount = (unitPrice * parseFloat(payload.qty)) + 50; 
+        }
+
+        payload.costAmount = costAmount; 
+
+        if(!confirm(`You are about to be charged ₦${costAmount}. Proceed?`)) return;
+
+        btn.disabled = true; 
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+        document.getElementById('srvLoader').style.display = "block";
+
         try {
-            if (type === 'data') {
-                if(!window.selectedPlanCode) return alert("Please select a data plan.");
-                const network = document.getElementById('inp_network').value;
-                const phone = document.getElementById('inp_phone').value;
-                if(!network || !phone) return alert("Fill all fields.");
-                payload.network = network;
-                payload.plan = window.selectedPlanCode;
-                payload.phone = phone;
-                costAmount = window.selectedPlanPrice + 10;
-            } 
-            else if (type === 'airtime') {
-                const network = document.getElementById('inp_network').value;
-                const phone = document.getElementById('inp_phone').value;
-                const amount = document.getElementById('inp_amount').value;
-                if(!network || !phone || !amount) return alert("Fill all fields.");
-                payload.network = network;
-                payload.phone = phone;
-                payload.amount = amount;
-                costAmount = parseFloat(amount);
-            }
-            else if (type === 'nin' || type === 'bvn') {
-                const num = document.getElementById('inp_kyc_num').value;
-                if(!num || num.length !== 11) return alert("Enter valid 11-digit number.");
-                if(type === 'nin') payload.nin = num;
-                if(type === 'bvn') payload.bvn = num;
-                costAmount = 150;
-            }
-            else if (type === 'tv') {
-                if(!window.selectedPlanCode) return alert("Select a TV plan.");
-                const service = document.getElementById('inp_service').value;
-                const account = document.getElementById('inp_account').value;
-                const phone = document.getElementById('inp_phone').value;
-                if(!service || !account || !phone) return alert("Fill all fields.");
-                payload.service = service;
-                payload.plan_id = window.selectedPlanCode;
-                payload.account = account;
-                payload.phone = phone;
-                costAmount = window.selectedPlanPrice + 30;
-            }
-            else if (type === 'power') {
-                const service = document.getElementById('inp_service').value;
-                const meter = document.getElementById('inp_account').value;
-                const amount = document.getElementById('inp_amount').value;
-                const phone = document.getElementById('inp_phone').value;
-                if(!service || !meter || !amount || !phone) return alert("Fill all fields.");
-                payload.service = service;
-                payload.meter_number = meter;
-                payload.meter_type = document.getElementById('inp_meter_type').value;
-                payload.amount = amount;
-                payload.phone = phone;
-                costAmount = parseFloat(amount) + 50;
-            }
-            else if (type === 'exam') {
-                if(!window.selectedPlanCode) return alert("Select an exam.");
-                const qty = document.getElementById('inp_qty').value;
-                if(!qty || qty < 1) return alert("Enter valid quantity.");
-                payload.exam_id = window.selectedPlanCode;
-                payload.qty = qty;
-                costAmount = (window.selectedPlanPrice * parseFloat(qty)) + 50;
-            }
-            else if (type === 'sms') {
-                const sender = document.getElementById('inp_sender').value || "Usman";
-                const phones = document.getElementById('inp_phone').value;
-                const msg = document.getElementById('inp_message').value;
-                if(!phones || !msg) return alert("Enter phone numbers and message.");
-                payload.sender_id = sender;
-                payload.phone = phones;
-                payload.message = msg;
-                const phoneCount = phones.split(',').filter(n => n.trim().length > 0).length;
-                costAmount = phoneCount * 4;
-            }
-
-            if(!confirm(`💰 You will be charged ₦${costAmount.toLocaleString()}. Proceed?`)) return;
-
-            btn.disabled = true; 
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i>Processing...`;
-            document.getElementById('srvLoader').style.display = "block";
-
-            const res = await fetch(`${RENDER_URL}/api/process`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+            // FIX: Strict Endpoint formatting
+            const endpoint = `${RENDER_URL}/api/process`;
+            
+            const res = await fetch(endpoint, {
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }, 
+                body: JSON.stringify(payload)
             });
+            
+            if (res.status === 404) {
+                throw new Error("Endpoint not found. Check server deployment.");
+            }
+
             const out = await res.json();
             
             document.getElementById('srvLoader').style.display = "none";
@@ -807,62 +543,71 @@
             if(out.success) {
                 document.getElementById('srvExtra').innerHTML = `
                     <div class="alert alert-success mt-3 text-center">
-                        <i class="fas fa-check-circle fa-2x mb-2 d-block"></i>
-                        <strong>Success!</strong><br>${out.message}
+                        <i class="fas fa-check-circle fa-2x mb-2"></i><br>
+                        ${out.message}
                     </div>
                 `;
-                btn.style.display = "none";
-                setTimeout(() => location.reload(), 3000);
+                btn.style.display = "none"; 
             } else {
-                alert("❌ " + (out.message || "Transaction failed"));
-                btn.disabled = false; 
-                btn.innerHTML = "Try Again";
+                alert(out.message || "Transaction Failed.");
+                btn.disabled = false; btn.innerText = "Try Again";
             }
         } catch(e) { 
+            console.error("Transaction Error:", e);
             document.getElementById('srvLoader').style.display = "none";
-            alert("❌ Error: " + e.message); 
-            btn.disabled = false; 
-            btn.innerHTML = "Process Transaction";
+            alert("Network Error: " + e.message); 
+            btn.disabled = false; btn.innerText = "Process Transaction";
         }
     };
 
-    // ===== VIRTUAL ACCOUNT GENERATION =====
+  // --- VIRTUAL ACCOUNT GENERATION (INSTANT FEEDBACK) ---
     window.genAcc = async () => {
         const kycType = document.getElementById('kycType').value;
         const kycNumber = document.getElementById('kycNumber').value.trim();
 
-        if (kycNumber.length !== 11) return alert(`Enter valid 11-digit ${kycType.toUpperCase()}.`);
+        if (kycNumber.length !== 11) {
+            return alert(`Please enter a valid 11-digit ${kycType.toUpperCase()}.`);
+        }
 
         const btn = document.getElementById('btn-gen-acc');
         const originalHtml = btn.innerHTML;
-        btn.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i>Processing...`;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
         btn.disabled = true;
         
         try {
             const res = await fetch(`${RENDER_URL}/api/gen-account`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({ uid: auth.currentUser.uid, kycType: kycType, kycNumber: kycNumber })
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({ 
+                    uid: auth.currentUser.uid, 
+                    kycType: kycType, 
+                    kycNumber: kycNumber 
+                })
             });
 
             if (!res.ok && res.status === 404) throw new Error("Backend server not found.");
+
             const out = await res.json();
             
             if(!out.success) {
-                alert("❌ " + out.message); 
+                alert(out.message); 
                 btn.innerHTML = originalHtml;
                 btn.disabled = false;
             } else {
-                alert("✅ " + out.message);
-                btn.innerHTML = `<i class="fas fa-cog fa-spin me-1"></i>Awaiting Bank...`;
+                alert(out.message);
+                
+                // If it was instant, Firebase will update the UI immediately.
+                // If it wasn't instant, show the spinning wheel.
+                if (out.message.includes('Processing')) {
+                    btn.innerHTML = `<i class="fas fa-cog fa-spin"></i> Awaiting Bank...`;
+                }
             }
         } catch(e) {
-            alert("❌ " + e.message);
+            alert("Connection Error: " + e.message);
             btn.innerHTML = originalHtml;
             btn.disabled = false;
         }
     };
-
-    // ===== LOGOUT =====
     const logout = () => signOut(auth).then(() => window.location.href="login.html");
     document.getElementById('btn-logout').onclick = logout;
     document.getElementById('btn-logout-mobile').onclick = logout;
