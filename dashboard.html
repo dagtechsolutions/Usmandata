@@ -207,6 +207,18 @@
 
     window.activeService = {};
     window.allFetchedPlans = []; 
+    
+    // Refresh user balance display
+const refreshBalance = (userId) => {
+    const userRef = ref(db, 'users/' + userId);
+    onValue(userRef, (snapshot) => {
+        const userData = snapshot.val();
+        if(userData) {
+            const bal = parseFloat(userData.balance);
+            document.getElementById('userBalance').innerText = isNaN(bal) ? "₦0.00" : "₦" + bal.toLocaleString('en-NG', {minimumFractionDigits: 2});
+        }
+    }, { onlyOnce: true }); // Listen once then detach
+};
 
     // --- FIREBASE LISTENER ---
     onAuthStateChanged(auth, (user) => {
@@ -631,9 +643,13 @@
             const out = await res.json();
             document.getElementById('srvLoader').style.display = "none";
             
-            if(out.success) {
-                document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success text-center fw-bold"><i class="fas fa-check-circle fa-2x"></i><br>Success!</div>`;
-                btn.style.display = "none"; 
+if(out.success) {
+    document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success text-center fw-bold"><i class="fas fa-check-circle fa-2x"></i><br>Success!</div>`;
+    btn.style.display = "none";
+    
+    // ✅ Refresh balance
+    setTimeout(() => refreshBalance(uid), 500);
+
             } else {
                 alert(out.message);
                 btn.disabled = false; btn.innerText = "Try Again";
