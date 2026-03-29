@@ -66,6 +66,7 @@
                 <div class="col-6 col-md-3"><button class="service-btn" onclick="openSrv('exam')"><i class="fas fa-graduation-cap"></i><br><span class="srv-name">Exam Pins</span></button></div>
                 <div class="col-6 col-md-3"><button class="service-btn" onclick="openSrv('sms')"><i class="fas fa-envelope"></i><br><span class="srv-name">Bulk SMS</span></button></div>
                 <div class="col-6 col-md-3"><button class="service-btn" onclick="openSrv('nin')"><i class="fas fa-id-card"></i><br><span class="srv-name">NIN Search</span></button></div>
+                <div class="col-6 col-md-3"><button class="service-btn" onclick="openSrv('bvn')"><i class="fas fa-university"></i><br><span class="srv-name">BVN Lookup</span></button></div>
             </div>
         </div>
     </div>
@@ -161,7 +162,7 @@
         btn.innerText = "Process Transaction";
         window.activeService = { type };
 
-        if (type === 'data') {
+if (type === 'data') {
             title.innerText = "Buy Data";
             body.innerHTML = `
                 <select id="inp_network" class="form-select mb-3" onchange="window.fetchDataPlans()">
@@ -234,6 +235,12 @@
             body.innerHTML = `<input type="number" id="inp_nin" class="form-control mb-3" placeholder="11 Digit NIN Number">`;
             btn.onclick = () => window.executeTransaction();
         }
+        // NEW: BVN SEARCH
+        else if (type === 'bvn') {
+            title.innerText = "BVN Lookup";
+            body.innerHTML = `<input type="number" id="inp_bvn" class="form-control mb-3" placeholder="11 Digit BVN Number">`;
+            btn.onclick = () => window.executeTransaction();
+        }
 
         modal.show();
     };
@@ -290,7 +297,7 @@
             
             if (!result.success) throw new Error(result.message);
 
-            // EXACT PATH from your working Postman demo
+            // EXACT PATH for TV Bouquets
             const bouquets = result.data?.message?.details || [];
 
             if (bouquets.length === 0) {
@@ -302,7 +309,7 @@
             bouquets.forEach(b => {
                 const name = b.name || "Bouquet";
                 const price = b.amount || 0;
-                const code = b.id || b.plan_code || ""; // TV uses 'id' instead of plan_code
+                const code = b.id || b.plan_code || ""; // TV uses 'id' 
                 
                 planSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
@@ -322,7 +329,7 @@
             
             if (!result.success) throw new Error(result.message);
 
-            // EXACT PATH from your working Postman demo
+            // EXACT PATH for Exam Pins
             const pins = result.data?.message?.details || [];
 
             if (pins.length === 0) {
@@ -424,6 +431,14 @@
         else if (type === 'nin') {
             payload.nin = document.getElementById('inp_nin').value;
             costAmount = 150; 
+        }
+        else if (type === 'nin') {
+            payload.nin = document.getElementById('inp_nin').value;
+            costAmount = 150; // Fixed price for NIN
+        }
+        else if (type === 'bvn') {
+            payload.bvn = document.getElementById('inp_bvn').value;
+            costAmount = 150; // Fixed price for BVN
         }
         else if (type === 'tv') {
             const planEl = document.getElementById('inp_plan');
