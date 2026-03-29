@@ -162,7 +162,7 @@
         btn.innerText = "Process Transaction";
         window.activeService = { type };
 
-if (type === 'data') {
+        if (type === 'data') {
             title.innerText = "Buy Data";
             body.innerHTML = `
                 <select id="inp_network" class="form-select mb-3" onchange="window.fetchDataPlans()">
@@ -227,7 +227,19 @@ if (type === 'data') {
                 </select>
                 <input type="number" id="inp_qty" class="form-control mb-3" placeholder="Quantity (e.g. 1)" value="1">
             `;
+            // Trigger fetch instantly when modal opens
             window.fetchExamPins();
+            btn.onclick = () => window.executeTransaction();
+        }
+        else if (type === 'sms') {
+            // FIX: Added dedicated Bulk SMS UI
+            title.innerText = "Send Bulk SMS";
+            body.innerHTML = `
+                <input type="text" id="inp_sender" class="form-control mb-3" placeholder="Sender ID (e.g. MySchool)" maxlength="11">
+                <input type="number" id="inp_phone" class="form-control mb-3" placeholder="Recipient Phone Numbers">
+                <textarea id="inp_message" class="form-control mb-3" rows="4" placeholder="Type your message here..."></textarea>
+                <small class="text-muted">Cost is usually ₦3 per page.</small>
+            `;
             btn.onclick = () => window.executeTransaction();
         }
         else if (type === 'nin') {
@@ -235,7 +247,6 @@ if (type === 'data') {
             body.innerHTML = `<input type="number" id="inp_nin" class="form-control mb-3" placeholder="11 Digit NIN Number">`;
             btn.onclick = () => window.executeTransaction();
         }
-        // NEW: BVN SEARCH
         else if (type === 'bvn') {
             title.innerText = "BVN Lookup";
             body.innerHTML = `<input type="number" id="inp_bvn" class="form-control mb-3" placeholder="11 Digit BVN Number">`;
@@ -244,7 +255,6 @@ if (type === 'data') {
 
         modal.show();
     };
-
     // --- SMART ARRAY EXTRACTOR (GUARANTEES NO MORE UNDEFINED DROPDOWNS) ---
 // ==========================================
     // DYNAMIC FETCHERS (STRICT PATHS)
@@ -324,9 +334,12 @@ if (type === 'data') {
         }
     };
 
+    // --- EXAM PINS FETCHER (FIXED PATH) ---
     window.fetchExamPins = async () => {
         const examSelect = document.getElementById('inp_exam_id');
-        examSelect.innerHTML = "<option>Loading Exams...</option>";
+        if (!examSelect) return;
+        
+        examSelect.innerHTML = "<option>Loading Exams... <i class='fas fa-spinner fa-spin'></i></option>";
         
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
@@ -334,8 +347,8 @@ if (type === 'data') {
             
             if (!result.success) throw new Error(result.message);
 
-            // EXACT PATH for Exams
-            const pins = result.data?.message?.details || [];
+            // FIX: Path must be result.data.message.details
+            const pins = result.data?.message?.details || result.data?.details || [];
 
             if (pins.length === 0) {
                 examSelect.innerHTML = "<option value=''>No exams available</option>";
@@ -344,17 +357,19 @@ if (type === 'data') {
 
             examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
             pins.forEach(pin => {
-                const name = pin.title || pin.name || "Exam Pin"; // Exams use 'title'
+                const name = pin.title || pin.name || "Exam Pin"; 
                 const price = pin.amount || 0;
                 const code = pin.id || ""; 
                 
-                examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
+                if(code) {
+                    examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
+                }
             });
         } catch(e) { 
+            console.error(e);
             examSelect.innerHTML = `<option value="">Error connecting to server</option>`; 
         }
     };
-
 
     // --- VALIDATORS (TV & POWER FIXED) ---
     window.validateMeterOrTV = async () => {
@@ -461,6 +476,16 @@ if (type === 'data') {
             payload.phone = document.getElementById('inp_phone').value;
             costAmount = parseFloat(payload.amount) + 50; 
         }
+        else if (type === 'sms') {
+            payload.sender_id = document.getElementById('inp_sender').value || "Update";
+            payload.phone = document.getElementById('inp_phone').value;
+            payload.message = document.getElementById('inp_message').value;
+            
+            if(!payload.phone || !payload.message) return alert("Phone and message are required.");
+            
+            // Assume ₦6 per page for SMS markup
+            costAmount = 6; 
+        }
         else if (type === 'exam') {
             const examEl = document.getElementById('inp_exam_id');
             payload.exam_id = examEl.value;
@@ -518,9 +543,7 @@ if (type === 'data') {
         }
     };
 
-    // ===================================
-    // VIRTUAL ACCOUNT (WITH ACCURATE ERROR LOGGING)
-    // ===================================
+  // --- VIRTUAL ACCOUNT GENERATION (INSTANT FEEDBACK) ---
     window.genAcc = async () => {
         const kycType = document.getElementById('kycType').value;
         const kycNumber = document.getElementById('kycNumber').value.trim();
@@ -550,13 +573,17 @@ if (type === 'data') {
             const out = await res.json();
             
             if(!out.success) {
-                // Shows the EXACT reason Payscribe rejected it
                 alert(out.message); 
                 btn.innerHTML = originalHtml;
                 btn.disabled = false;
             } else {
                 alert(out.message);
-                btn.innerHTML = `<i class="fas fa-cog fa-spin"></i> Awaiting Bank...`;
+                
+                // If it was instant, Firebase will update the UI immediately.
+                // If it wasn't instant, show the spinning wheel.
+                if (out.message.includes('Processing')) {
+                    btn.innerHTML = `<i class="fas fa-cog fa-spin"></i> Awaiting Bank...`;
+                }
             }
         } catch(e) {
             alert("Connection Error: " + e.message);
