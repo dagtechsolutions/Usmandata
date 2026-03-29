@@ -8,18 +8,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- REQUIRED FOR EXCEL UPLOAD IN BULK SMS -->
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
 
     <style>
         body { background: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1e293b; }
         
-        /* Sidebar Styling */
         .sidebar { background: #0f172a; color: white; min-height: 100vh; padding: 20px; position: sticky; top: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.05); }
         .nav-link { color: #94a3b8; font-weight: 600; padding: 12px 15px; border-radius: 8px; margin-bottom: 5px; transition: 0.3s; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: #fff; }
         
-        /* Premium Balance Card */
         .balance-card { 
             background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); 
             color: white; border-radius: 20px; padding: 35px 30px; margin-bottom: 25px; 
@@ -31,7 +28,6 @@
         }
         .balance-card h1 { font-size: 3rem; font-weight: 800; letter-spacing: -1px; margin: 5px 0 15px 0;}
         
-        /* Aesthetic Service Buttons */
         .service-btn { 
             background: white; border: 1px solid #e2e8f0; border-radius: 18px; padding: 25px 15px; 
             text-align: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
@@ -47,10 +43,8 @@
         }
         .srv-name { font-weight: 700; font-size: 0.95rem; color: #334155; }
         
-        /* Virtual Account Display */
         .vacc-box { background: white; border: 1px solid #e2e8f0; border-left: 5px solid #10b981; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);}
         
-        /* Modal Aesthetics */
         .modal-content { border-radius: 24px; border: none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
         .modal-header { background: #f8fafc; border-radius: 24px 24px 0 0; border-bottom: 1px solid #e2e8f0; padding: 20px 25px; }
         .form-control, .form-select { border-radius: 10px; padding: 12px 15px; border: 2px solid #e2e8f0; background: #f8fafc; font-weight: 500; }
@@ -58,7 +52,6 @@
         
         .loader { display: none; text-align: center; margin: 15px 0; color: #3b82f6; }
         
-        /* Top Process Button */
         #procBtn { border-radius: 12px; font-size: 1.1rem; padding: 14px; box-shadow: 0 4px 15px rgba(37,99,235,0.3); transition: 0.3s; }
         #procBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,99,235,0.4); }
     </style>
@@ -181,9 +174,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body p-4">
-          <!-- FIX: Moved Process Button to the TOP -->
           <button class="btn btn-primary w-100 fw-bold mb-4" id="procBtn" style="display:none;"></button>
-          
           <div id="srvBody"></div>
           <div class="loader" id="srvLoader"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Processing...</div>
           <div id="srvExtra"></div>
@@ -215,7 +206,7 @@
     const RENDER_URL = "https://usmandata.onrender.com";
 
     window.activeService = {};
-    window.allFetchedPlans = []; // Cache plans to filter by category
+    window.allFetchedPlans = []; 
 
     // --- FIREBASE LISTENER ---
     onAuthStateChanged(auth, (user) => {
@@ -225,15 +216,29 @@
                 if(data) {
                     document.getElementById('userName').innerText = data.fullName || "User";
                     
-                    // FIX: Ensure balance always displays even if missing
-                    const bal = parseFloat(data.balance) || 0;
-                    document.getElementById('userBalance').innerText = bal.toLocaleString('en-NG', {minimumFractionDigits: 2});
+                    // FIX: Ensure balance correctly displays as 0.00 if undefined
+                    const bal = parseFloat(data.balance);
+                    document.getElementById('userBalance').innerText = isNaN(bal) ? "0.00" : bal.toLocaleString('en-NG', {minimumFractionDigits: 2});
+                    
                     document.getElementById('roleBadge').innerText = (data.role || "user").toUpperCase();
                     
                     if(data.virtual_account) {
                         document.getElementById('vAccDisplay').innerHTML = `
-                            <h4 class="fw-bold text-primary mb-1" style="letter-spacing:2px; font-family:monospace;">${data.virtual_account}</h4>
-                            <div class="text-muted fw-bold text-uppercase small">${data.bank_name || "9PSB Bank"} &bull; ${data.fullName}</div>
+                            <div style="background: linear-gradient(135deg, #f8fafc, #e2e8f0); padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; position: relative; overflow: hidden;">
+                                <div style="position: absolute; right: -10px; top: -10px; opacity: 0.1;">
+                                    <i class="fas fa-university" style="font-size: 5rem; color: #004a99;"></i>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: relative; z-index: 2;">
+                                    <span style="font-size: 0.85rem; color: #64748b; font-weight: bold; text-transform: uppercase;">${data.bank_name || "9PSB Bank"}</span>
+                                    <span style="background: #dcfce7; color: #166534; font-size: 0.7rem; padding: 3px 8px; border-radius: 20px; font-weight: bold;"><i class="fas fa-bolt"></i> Auto-Funding</span>
+                                </div>
+                                <h3 style="color: #004a99; font-weight: 900; letter-spacing: 2px; margin: 0; font-family: monospace; position: relative; z-index: 2;">
+                                    ${data.virtual_account}
+                                </h3>
+                                <div style="margin-top: 5px; font-size: 0.85rem; color: #334155; font-weight: 600; text-transform: uppercase; position: relative; z-index: 2;">
+                                    ${data.fullName}
+                                </div>
+                            </div>
                         `;
                     } else {
                         document.getElementById('vAccDisplay').innerHTML = `
@@ -272,7 +277,6 @@
 
         if (type === 'data') {
             title.innerHTML = '<i class="fas fa-wifi text-primary"></i> Buy Data';
-            // NEW: Added Category Filter (SME, CG, Gifting)
             body.innerHTML = `
                 <select id="inp_network" class="form-select mb-3" onchange="window.fetchDataPlans()">
                     <option value="">1. Select Network...</option>
@@ -346,7 +350,6 @@
             btn.onclick = () => window.executeTransaction();
         }
         else if (type === 'sms') {
-            // FIX: Added EXCEL UPLOAD Logic & Calculation
             title.innerHTML = '<i class="fas fa-envelope text-primary"></i> Bulk SMS';
             body.innerHTML = `
                 <input type="text" id="inp_sender" class="form-control mb-3" placeholder="Sender ID (e.g. MySchool)" maxlength="11">
@@ -369,7 +372,7 @@
         modal.show();
     };
 
-    // --- ARRAY EXTRACTOR ---
+    // --- ARRAY EXTRACTOR (ULTIMATE FALLBACK) ---
     const getArraySafely = (payload) => {
         if (!payload) return [];
         if (Array.isArray(payload)) return payload;
@@ -400,22 +403,19 @@
             const data = await res.json();
             if (!data.success) throw new Error(data.message);
 
-            // Extract Plans
             let plans = [];
             if (data.data?.message?.details?.[0]?.plans) plans = data.data.message.details[0].plans;
             else plans = getArraySafely(data.data);
 
             if (plans.length === 0) throw new Error("No plans available");
 
-            // Save globally for categorization
             window.allFetchedPlans = plans;
             catSelect.style.display = "block";
-            window.filterDataByCategory(); // Initial render
+            window.filterDataByCategory();
 
         } catch(e) { planSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
     };
 
-    // NEW: DATA CATEGORY FILTER
     window.filterDataByCategory = () => {
         const category = document.getElementById('inp_category').value;
         const planSelect = document.getElementById('inp_plan');
@@ -427,7 +427,6 @@
             const code = p.plan_code || p.id || "";
             const nUpper = name.toUpperCase();
 
-            // Filter Logic
             let match = false;
             if (category === "ALL") match = true;
             else if (category === "SME" && nUpper.includes("SME")) match = true;
@@ -461,7 +460,6 @@
         } catch(e) { planSelect.innerHTML = `<option value="">Error connecting</option>`; }
     };
 
-    // FIX: EXAM PINS NOW SHOWING
     window.fetchExamPins = async () => {
         const examSelect = document.getElementById('inp_exam_id');
         examSelect.innerHTML = "<option>Loading Exams...</option>";
@@ -473,9 +471,11 @@
             const pins = getArraySafely(data.data);
             examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
             pins.forEach(pin => {
-                const name = pin.title || pin.name || "Exam"; 
-                const code = pin.id || ""; 
-                if(code) examSelect.innerHTML += `<option value="${code}" data-price="${pin.amount}">${name} - ₦${pin.amount}</option>`;
+                // FIX: Look for exact names used by Payscribe for exams
+                const name = pin.title || pin.name || pin.description || "Exam Pin"; 
+                const price = pin.amount || pin.price || 0;
+                const code = pin.id || pin.plan_code || ""; 
+                if(code) examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
         } catch(e) { examSelect.innerHTML = `<option value="">Error connecting</option>`; }
     };
@@ -615,7 +615,7 @@
             payload.phone = document.getElementById('inp_phone').value;
             payload.message = document.getElementById('inp_message').value;
             if(!payload.phone || !payload.message) return alert("Numbers and message required.");
-            costAmount = window.calcSmsCost(); // FIX: Dynamically gets the N6 calculation
+            costAmount = window.calcSmsCost(); 
         }
 
         payload.costAmount = costAmount; 
