@@ -216,10 +216,8 @@
                 if(data) {
                     document.getElementById('userName').innerText = data.fullName || "User";
                     
-                    // FIX: Ensure balance correctly displays as 0.00 if undefined
                     const bal = parseFloat(data.balance);
                     document.getElementById('userBalance').innerText = isNaN(bal) ? "0.00" : bal.toLocaleString('en-NG', {minimumFractionDigits: 2});
-                    
                     document.getElementById('roleBadge').innerText = (data.role || "user").toUpperCase();
                     
                     if(data.virtual_account) {
@@ -252,8 +250,8 @@
                                 </select>
                                 <input type="number" id="kycNumber" class="form-control" placeholder="Enter 11-digit number">
                             </div>
-                            <button class="btn btn-primary w-100 fw-bold" id="btn-gen-acc" onclick="window.genAcc()">
-                                <i class="fas fa-plus"></i> Generate Account
+                            <button class="btn btn-primary w-100 fw-bold shadow-sm" id="btn-gen-acc" onclick="window.genAcc()">
+                                <i class="fas fa-plus"></i> Generate Funding Account
                             </button>
                         `;
                     }
@@ -372,22 +370,9 @@
         modal.show();
     };
 
-    // --- ARRAY EXTRACTOR (ULTIMATE FALLBACK) ---
-    const getArraySafely = (payload) => {
-        if (!payload) return [];
-        if (Array.isArray(payload)) return payload;
-        if (payload.message) {
-            if (Array.isArray(payload.message.details)) return payload.message.details;
-            if (Array.isArray(payload.message)) return payload.message;
-        }
-        if (payload.details && Array.isArray(payload.details)) return payload.details;
-        for (let key in payload) {
-            if (Array.isArray(payload[key])) return payload[key];
-        }
-        return [];
-    };
-
-    // --- FETCHERS ---
+    // ==========================================
+    // DYNAMIC FETCHERS (STRICT PATHS)
+    // ==========================================
     window.fetchDataPlans = async () => {
         const network = document.getElementById('inp_network').value;
         if(!network) return;
@@ -395,19 +380,24 @@
         const planSelect = document.getElementById('inp_plan');
         const catSelect = document.getElementById('inp_category');
         
-        planSelect.innerHTML = "<option>Loading plans...</option>";
+        planSelect.innerHTML = "<option>Loading plans... <i class='fas fa-spinner fa-spin'></i></option>";
         catSelect.style.display = "none";
         
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=data_plans&network=${network}`);
-            const data = await res.json();
-            if (!data.success) throw new Error(data.message);
+            const apiRes = await res.json();
+            
+            if (!apiRes.success) throw new Error(apiRes.message);
 
+            // STRICT PATH: Extracted directly from Payscribe Docs
             let plans = [];
-            if (data.data?.message?.details?.[0]?.plans) plans = data.data.message.details[0].plans;
-            else plans = getArraySafely(data.data);
+            if (apiRes.data?.data?.message?.details?.[0]?.plans) {
+                plans = apiRes.data.data.message.details[0].plans;
+            } else if (apiRes.data?.message?.details?.[0]?.plans) {
+                plans = apiRes.data.message.details[0].plans;
+            }
 
-            if (plans.length === 0) throw new Error("No plans available");
+            if (!plans || plans.length === 0) throw new Error("No plans available");
 
             window.allFetchedPlans = plans;
             catSelect.style.display = "block";
@@ -443,41 +433,58 @@
         const service = document.getElementById('inp_service').value;
         if(!service) return;
         const planSelect = document.getElementById('inp_plan');
-        planSelect.innerHTML = "<option>Loading bouquets...</option>";
+        planSelect.innerHTML = "<option>Loading bouquets... <i class='fas fa-spinner fa-spin'></i></option>";
         
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=tv_bouquets&service=${service}`);
-            const data = await res.json();
-            if (!data.success) throw new Error(data.message);
+            const apiRes = await res.json();
+            
+            if (!apiRes.success) throw new Error(apiRes.message);
 
-            const plans = getArraySafely(data.data);
+            // STRICT PATH
+            let plans = [];
+            if (apiRes.data?.data?.message?.details) plans = apiRes.data.data.message.details;
+            else if (apiRes.data?.message?.details) plans = apiRes.data.message.details;
+
+            if (!plans || plans.length === 0) throw new Error("No bouquets available");
+
             planSelect.innerHTML = "<option value=''>Select Bouquet...</option>";
             plans.forEach(p => {
                 const name = p.name || "Bouquet";
-                const code = p.id || p.plan_code || ""; 
-                if(code) planSelect.innerHTML += `<option value="${code}" data-price="${p.amount}">${name} - ₦${p.amount}</option>`;
+                const price = p.amount || p.price || 0;
+                const code = p.id || p.plan_code || ""; // TV Uses ID
+                
+                if(code) planSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
-        } catch(e) { planSelect.innerHTML = `<option value="">Error connecting</option>`; }
+        } catch(e) { planSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
     };
 
     window.fetchExamPins = async () => {
         const examSelect = document.getElementById('inp_exam_id');
-        examSelect.innerHTML = "<option>Loading Exams...</option>";
+        examSelect.innerHTML = "<option>Loading Exams... <i class='fas fa-spinner fa-spin'></i></option>";
+        
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
-            const data = await res.json();
-            if (!data.success) throw new Error(data.message);
+            const apiRes = await res.json();
+            
+            if (!apiRes.success) throw new Error(apiRes.message);
 
-            const pins = getArraySafely(data.data);
+            // STRICT PATH
+            let pins = [];
+            if (apiRes.data?.data?.message?.details) pins = apiRes.data.data.message.details;
+            else if (apiRes.data?.message?.details) pins = apiRes.data.message.details;
+
+            if (!pins || pins.length === 0) throw new Error("No exams available");
+
             examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
             pins.forEach(pin => {
-                // FIX: Look for exact names used by Payscribe for exams
-                const name = pin.title || pin.name || pin.description || "Exam Pin"; 
+                const name = pin.title || pin.name || pin.description || "Exam Pin"; // Exam uses title
                 const price = pin.amount || pin.price || 0;
-                const code = pin.id || pin.plan_code || ""; 
+                const code = pin.id || pin.plan_code || ""; // Exam uses id
+                
                 if(code) examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
-        } catch(e) { examSelect.innerHTML = `<option value="">Error connecting</option>`; }
+        } catch(e) { examSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
     };
 
     // --- BULK SMS HELPERS ---
@@ -549,7 +556,7 @@
             document.getElementById('srvLoader').style.display = "none";
 
             if (out.success) {
-                const custName = out.data.message?.details?.customer_name || out.data.message?.details?.name || "Customer Verified";
+                const custName = out.data?.data?.message?.details?.customer_name || out.data?.data?.message?.details?.name || "Customer Verified";
                 window.activeService.customer_name = custName;
                 document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success fw-bold text-center border-2 border-success">Verified: ${custName}</div>`;
                 btn.innerText = "Pay Now";
@@ -659,9 +666,20 @@
                 body: JSON.stringify({ uid: auth.currentUser.uid, kycType, kycNumber })
             });
             const out = await res.json();
-            alert(out.message);
-            if(!out.success) { btn.innerHTML = `Try Again`; btn.disabled = false; }
-        } catch(e) { alert("Error connecting."); btn.innerHTML = `Try Again`; btn.disabled = false; }
+            
+            if(!out.success) { 
+                alert(out.message); 
+                btn.innerHTML = `<i class="fas fa-plus"></i> Try Again`; 
+                btn.disabled = false; 
+            } else {
+                alert(out.message);
+                btn.innerHTML = `<i class="fas fa-cog fa-spin"></i> Awaiting Bank...`;
+            }
+        } catch(e) { 
+            alert("Error connecting."); 
+            btn.innerHTML = `<i class="fas fa-plus"></i> Try Again`; 
+            btn.disabled = false; 
+        }
     };
 
     const logout = () => signOut(auth).then(() => window.location.href="login.html");
