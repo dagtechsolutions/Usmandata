@@ -8,15 +8,18 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- REQUIRED FOR EXCEL UPLOAD IN BULK SMS -->
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
 
     <style>
         body { background: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1e293b; }
         
+        /* Sidebar Styling */
         .sidebar { background: #0f172a; color: white; min-height: 100vh; padding: 20px; position: sticky; top: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.05); }
         .nav-link { color: #94a3b8; font-weight: 600; padding: 12px 15px; border-radius: 8px; margin-bottom: 5px; transition: 0.3s; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: #fff; }
         
+        /* Premium Balance Card */
         .balance-card { 
             background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); 
             color: white; border-radius: 20px; padding: 35px 30px; margin-bottom: 25px; 
@@ -28,6 +31,7 @@
         }
         .balance-card h1 { font-size: 3rem; font-weight: 800; letter-spacing: -1px; margin: 5px 0 15px 0;}
         
+        /* Aesthetic Service Buttons */
         .service-btn { 
             background: white; border: 1px solid #e2e8f0; border-radius: 18px; padding: 25px 15px; 
             text-align: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
@@ -43,8 +47,10 @@
         }
         .srv-name { font-weight: 700; font-size: 0.95rem; color: #334155; }
         
+        /* Virtual Account Display */
         .vacc-box { background: white; border: 1px solid #e2e8f0; border-left: 5px solid #10b981; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);}
         
+        /* Modal Aesthetics */
         .modal-content { border-radius: 24px; border: none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
         .modal-header { background: #f8fafc; border-radius: 24px 24px 0 0; border-bottom: 1px solid #e2e8f0; padding: 20px 25px; }
         .form-control, .form-select { border-radius: 10px; padding: 12px 15px; border: 2px solid #e2e8f0; background: #f8fafc; font-weight: 500; }
@@ -52,6 +58,7 @@
         
         .loader { display: none; text-align: center; margin: 15px 0; color: #3b82f6; }
         
+        /* Top Process Button */
         #procBtn { border-radius: 12px; font-size: 1.1rem; padding: 14px; box-shadow: 0 4px 15px rgba(37,99,235,0.3); transition: 0.3s; }
         #procBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,99,235,0.4); }
     </style>
@@ -168,12 +175,13 @@
 <!-- Dynamic Modal -->
 <div class="modal fade" id="srvModal" tabindex="-1" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-          <h5 class="modal-title fw-bold text-dark" id="srvTitle">Service</h5>
+    <div class="modal-content border-0" style="border-radius: 20px;">
+      <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold" id="srvTitle">Service</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body p-4">
+          <!-- FIX: Process Button is at the TOP -->
           <button class="btn btn-primary w-100 fw-bold mb-4" id="procBtn" style="display:none;"></button>
           
           <div id="srvBody"></div>
@@ -209,7 +217,9 @@
     window.activeService = {};
     window.allFetchedPlans = []; 
 
-    // --- FIREBASE LISTENER (Displays Balance Real-time) ---
+    // ====================================================
+    // THIS IS THE CODE THAT UPDATES YOUR BALANCE LIVE
+    // ====================================================
     onAuthStateChanged(auth, (user) => {
         if (user) {
             onValue(ref(db, 'users/' + user.uid), (snapshot) => {
@@ -217,8 +227,10 @@
                 if(data) {
                     document.getElementById('userName').innerText = data.fullName || "User";
                     
+                    // THIS LINE UPDATES YOUR BALANCE ON SCREEN!
                     const bal = parseFloat(data.balance);
                     document.getElementById('userBalance').innerText = isNaN(bal) ? "0.00" : bal.toLocaleString('en-NG', {minimumFractionDigits: 2});
+                    
                     document.getElementById('roleBadge').innerText = (data.role || "user").toUpperCase();
                     
                     if(data.virtual_account) {
@@ -244,15 +256,15 @@
                             <div class="alert alert-warning p-2 mb-3" style="font-size:0.85rem; border-left: 4px solid #ffc107;">
                                 <i class="fas fa-shield-alt text-danger"></i> <b>CBN KYC:</b> To generate an account, your registered name <b>(${data.fullName})</b> MUST match your BVN/NIN.
                             </div>
-                            <div class="input-group mb-2">
+                            <div class="input-group mb-2 shadow-sm">
                                 <select id="kycType" class="form-select bg-white fw-bold" style="max-width: 100px;">
                                     <option value="nin">NIN</option>
                                     <option value="bvn">BVN</option>
                                 </select>
                                 <input type="number" id="kycNumber" class="form-control" placeholder="Enter 11-digit number">
                             </div>
-                            <button class="btn btn-primary w-100 fw-bold" id="btn-gen-acc" onclick="window.genAcc()">
-                                <i class="fas fa-plus"></i> Generate Account
+                            <button class="btn btn-primary w-100 fw-bold shadow-sm" id="btn-gen-acc" onclick="window.genAcc()">
+                                <i class="fas fa-plus"></i> Generate Funding Account
                             </button>
                         `;
                     }
@@ -371,6 +383,29 @@
         modal.show();
     };
 
+    // --- ARRAY EXTRACTOR ---
+    const getArraySafely = (apiResponse) => {
+        if (!apiResponse) return [];
+        let payload = apiResponse.data || apiResponse;
+        
+        if (Array.isArray(payload)) return payload;
+        if (payload.message) {
+            if (Array.isArray(payload.message.details)) return payload.message.details;
+            if (Array.isArray(payload.message)) return payload.message;
+        }
+        if (payload.details && Array.isArray(payload.details)) return payload.details;
+        
+        for (let key in payload) {
+            if (Array.isArray(payload[key])) return payload[key];
+            if (payload[key] && typeof payload[key] === 'object') {
+                for (let subKey in payload[key]) {
+                    if (Array.isArray(payload[key][subKey])) return payload[key][subKey];
+                }
+            }
+        }
+        return [];
+    };
+
     // --- FETCHERS ---
     window.fetchDataPlans = async () => {
         const network = document.getElementById('inp_network').value;
@@ -384,24 +419,21 @@
         
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=data_plans&network=${network}`);
-            const apiRes = await res.json();
+            const data = await res.json();
             
-            if (!apiRes.success) throw new Error(apiRes.message);
+            if (!data.success) throw new Error(data.message);
 
             let plans = [];
-            if (apiRes.data?.data?.message?.details?.[0]?.plans) {
-                plans = apiRes.data.data.message.details[0].plans;
-            } else if (apiRes.data?.message?.details?.[0]?.plans) {
-                plans = apiRes.data.message.details[0].plans;
-            }
+            if (data.data?.message?.details?.[0]?.plans) plans = data.data.message.details[0].plans;
+            else plans = getArraySafely(data);
 
-            if (!plans || plans.length === 0) throw new Error("No plans available");
+            if (plans.length === 0) throw new Error("No plans available");
 
             window.allFetchedPlans = plans;
             catSelect.style.display = "block";
             window.filterDataByCategory();
 
-        } catch(e) { planSelect.innerHTML = `<option value="">${e.message}</option>`; }
+        } catch(e) { planSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
     };
 
     window.filterDataByCategory = () => {
@@ -435,43 +467,30 @@
         
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=tv_bouquets&service=${service}`);
-            const apiRes = await res.json();
+            const data = await res.json();
             
-            if (!apiRes.success) throw new Error(apiRes.message);
+            if (!data.success) throw new Error(data.message);
 
-            let plans = [];
-            if (apiRes.data?.data?.message?.details) plans = apiRes.data.data.message.details;
-            else if (apiRes.data?.message?.details) plans = apiRes.data.message.details;
-
-            if (!plans || plans.length === 0) throw new Error("No bouquets available");
-
+            const plans = getArraySafely(data);
             planSelect.innerHTML = "<option value=''>Select Bouquet...</option>";
             plans.forEach(p => {
                 const name = p.name || "Bouquet";
                 const price = p.amount || p.price || 0;
                 const code = p.id || p.plan_code || ""; 
-                
                 if(code) planSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
-        } catch(e) { planSelect.innerHTML = `<option value="">${e.message}</option>`; }
+        } catch(e) { planSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
     };
 
     window.fetchExamPins = async () => {
         const examSelect = document.getElementById('inp_exam_id');
         examSelect.innerHTML = "<option>Loading Exams... <i class='fas fa-spinner fa-spin'></i></option>";
-        
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
-            const apiRes = await res.json();
-            
-            if (!apiRes.success) throw new Error(apiRes.message);
+            const data = await res.json();
+            if (!data.success) throw new Error(data.message);
 
-            let pins = [];
-            if (apiRes.data?.data?.message?.details) pins = apiRes.data.data.message.details;
-            else if (apiRes.data?.message?.details) pins = apiRes.data.message.details;
-
-            if (!pins || pins.length === 0) throw new Error("No exams available");
-
+            const pins = getArraySafely(data);
             examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
             pins.forEach(pin => {
                 const name = pin.title || pin.name || pin.description || "Exam Pin"; 
@@ -479,10 +498,10 @@
                 const code = pin.id || pin.plan_code || ""; 
                 if(code) examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
-        } catch(e) { examSelect.innerHTML = `<option value="">${e.message}</option>`; }
+        } catch(e) { examSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
     };
 
-    // --- BULK SMS ---
+    // --- BULK SMS HELPERS ---
     window.handleSmsExcel = (input) => {
         const file = input.files[0];
         if(!file) return;
@@ -544,14 +563,15 @@
         document.getElementById('srvLoader').style.display = "block";
 
         try {
-            const res = await fetch(`${RENDER_URL}/api/validate`, {
+            const endpoint = `${RENDER_URL}/api/validate`;
+            const res = await fetch(endpoint, {
                 method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
             });
             const out = await res.json();
             document.getElementById('srvLoader').style.display = "none";
 
             if (out.success) {
-                const custName = out.data?.data?.message?.details?.customer_name || out.data?.data?.message?.details?.name || "Customer Verified";
+                const custName = out.data?.message?.details?.customer_name || out.data?.message?.details?.name || "Customer Verified";
                 window.activeService.customer_name = custName;
                 document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success fw-bold text-center border-2 border-success">Verified: ${custName}</div>`;
                 btn.innerText = "Pay Now";
@@ -627,9 +647,12 @@
         document.getElementById('srvLoader').style.display = "block";
 
         try {
-            const res = await fetch(`${RENDER_URL}/api/process`, {
+            const endpoint = `${RENDER_URL}/api/process`;
+            const res = await fetch(endpoint, {
                 method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
             });
+            if (res.status === 404) throw new Error("Endpoint not found.");
+            
             const out = await res.json();
             document.getElementById('srvLoader').style.display = "none";
             
@@ -653,17 +676,28 @@
         if (kycNumber.length !== 11) return alert(`Enter valid 11-digit ${kycType.toUpperCase()}.`);
 
         const btn = document.getElementById('btn-gen-acc');
-        btn.innerHTML = `Processing...`; btn.disabled = true;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`; 
+        btn.disabled = true;
         
         try {
-            const res = await fetch(`${RENDER_URL}/api/gen-account`, {
+            const endpoint = `${RENDER_URL}/api/gen-account`;
+            const res = await fetch(endpoint, {
                 method: 'POST', headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ uid: auth.currentUser.uid, kycType, kycNumber })
             });
+            if (res.status === 404) throw new Error("Endpoint not found.");
+
             const out = await res.json();
             alert(out.message);
-            if(!out.success) { btn.innerHTML = `Try Again`; btn.disabled = false; }
-        } catch(e) { alert("Error connecting."); btn.innerHTML = `Try Again`; btn.disabled = false; }
+            if(!out.success) { 
+                btn.innerHTML = `<i class="fas fa-plus"></i> Try Again`; 
+                btn.disabled = false; 
+            }
+        } catch(e) { 
+            alert("Error connecting."); 
+            btn.innerHTML = `<i class="fas fa-plus"></i> Try Again`; 
+            btn.disabled = false; 
+        }
     };
 
     const logout = () => signOut(auth).then(() => window.location.href="login.html");
