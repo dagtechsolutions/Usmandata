@@ -482,8 +482,11 @@
         } catch(e) { planSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
     };
 
+    // --- EXAM PINS FETCHER (FIXED PATH) ---
     window.fetchExamPins = async () => {
         const examSelect = document.getElementById('inp_exam_id');
+        if (!examSelect) return;
+        
         examSelect.innerHTML = "<option>Loading Exams... <i class='fas fa-spinner fa-spin'></i></option>";
         
         try {
@@ -492,12 +495,21 @@
             
             if (!apiRes.success) throw new Error(apiRes.message);
 
-            // 🌟 EXTRA SAFE ARRAY EXTRACTOR FOR EXAM PINS
+            // FIX: Dig deeper into the response to find the actual array of pins
             let pins = [];
-            if (apiRes.data?.data?.message?.details) pins = apiRes.data.data.message.details;
-            else if (apiRes.data?.message?.details) pins = apiRes.data.message.details;
-            else if (Array.isArray(apiRes.data?.data)) pins = apiRes.data.data;
-            else if (Array.isArray(apiRes.data)) pins = apiRes.data;
+            if (apiRes.data?.data?.message?.details?.[0]?.plans) {
+                pins = apiRes.data.data.message.details[0].plans; // New Payscribe Format
+            } else if (apiRes.data?.message?.details?.[0]?.plans) {
+                pins = apiRes.data.message.details[0].plans; 
+            } else if (apiRes.data?.data?.message?.details) {
+                pins = apiRes.data.data.message.details; // Standard Format
+            } else if (apiRes.data?.message?.details) {
+                pins = apiRes.data.message.details;
+            } else if (Array.isArray(apiRes.data?.data)) {
+                pins = apiRes.data.data;
+            } else if (Array.isArray(apiRes.data)) {
+                pins = apiRes.data;
+            }
 
             if (!pins || pins.length === 0) throw new Error("No exams available currently");
 
@@ -505,11 +517,14 @@
             pins.forEach(pin => {
                 const name = pin.title || pin.name || pin.description || "Exam Pin"; 
                 const price = pin.amount || pin.price || 0;
-                const code = pin.id || pin.plan_code || ""; 
+                const code = pin.id || pin.plan_code || pin.code || ""; 
                 
-                if(code) examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
+                if(code) {
+                    examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
+                }
             });
         } catch(e) { 
+            console.error("Exam Pin Fetch Error:", e);
             examSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; 
         }
     };
