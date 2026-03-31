@@ -491,24 +491,18 @@
         
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
-            const apiRes = await res.json();
+            const result = await res.json();
             
-            if (!apiRes.success) throw new Error(apiRes.message);
+            if (!result.success) throw new Error(result.message);
 
-            // FIX: Dig deeper into the response to find the actual array of pins
+            // FIX: Dig directly into the response to find the array of pins
             let pins = [];
-            if (apiRes.data?.data?.message?.details?.[0]?.plans) {
-                pins = apiRes.data.data.message.details[0].plans; // New Payscribe Format
-            } else if (apiRes.data?.message?.details?.[0]?.plans) {
-                pins = apiRes.data.message.details[0].plans; 
-            } else if (apiRes.data?.data?.message?.details) {
-                pins = apiRes.data.data.message.details; // Standard Format
-            } else if (apiRes.data?.message?.details) {
-                pins = apiRes.data.message.details;
-            } else if (Array.isArray(apiRes.data?.data)) {
-                pins = apiRes.data.data;
-            } else if (Array.isArray(apiRes.data)) {
-                pins = apiRes.data;
+            if (result.data?.message?.details) {
+                pins = result.data.message.details;
+            } else if (result.data?.data?.message?.details) {
+                pins = result.data.data.message.details;
+            } else if (Array.isArray(result.data?.data)) {
+                pins = result.data.data;
             }
 
             if (!pins || pins.length === 0) throw new Error("No exams available currently");
@@ -526,6 +520,94 @@
         } catch(e) { 
             console.error("Exam Pin Fetch Error:", e);
             examSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; 
+        }
+    };
+
+    // --- EXECUTION FUNCTION (FIXED NIN/BVN COST) ---
+    window.executeTransaction = async () => {
+        const uid = auth.currentUser.uid;
+        const type = window.activeService.type;
+        const btn = document.getElementById('procBtn');
+        const payload = { uid, type, customer_name: window.activeService.customer_name };
+        let costAmount = 0;
+
+        if (type === 'data') {
+            const p = document.getElementById('inp_plan');
+            if(!p.value) return alert("Select a plan.");
+            payload.network = document.getElementById('inp_network').value;
+            payload.plan = p.value;
+            payload.phone = document.getElementById('inp_phone').value;
+            costAmount = parseFloat(p.options[p.selectedIndex].getAttribute('data-price')) + 10; 
+        } 
+        else if (type === 'airtime') {
+            payload.network = document.getElementById('inp_network').value;
+            payload.phone = document.getElementById('inp_phone').value;
+            payload.amount = document.getElementById('inp_amount').value;
+            costAmount = parseFloat(payload.amount); 
+        }
+        else if (type === 'nin' || type === 'bvn') {
+            // FIX: Correctly set the payload based on type, and explicitly set costAmount!
+            if (type === 'nin') payload.nin = document.getElementById('inp_kyc_num').value;
+            if (type === 'bvn') payload.bvn = document.getElementById('inp_kyc_num').value;
+            costAmount = 150; 
+        }
+        else if (type === 'tv') {
+            const p = document.getElementById('inp_plan');
+            payload.service = document.getElementById('inp_service').value;
+            payload.plan_id = p.value;
+            payload.account = document.getElementById('inp_account').value;
+            payload.phone = document.getElementById('inp_phone').value;
+            costAmount = parseFloat(p.options[p.selectedIndex].getAttribute('data-price')) + 30; 
+        }
+        else if (type === 'power') {
+            payload.service = document.getElementById('inp_service').value;
+            payload.meter_number = document.getElementById('inp_account').value;
+            payload.meter_type = document.getElementById('inp_meter_type').value;
+            payload.amount = document.getElementById('inp_amount').value;
+            payload.phone = document.getElementById('inp_phone').value;
+            costAmount = parseFloat(payload.amount) + 50; 
+        }
+        else if (type === 'exam') {
+            const p = document.getElementById('inp_exam_id');
+            if(!p.value) return alert("Select an Exam.");
+            payload.exam_id = p.value;
+            payload.qty = document.getElementById('inp_qty').value;
+            const unitPrice = parseFloat(p.options[p.selectedIndex].getAttribute('data-price'));
+            costAmount = (unitPrice * parseFloat(payload.qty)) + 50; 
+        }
+        else if (type === 'sms') {
+            payload.sender_id = document.getElementById('inp_sender').value || "Update";
+            payload.phone = document.getElementById('inp_phone').value;
+            payload.message = document.getElementById('inp_message').value;
+            if(!payload.phone || !payload.message) return alert("Numbers and message required.");
+            costAmount = window.calcSmsCost(); 
+        }
+
+        // FIX: Ensure costAmount is always sent!
+        payload.costAmount = costAmount; 
+        if(!confirm(`You will be charged ₦${costAmount.toLocaleString()}. Proceed?`)) return;
+
+        btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+        document.getElementById('srvLoader').style.display = "block";
+
+        try {
+            const res = await fetch(`${RENDER_URL}/api/process`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+            });
+            const out = await res.json();
+            document.getElementById('srvLoader').style.display = "none";
+            
+            if(out.success) {
+                document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success text-center fw-bold"><i class="fas fa-check-circle fa-2x"></i><br>Success!</div>`;
+                btn.style.display = "none"; 
+            } else {
+                alert(out.message);
+                btn.disabled = false; btn.innerText = "Try Again";
+            }
+        } catch(e) { 
+            alert("Network Error."); 
+            btn.disabled = false; btn.innerText = "Process"; 
+            document.getElementById('srvLoader').style.display = "none";
         }
     };
     // --- BULK SMS HELPERS ---
