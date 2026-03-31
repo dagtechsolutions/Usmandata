@@ -175,6 +175,7 @@
       </div>
       <div class="modal-body p-4">
           <button class="btn btn-primary w-100 fw-bold mb-4" id="procBtn" style="display:none;"></button>
+          
           <div id="srvBody"></div>
           <div class="loader" id="srvLoader"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Processing...</div>
           <div id="srvExtra"></div>
@@ -208,7 +209,7 @@
     window.activeService = {};
     window.allFetchedPlans = []; 
 
-    // --- FIREBASE LISTENER ---
+    // --- FIREBASE LISTENER (Displays Balance Real-time) ---
     onAuthStateChanged(auth, (user) => {
         if (user) {
             onValue(ref(db, 'users/' + user.uid), (snapshot) => {
@@ -250,8 +251,8 @@
                                 </select>
                                 <input type="number" id="kycNumber" class="form-control" placeholder="Enter 11-digit number">
                             </div>
-                            <button class="btn btn-primary w-100 fw-bold shadow-sm" id="btn-gen-acc" onclick="window.genAcc()">
-                                <i class="fas fa-plus"></i> Generate Funding Account
+                            <button class="btn btn-primary w-100 fw-bold" id="btn-gen-acc" onclick="window.genAcc()">
+                                <i class="fas fa-plus"></i> Generate Account
                             </button>
                         `;
                     }
@@ -370,9 +371,7 @@
         modal.show();
     };
 
-    // ==========================================
-    // DYNAMIC FETCHERS (STRICT PATHS)
-    // ==========================================
+    // --- FETCHERS ---
     window.fetchDataPlans = async () => {
         const network = document.getElementById('inp_network').value;
         if(!network) return;
@@ -389,7 +388,6 @@
             
             if (!apiRes.success) throw new Error(apiRes.message);
 
-            // STRICT PATH: Extracted directly from Payscribe Docs
             let plans = [];
             if (apiRes.data?.data?.message?.details?.[0]?.plans) {
                 plans = apiRes.data.data.message.details[0].plans;
@@ -403,7 +401,7 @@
             catSelect.style.display = "block";
             window.filterDataByCategory();
 
-        } catch(e) { planSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
+        } catch(e) { planSelect.innerHTML = `<option value="">${e.message}</option>`; }
     };
 
     window.filterDataByCategory = () => {
@@ -441,7 +439,6 @@
             
             if (!apiRes.success) throw new Error(apiRes.message);
 
-            // STRICT PATH
             let plans = [];
             if (apiRes.data?.data?.message?.details) plans = apiRes.data.data.message.details;
             else if (apiRes.data?.message?.details) plans = apiRes.data.message.details;
@@ -452,11 +449,11 @@
             plans.forEach(p => {
                 const name = p.name || "Bouquet";
                 const price = p.amount || p.price || 0;
-                const code = p.id || p.plan_code || ""; // TV Uses ID
+                const code = p.id || p.plan_code || ""; 
                 
                 if(code) planSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
-        } catch(e) { planSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
+        } catch(e) { planSelect.innerHTML = `<option value="">${e.message}</option>`; }
     };
 
     window.fetchExamPins = async () => {
@@ -469,7 +466,6 @@
             
             if (!apiRes.success) throw new Error(apiRes.message);
 
-            // STRICT PATH
             let pins = [];
             if (apiRes.data?.data?.message?.details) pins = apiRes.data.data.message.details;
             else if (apiRes.data?.message?.details) pins = apiRes.data.message.details;
@@ -478,16 +474,15 @@
 
             examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
             pins.forEach(pin => {
-                const name = pin.title || pin.name || pin.description || "Exam Pin"; // Exam uses title
+                const name = pin.title || pin.name || pin.description || "Exam Pin"; 
                 const price = pin.amount || pin.price || 0;
-                const code = pin.id || pin.plan_code || ""; // Exam uses id
-                
+                const code = pin.id || pin.plan_code || ""; 
                 if(code) examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
-        } catch(e) { examSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
+        } catch(e) { examSelect.innerHTML = `<option value="">${e.message}</option>`; }
     };
 
-    // --- BULK SMS HELPERS ---
+    // --- BULK SMS ---
     window.handleSmsExcel = (input) => {
         const file = input.files[0];
         if(!file) return;
@@ -628,7 +623,7 @@
         payload.costAmount = costAmount; 
         if(!confirm(`You will be charged ₦${costAmount.toLocaleString()}. Proceed?`)) return;
 
-        btn.disabled = true; btn.innerHTML = "Processing...";
+        btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
         document.getElementById('srvLoader').style.display = "block";
 
         try {
@@ -666,20 +661,9 @@
                 body: JSON.stringify({ uid: auth.currentUser.uid, kycType, kycNumber })
             });
             const out = await res.json();
-            
-            if(!out.success) { 
-                alert(out.message); 
-                btn.innerHTML = `<i class="fas fa-plus"></i> Try Again`; 
-                btn.disabled = false; 
-            } else {
-                alert(out.message);
-                btn.innerHTML = `<i class="fas fa-cog fa-spin"></i> Awaiting Bank...`;
-            }
-        } catch(e) { 
-            alert("Error connecting."); 
-            btn.innerHTML = `<i class="fas fa-plus"></i> Try Again`; 
-            btn.disabled = false; 
-        }
+            alert(out.message);
+            if(!out.success) { btn.innerHTML = `Try Again`; btn.disabled = false; }
+        } catch(e) { alert("Error connecting."); btn.innerHTML = `Try Again`; btn.disabled = false; }
     };
 
     const logout = () => signOut(auth).then(() => window.location.href="login.html");
