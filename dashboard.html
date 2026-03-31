@@ -485,22 +485,34 @@
     window.fetchExamPins = async () => {
         const examSelect = document.getElementById('inp_exam_id');
         examSelect.innerHTML = "<option>Loading Exams... <i class='fas fa-spinner fa-spin'></i></option>";
+        
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
-            const data = await res.json();
-            if (!data.success) throw new Error(data.message);
+            const apiRes = await res.json();
+            
+            if (!apiRes.success) throw new Error(apiRes.message);
 
-            const pins = getArraySafely(data);
+            // 🌟 EXTRA SAFE ARRAY EXTRACTOR FOR EXAM PINS
+            let pins = [];
+            if (apiRes.data?.data?.message?.details) pins = apiRes.data.data.message.details;
+            else if (apiRes.data?.message?.details) pins = apiRes.data.message.details;
+            else if (Array.isArray(apiRes.data?.data)) pins = apiRes.data.data;
+            else if (Array.isArray(apiRes.data)) pins = apiRes.data;
+
+            if (!pins || pins.length === 0) throw new Error("No exams available currently");
+
             examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
             pins.forEach(pin => {
                 const name = pin.title || pin.name || pin.description || "Exam Pin"; 
                 const price = pin.amount || pin.price || 0;
                 const code = pin.id || pin.plan_code || ""; 
+                
                 if(code) examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             });
-        } catch(e) { examSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
+        } catch(e) { 
+            examSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; 
+        }
     };
-
     // --- BULK SMS HELPERS ---
     window.handleSmsExcel = (input) => {
         const file = input.files[0];
