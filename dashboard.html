@@ -482,47 +482,65 @@
         } catch(e) { planSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
     };
 
-    // --- EXAM PINS FETCHER (FIXED PATH) ---
-    window.fetchExamPins = async () => {
-        const examSelect = document.getElementById('inp_exam_id');
-        if (!examSelect) return;
+// --- EXAM PINS FETCHER (FIXED) ---
+window.fetchExamPins = async () => {
+    const examSelect = document.getElementById('inp_exam_id');
+    if (!examSelect) return;
+    
+    examSelect.innerHTML = "<option>Loading Exams... <i class='fas fa-spinner fa-spin'></i></option>";
+    
+    try {
+        const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
+        const result = await res.json();
         
-        examSelect.innerHTML = "<option>Loading Exams... <i class='fas fa-spinner fa-spin'></i></option>";
+        if (!result.success) throw new Error(result.message);
+
+        // FIX: Better extraction logic for Payscribe API response
+        let pins = [];
         
-        try {
-            const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
-            const result = await res.json();
-            
-            if (!result.success) throw new Error(result.message);
-
-            // FIX: Dig directly into the response to find the array of pins
-            let pins = [];
-            if (result.data?.message?.details) {
-                pins = result.data.message.details;
-            } else if (result.data?.data?.message?.details) {
-                pins = result.data.data.message.details;
-            } else if (Array.isArray(result.data?.data)) {
-                pins = result.data.data;
-            }
-
-            if (!pins || pins.length === 0) throw new Error("No exams available currently");
-
-            examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
-            pins.forEach(pin => {
-                const name = pin.title || pin.name || pin.description || "Exam Pin"; 
-                const price = pin.amount || pin.price || 0;
-                const code = pin.id || pin.plan_code || pin.code || ""; 
-                
-                if(code) {
-                    examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
-                }
-            });
-        } catch(e) { 
-            console.error("Exam Pin Fetch Error:", e);
-            examSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; 
+        // Try different possible response structures
+        if (result.data?.data && Array.isArray(result.data.data)) {
+            pins = result.data.data;
+        } else if (result.data?.message?.details && Array.isArray(result.data.message.details)) {
+            pins = result.data.message.details;
+        } else if (result.data?.data?.message?.details && Array.isArray(result.data.data.message.details)) {
+            pins = result.data.data.message.details;
+        } else if (Array.isArray(result.data?.data)) {
+            pins = result.data.data;
+        } else if (Array.isArray(result.data)) {
+            pins = result.data;
         }
-    };
 
+        if (!pins || pins.length === 0) {
+            // Fallback to hardcoded exam pins if API returns empty
+            examSelect.innerHTML = `<option value="">No exams available</option>`;
+            console.warn("No exam pins found in response:", result);
+            return;
+        }
+
+        examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
+        
+        pins.forEach(pin => {
+            // Try to extract name and price from various possible field names
+            const name = pin.title || pin.name || pin.description || pin.exam_name || "Exam Pin";
+            const price = pin.amount || pin.price || pin.cost || 0;
+            const code = pin.id || pin.plan_code || pin.code || pin.exam_id || "";
+            
+            if (code) {
+                examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
+            }
+        });
+        
+        // If no options were added, show error
+        if (examSelect.options.length <= 1) {
+            examSelect.innerHTML = `<option value="">No exam pins available</option>`;
+        }
+        
+    } catch (e) { 
+        console.error("Exam Pin Fetch Error:", e);
+        examSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; 
+    }
+};
     // --- EXECUTION FUNCTION (FIXED NIN/BVN COST) ---
     window.executeTransaction = async () => {
         const uid = auth.currentUser.uid;
@@ -550,6 +568,11 @@
             if (type === 'nin') payload.nin = document.getElementById('inp_kyc_num').value;
             if (type === 'bvn') payload.bvn = document.getElementById('inp_kyc_num').value;
             costAmount = 150; 
+            // Add this after calculating costAmount
+console.log("Transaction Type:", type);
+console.log("Cost Amount:", costAmount);
+console.log("Payload:", payload);
+ payload.costAmount=costAmount;
         }
         else if (type === 'tv') {
             const p = document.getElementById('inp_plan');
@@ -693,7 +716,7 @@
         } catch(e) { alert("Network Error."); btn.disabled = false; document.getElementById('srvLoader').style.display = "none";}
     };
 
-    window.executeTransaction = async () => {
+  /*  window.executeTransaction = async () => {
         const uid = auth.currentUser.uid;
         const type = window.activeService.type;
         const btn = document.getElementById('procBtn');
@@ -777,7 +800,7 @@
             btn.disabled = false; btn.innerText = "Process"; 
             document.getElementById('srvLoader').style.display = "none";
         }
-    };
+    };*/
 
     window.genAcc = async () => {
         const kycType = document.getElementById('kycType').value;
