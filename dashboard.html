@@ -482,46 +482,52 @@
         } catch(e) { planSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
     };
 
-// --- EXAM PINS FETCHER (FIXED) ---
 window.fetchExamPins = async () => {
     const examSelect = document.getElementById('inp_exam_id');
     if (!examSelect) return;
     
-    examSelect.innerHTML = "<option>Loading Exams... <i class='fas fa-spinner fa-spin'></i></option>";
+    examSelect.innerHTML = "<option>Loading Exams...</option>";
     
     try {
         const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
         const result = await res.json();
         
+        console.log("Exam Pins API Response:", result); // Debug log
+        
         if (!result.success) throw new Error(result.message);
 
-        // FIX: Better extraction logic for Payscribe API response
+        // Try to extract exam pins from various response structures
         let pins = [];
         
-        // Try different possible response structures
-        if (result.data?.data && Array.isArray(result.data.data)) {
+        // Check different possible response structures
+        if (result.data && result.data.data && Array.isArray(result.data.data)) {
             pins = result.data.data;
-        } else if (result.data?.message?.details && Array.isArray(result.data.message.details)) {
+        } else if (result.data && result.data.message && result.data.message.details && Array.isArray(result.data.message.details)) {
             pins = result.data.message.details;
-        } else if (result.data?.data?.message?.details && Array.isArray(result.data.data.message.details)) {
-            pins = result.data.data.message.details;
-        } else if (Array.isArray(result.data?.data)) {
-            pins = result.data.data;
-        } else if (Array.isArray(result.data)) {
+        } else if (result.data && Array.isArray(result.data)) {
             pins = result.data;
+        } else if (Array.isArray(result)) {
+            pins = result;
+        }
+        
+        // If still empty, try to find any array in the response
+        if (pins.length === 0 && result.data) {
+            for (let key in result.data) {
+                if (Array.isArray(result.data[key]) && result.data[key].length > 0) {
+                    pins = result.data[key];
+                    break;
+                }
+            }
         }
 
-        if (!pins || pins.length === 0) {
-            // Fallback to hardcoded exam pins if API returns empty
-            examSelect.innerHTML = `<option value="">No exams available</option>`;
-            console.warn("No exam pins found in response:", result);
+        if (pins.length === 0) {
+            examSelect.innerHTML = "<option value=''>No exam pins available</option>";
             return;
         }
 
         examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
         
         pins.forEach(pin => {
-            // Try to extract name and price from various possible field names
             const name = pin.title || pin.name || pin.description || pin.exam_name || "Exam Pin";
             const price = pin.amount || pin.price || pin.cost || 0;
             const code = pin.id || pin.plan_code || pin.code || pin.exam_id || "";
@@ -530,11 +536,6 @@ window.fetchExamPins = async () => {
                 examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             }
         });
-        
-        // If no options were added, show error
-        if (examSelect.options.length <= 1) {
-            examSelect.innerHTML = `<option value="">No exam pins available</option>`;
-        }
         
     } catch (e) { 
         console.error("Exam Pin Fetch Error:", e);
@@ -563,17 +564,23 @@ window.fetchExamPins = async () => {
             payload.amount = document.getElementById('inp_amount').value;
             costAmount = parseFloat(payload.amount); 
         }
-        else if (type === 'nin' || type === 'bvn') {
-            // FIX: Correctly set the payload based on type, and explicitly set costAmount!
-            if (type === 'nin') payload.nin = document.getElementById('inp_kyc_num').value;
-            if (type === 'bvn') payload.bvn = document.getElementById('inp_kyc_num').value;
-            costAmount = 150; 
-            // Add this after calculating costAmount
-console.log("Transaction Type:", type);
-console.log("Cost Amount:", costAmount);
-console.log("Payload:", payload);
- payload.costAmount=costAmount;
-        }
+else if (type === 'nin' || type === 'bvn') {
+    payload[type] = document.getElementById('inp_kyc_num').value;
+    costAmount = 150;
+    
+    // ADD THIS DEBUG CODE
+    console.log("NIN/BVN Transaction:");
+    console.log("Type:", type);
+    console.log("Number:", payload[type]);
+    console.log("Cost:", costAmount);
+    console.log("User UID:", uid);
+}
+
+// After calculating all costs, add this before payload.costAmount:
+console.log("Final costAmount before sending:", costAmount);
+console.log("Type of costAmount:", typeof costAmount);
+payload.costAmount = costAmount;
+
         else if (type === 'tv') {
             const p = document.getElementById('inp_plan');
             payload.service = document.getElementById('inp_service').value;
