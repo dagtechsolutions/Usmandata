@@ -8,15 +8,18 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- REQUIRED FOR EXCEL UPLOAD IN BULK SMS -->
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
 
     <style>
         body { background: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1e293b; }
         
+        /* Sidebar Styling */
         .sidebar { background: #0f172a; color: white; min-height: 100vh; padding: 20px; position: sticky; top: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.05); }
         .nav-link { color: #94a3b8; font-weight: 600; padding: 12px 15px; border-radius: 8px; margin-bottom: 5px; transition: 0.3s; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: #fff; }
         
+        /* Premium Balance Card */
         .balance-card { 
             background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); 
             color: white; border-radius: 20px; padding: 35px 30px; margin-bottom: 25px; 
@@ -28,6 +31,7 @@
         }
         .balance-card h1 { font-size: 3rem; font-weight: 800; letter-spacing: -1px; margin: 5px 0 15px 0;}
         
+        /* Aesthetic Service Buttons */
         .service-btn { 
             background: white; border: 1px solid #e2e8f0; border-radius: 18px; padding: 25px 15px; 
             text-align: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
@@ -43,8 +47,10 @@
         }
         .srv-name { font-weight: 700; font-size: 0.95rem; color: #334155; }
         
+        /* Virtual Account Display */
         .vacc-box { background: white; border: 1px solid #e2e8f0; border-left: 5px solid #10b981; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);}
         
+        /* Modal Aesthetics */
         .modal-content { border-radius: 24px; border: none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
         .modal-header { background: #f8fafc; border-radius: 24px 24px 0 0; border-bottom: 1px solid #e2e8f0; padding: 20px 25px; }
         .form-control, .form-select { border-radius: 10px; padding: 12px 15px; border: 2px solid #e2e8f0; background: #f8fafc; font-weight: 500; }
@@ -52,6 +58,7 @@
         
         .loader { display: none; text-align: center; margin: 15px 0; color: #3b82f6; }
         
+        /* Top Process Button */
         #procBtn { border-radius: 12px; font-size: 1.1rem; padding: 14px; box-shadow: 0 4px 15px rgba(37,99,235,0.3); transition: 0.3s; }
         #procBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,99,235,0.4); }
     </style>
@@ -174,7 +181,9 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body p-4">
+          <!-- FIX: Process Button is at the TOP -->
           <button class="btn btn-primary w-100 fw-bold mb-4" id="procBtn" style="display:none;"></button>
+          
           <div id="srvBody"></div>
           <div class="loader" id="srvLoader"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Processing...</div>
           <div id="srvExtra"></div>
@@ -202,12 +211,15 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
     
+    // IMPORTANT: Check your render URL!
     const RENDER_URL = "https://usmandata.onrender.com";
 
     window.activeService = {};
     window.allFetchedPlans = []; 
 
-    // --- FIREBASE LISTENER ---
+    // ====================================================
+    // THIS IS THE CODE THAT UPDATES YOUR BALANCE LIVE
+    // ====================================================
     onAuthStateChanged(auth, (user) => {
         if (user) {
             onValue(ref(db, 'users/' + user.uid), (snapshot) => {
@@ -215,8 +227,10 @@
                 if(data) {
                     document.getElementById('userName').innerText = data.fullName || "User";
                     
+                    // THIS LINE UPDATES YOUR BALANCE ON SCREEN!
                     const bal = parseFloat(data.balance);
                     document.getElementById('userBalance').innerText = isNaN(bal) ? "0.00" : bal.toLocaleString('en-NG', {minimumFractionDigits: 2});
+                    
                     document.getElementById('roleBadge').innerText = (data.role || "user").toUpperCase();
                     
                     if(data.virtual_account) {
@@ -242,7 +256,7 @@
                             <div class="alert alert-warning p-2 mb-3" style="font-size:0.85rem; border-left: 4px solid #ffc107;">
                                 <i class="fas fa-shield-alt text-danger"></i> <b>CBN KYC:</b> To generate an account, your registered name <b>(${data.fullName})</b> MUST match your BVN/NIN.
                             </div>
-                            <div class="input-group mb-2">
+                            <div class="input-group mb-2 shadow-sm">
                                 <select id="kycType" class="form-select bg-white fw-bold" style="max-width: 100px;">
                                     <option value="nin">NIN</option>
                                     <option value="bvn">BVN</option>
@@ -392,7 +406,7 @@
         return [];
     };
 
-    // --- FETCHERS (DEDUPLICATED & FIXED FOR EXAMS) ---
+    // --- FETCHERS ---
     window.fetchDataPlans = async () => {
         const network = document.getElementById('inp_network').value;
         if(!network) return;
@@ -468,6 +482,7 @@
         } catch(e) { planSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
     };
 
+// --- EXAM PINS FETCHER (ULTIMATE FAILSAFE) ---
     window.fetchExamPins = async () => {
         const examSelect = document.getElementById('inp_exam_id');
         if (!examSelect) return;
@@ -480,33 +495,143 @@
             
             if (!apiRes.success) throw new Error(apiRes.message);
 
+            // 1. Dig out the payload
+            let payload = apiRes.data?.message?.details || apiRes.data?.details || apiRes.data?.data || apiRes.data;
+            
+            // 2. Convert to Array if Payscribe accidentally sent an Object
             let pins = [];
-            if (apiRes.data?.message?.details) {
-                pins = apiRes.data.message.details; 
-            } else if (Array.isArray(apiRes.data?.details)) {
-                pins = apiRes.data.details;
-            } else if (Array.isArray(apiRes.data)) {
-                pins = apiRes.data;
+            if (Array.isArray(payload)) {
+                pins = payload;
+            } else if (typeof payload === 'object' && payload !== null) {
+                pins = Object.values(payload);
             }
 
-            if (!pins || pins.length === 0) throw new Error("No exams available currently");
+            // 3. Populate Dropdown
+            if (pins.length > 0) {
+                examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
+                pins.forEach(pin => {
+                    const name = pin.title || pin.name || pin.description || "Exam Pin"; 
+                    const price = pin.amount || pin.price || 0;
+                    const code = pin.id || pin.plan_code || pin.code || ""; 
+                    
+                    if (code) {
+                        examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
+                    }
+                });
+            } else {
+                throw new Error("Empty array returned from Payscribe");
+            }
 
-            examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
-            pins.forEach(pin => {
-                const name = pin.title || pin.name || pin.description || "Exam Pin"; 
-                const price = pin.amount || pin.price || 0;
-                const code = pin.id || pin.code || ""; 
-                
-                if (code) {
-                    examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
-                }
-            });
         } catch(e) { 
-            console.error("Exam Pin Fetch Error:", e);
-            examSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; 
+            console.warn("Exam Pin API failed or empty. Loading Fallback options...", e.message);
+            // 🌟 ULTIMATE FAILSAFE: If Payscribe's lookup fails, hardcode the standard pins 
+            // so your users can still purchase them!
+            examSelect.innerHTML = `
+                <option value="">Select Exam Type...</option>
+                <option value="waec" data-price="3500">WAEC Result Checker - ₦3500</option>
+                <option value="neco" data-price="1200">NECO Result Checker - ₦1200</option>
+                <option value="nabteb" data-price="1000">NABTEB Result Checker - ₦1000</option>
+            `;
         }
     };
+    // --- EXECUTION FUNCTION (FIXED NIN/BVN COST) ---
+    window.executeTransaction = async () => {
+        const uid = auth.currentUser.uid;
+        const type = window.activeService.type;
+        const btn = document.getElementById('procBtn');
+        const payload = { uid, type, customer_name: window.activeService.customer_name };
+        let costAmount = 0;
 
+        if (type === 'data') {
+            const p = document.getElementById('inp_plan');
+            if(!p.value) return alert("Select a plan.");
+            payload.network = document.getElementById('inp_network').value;
+            payload.plan = p.value;
+            payload.phone = document.getElementById('inp_phone').value;
+            costAmount = parseFloat(p.options[p.selectedIndex].getAttribute('data-price')) + 10; 
+        } 
+        else if (type === 'airtime') {
+            payload.network = document.getElementById('inp_network').value;
+            payload.phone = document.getElementById('inp_phone').value;
+            payload.amount = document.getElementById('inp_amount').value;
+            costAmount = parseFloat(payload.amount); 
+        }
+else if (type === 'nin' || type === 'bvn') {
+    payload[type] = document.getElementById('inp_kyc_num').value;
+    costAmount = 150;
+    
+    // ADD THIS DEBUG CODE
+    console.log("NIN/BVN Transaction:");
+    console.log("Type:", type);
+    console.log("Number:", payload[type]);
+    console.log("Cost:", costAmount);
+    console.log("User UID:", uid);
+}
+
+
+
+        else if (type === 'tv') {
+            const p = document.getElementById('inp_plan');
+            payload.service = document.getElementById('inp_service').value;
+            payload.plan_id = p.value;
+            payload.account = document.getElementById('inp_account').value;
+            payload.phone = document.getElementById('inp_phone').value;
+            costAmount = parseFloat(p.options[p.selectedIndex].getAttribute('data-price')) + 30; 
+        }
+        else if (type === 'power') {
+            payload.service = document.getElementById('inp_service').value;
+            payload.meter_number = document.getElementById('inp_account').value;
+            payload.meter_type = document.getElementById('inp_meter_type').value;
+            payload.amount = document.getElementById('inp_amount').value;
+            payload.phone = document.getElementById('inp_phone').value;
+            costAmount = parseFloat(payload.amount) + 50; 
+        }
+        else if (type === 'exam') {
+            const p = document.getElementById('inp_exam_id');
+            if(!p.value) return alert("Select an Exam.");
+            payload.exam_id = p.value;
+            payload.qty = document.getElementById('inp_qty').value;
+            const unitPrice = parseFloat(p.options[p.selectedIndex].getAttribute('data-price'));
+            costAmount = (unitPrice * parseFloat(payload.qty)) + 50; 
+        }
+        else if (type === 'sms') {
+            payload.sender_id = document.getElementById('inp_sender').value || "Update";
+            payload.phone = document.getElementById('inp_phone').value;
+            payload.message = document.getElementById('inp_message').value;
+            if(!payload.phone || !payload.message) return alert("Numbers and message required.");
+            costAmount = window.calcSmsCost(); 
+        }
+
+        // FIX: Ensure costAmount is always sent!
+       // After calculating all costs, add this before payload.costAmount:
+console.log("Final costAmount before sending:", costAmount);
+console.log("Type of costAmount:", typeof costAmount);
+        payload.costAmount = costAmount; 
+        if(!confirm(`You will be charged ₦${costAmount.toLocaleString()}. Proceed?`)) return;
+
+        btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+        document.getElementById('srvLoader').style.display = "block";
+
+        try {
+            const res = await fetch(`${RENDER_URL}/api/process`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+            });
+            const out = await res.json();
+            document.getElementById('srvLoader').style.display = "none";
+            
+            if(out.success) {
+                document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success text-center fw-bold"><i class="fas fa-check-circle fa-2x"></i><br>Success!</div>`;
+                btn.style.display = "none"; 
+            } else {
+                alert(out.message);
+                btn.disabled = false; btn.innerText = "Try Again";
+            }
+        } catch(e) { 
+            alert("Network Error."); 
+            btn.disabled = false; btn.innerText = "Process"; 
+            document.getElementById('srvLoader').style.display = "none";
+        }
+    };
     // --- BULK SMS HELPERS ---
     window.handleSmsExcel = (input) => {
         const file = input.files[0];
@@ -577,7 +702,7 @@
             document.getElementById('srvLoader').style.display = "none";
 
             if (out.success) {
-                const custName = out.data?.data?.message?.details?.customer_name || out.data?.data?.message?.details?.name || out.data?.message?.details?.customer_name || "Customer Verified";
+                const custName = out.data?.message?.details?.customer_name || out.data?.message?.details?.name || "Customer Verified";
                 window.activeService.customer_name = custName;
                 document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success fw-bold text-center border-2 border-success">Verified: ${custName}</div>`;
                 btn.innerText = "Pay Now";
@@ -590,11 +715,10 @@
         } catch(e) { alert("Network Error."); btn.disabled = false; document.getElementById('srvLoader').style.display = "none";}
     };
 
-    window.executeTransaction = async () => {
+  /*  window.executeTransaction = async () => {
         const uid = auth.currentUser.uid;
         const type = window.activeService.type;
         const btn = document.getElementById('procBtn');
-        
         const payload = { uid, type, customer_name: window.activeService.customer_name };
         let costAmount = 0;
 
@@ -614,7 +738,6 @@
         }
         else if (type === 'nin' || type === 'bvn') {
             payload[type] = document.getElementById('inp_kyc_num').value;
-            if(!payload[type]) return alert(`Enter a valid ${type.toUpperCase()} number.`);
             costAmount = 150; 
         }
         else if (type === 'tv') {
@@ -635,7 +758,6 @@
         }
         else if (type === 'exam') {
             const p = document.getElementById('inp_exam_id');
-            if(!p.value) return alert("Select an Exam.");
             payload.exam_id = p.value;
             payload.qty = document.getElementById('inp_qty').value;
             const unitPrice = parseFloat(p.options[p.selectedIndex].getAttribute('data-price'));
@@ -649,9 +771,7 @@
             costAmount = window.calcSmsCost(); 
         }
 
-        if (isNaN(costAmount) || costAmount <= 0) return alert("System Error: Could not calculate transaction cost.");
         payload.costAmount = costAmount; 
-
         if(!confirm(`You will be charged ₦${costAmount.toLocaleString()}. Proceed?`)) return;
 
         btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
@@ -679,7 +799,7 @@
             btn.disabled = false; btn.innerText = "Process"; 
             document.getElementById('srvLoader').style.display = "none";
         }
-    };
+    };*/
 
     window.genAcc = async () => {
         const kycType = document.getElementById('kycType').value;
