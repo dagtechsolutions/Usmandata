@@ -576,10 +576,7 @@ else if (type === 'nin' || type === 'bvn') {
     console.log("User UID:", uid);
 }
 
-// After calculating all costs, add this before payload.costAmount:
-console.log("Final costAmount before sending:", costAmount);
-console.log("Type of costAmount:", typeof costAmount);
-payload.costAmount = costAmount;
+
 
         else if (type === 'tv') {
             const p = document.getElementById('inp_plan');
@@ -614,6 +611,9 @@ payload.costAmount = costAmount;
         }
 
         // FIX: Ensure costAmount is always sent!
+       // After calculating all costs, add this before payload.costAmount:
+console.log("Final costAmount before sending:", costAmount);
+console.log("Type of costAmount:", typeof costAmount);
         payload.costAmount = costAmount; 
         if(!confirm(`You will be charged ₦${costAmount.toLocaleString()}. Proceed?`)) return;
 
