@@ -7,19 +7,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- REQUIRED FOR EXCEL UPLOAD IN BULK SMS -->
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
 
     <style>
         body { background: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1e293b; }
         
-        /* Sidebar Styling */
         .sidebar { background: #0f172a; color: white; min-height: 100vh; padding: 20px; position: sticky; top: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.05); }
-        .nav-link { color: #94a3b8; font-weight: 600; padding: 12px 15px; border-radius: 8px; margin-bottom: 5px; transition: 0.3s; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: #fff; }
+        .nav-link-side { color: #94a3b8; font-weight: 600; padding: 12px 15px; border-radius: 8px; margin-bottom: 5px; transition: 0.3s; display: block; text-decoration: none;}
+        .nav-link-side:hover, .nav-link-side.active { background: rgba(255,255,255,0.1); color: #fff; }
         
-        /* Premium Balance Card */
         .balance-card { 
             background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); 
             color: white; border-radius: 20px; padding: 35px 30px; margin-bottom: 25px; 
@@ -31,7 +27,10 @@
         }
         .balance-card h1 { font-size: 3rem; font-weight: 800; letter-spacing: -1px; margin: 5px 0 15px 0;}
         
-        /* Aesthetic Service Buttons */
+        /* Custom Nav Tabs for Services */
+        .nav-pills .nav-link { border-radius: 50px; font-weight: bold; color: #64748b; padding: 10px 25px; margin-right: 10px; transition: 0.3s; border: 1px solid #e2e8f0; background: white;}
+        .nav-pills .nav-link.active { background-color: #047857; color: white; border-color: #047857; box-shadow: 0 4px 10px rgba(4,120,87,0.2);}
+        
         .service-btn { 
             background: white; border: 1px solid #e2e8f0; border-radius: 18px; padding: 25px 15px; 
             text-align: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
@@ -47,25 +46,19 @@
         }
         .srv-name { font-weight: 700; font-size: 0.95rem; color: #334155; }
         
-        /* Virtual Account Display */
         .vacc-box { background: white; border: 1px solid #e2e8f0; border-left: 5px solid #10b981; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);}
         
-        /* Modal Aesthetics */
         .modal-content { border-radius: 24px; border: none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
         .modal-header { background: #f8fafc; border-radius: 24px 24px 0 0; border-bottom: 1px solid #e2e8f0; padding: 20px 25px; }
         .form-control, .form-select { border-radius: 10px; padding: 12px 15px; border: 2px solid #e2e8f0; background: #f8fafc; font-weight: 500; }
         .form-control:focus, .form-select:focus { border-color: #3b82f6; background: white; box-shadow: none; }
-        
         .loader { display: none; text-align: center; margin: 15px 0; color: #3b82f6; }
-        
-        /* Top Process Button */
         #procBtn { border-radius: 12px; font-size: 1.1rem; padding: 14px; box-shadow: 0 4px 15px rgba(37,99,235,0.3); transition: 0.3s; }
         #procBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,99,235,0.4); }
     </style>
 </head>
 <body>
 
-<!-- Mobile Navbar -->
 <nav class="navbar navbar-dark d-md-none px-3" style="background:#0f172a;">
     <span class="navbar-brand fw-bold mb-0 h1"><i class="fas fa-bolt text-warning"></i> USMAN DATA</span>
     <button class="btn btn-danger btn-sm fw-bold" id="btn-logout-mobile"><i class="fas fa-sign-out-alt"></i></button>
@@ -77,8 +70,8 @@
         <div class="col-md-2 sidebar d-none d-md-block">
             <h4 class="fw-bold mb-4 text-white"><i class="fas fa-bolt text-warning"></i> USMAN DATA</h4>
             <nav class="nav flex-column">
-                <a class="nav-link active" href="#"><i class="fas fa-home me-2"></i> Dashboard</a>
-                <a class="nav-link" href="fund.html"><i class="fas fa-wallet me-2"></i> Fund Wallet</a>
+                <a class="nav-link-side active" href="#"><i class="fas fa-home me-2"></i> Dashboard</a>
+                <a class="nav-link-side" href="fund.html"><i class="fas fa-wallet me-2"></i> Fund Wallet</a>
                 <button class="btn btn-danger mt-5 w-100 fw-bold" id="btn-logout" style="border-radius:10px;">
                     <i class="fas fa-sign-out-alt me-2"></i> Logout
                 </button>
@@ -95,9 +88,9 @@
                 <span id="roleBadge" class="badge bg-primary px-3 py-2" style="border-radius:20px;">USER</span>
             </div>
 
-            <!-- Premium Balance Card -->
+            <!-- Premium Unified Wallet -->
             <div class="balance-card">
-                <p class="mb-1 fw-bold text-light" style="opacity: 0.8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Available Balance</p>
+                <p class="mb-1 fw-bold text-light" style="opacity: 0.8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Unified Wallet Balance</p>
                 <h1 id="userBalance">₦0.00</h1>
                 <button class="btn btn-warning fw-bold px-4" style="border-radius: 50px; color: #0f172a;" onclick="window.location.href='fund.html'">
                     <i class="fas fa-plus-circle me-1"></i> Add Money
@@ -107,7 +100,7 @@
             <!-- Virtual Account Display -->
             <div class="vacc-box" id="vAccCard">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold text-dark mb-0"><i class="fas fa-university text-success me-2"></i> Auto-Funding Account</h6>
+                    <h6 class="fw-bold text-dark mb-0"><i class="fas fa-university text-success me-2"></i> Unified Funding Account</h6>
                     <span class="badge bg-success bg-opacity-10 text-success">Instant</span>
                 </div>
                 <div id="vAccDisplay" class="mt-3">
@@ -115,58 +108,105 @@
                 </div>
             </div>
 
-            <h5 class="fw-bold text-dark mb-3">Our Services</h5>
-            
-            <!-- Service Grid -->
-            <div class="row g-3 g-md-4">
-                <div class="col-6 col-md-3">
-                    <button class="service-btn" onclick="openSrv('data')">
-                        <div class="icon-wrapper"><i class="fas fa-wifi"></i></div>
-                        <span class="srv-name">Buy Data</span>
-                    </button>
+            <!-- 🌟 TABBED NAVIGATION 🌟 -->
+            <ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="pills-vending-tab" data-bs-toggle="pill" data-bs-target="#pills-vending" type="button" role="tab"><i class="fas fa-shopping-cart"></i> Vending Services</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-kyc-tab" data-bs-toggle="pill" data-bs-target="#pills-kyc" type="button" role="tab"><i class="fas fa-fingerprint"></i> Identity & KYC</button>
+                </li>
+            </ul>
+
+            <!-- 🌟 TAB CONTENT 🌟 -->
+            <div class="tab-content" id="pills-tabContent">
+                
+                <!-- TAB 1: VENDING SERVICES -->
+                <div class="tab-pane fade show active" id="pills-vending" role="tabpanel">
+                    <div class="row g-3 g-md-4">
+                        <div class="col-6 col-md-3">
+                            <button class="service-btn" onclick="openSrv('data')">
+                                <div class="icon-wrapper"><i class="fas fa-wifi"></i></div>
+                                <span class="srv-name">Buy Data</span>
+                            </button>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <button class="service-btn" onclick="openSrv('airtime')">
+                                <div class="icon-wrapper" style="background:#fef3c7; color:#d97706;"><i class="fas fa-phone"></i></div>
+                                <span class="srv-name">Airtime</span>
+                            </button>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <button class="service-btn" onclick="openSrv('tv')">
+                                <div class="icon-wrapper" style="background:#fee2e2; color:#dc2626;"><i class="fas fa-tv"></i></div>
+                                <span class="srv-name">Cable TV</span>
+                            </button>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <button class="service-btn" onclick="openSrv('power')">
+                                <div class="icon-wrapper" style="background:#fef08a; color:#b45309;"><i class="fas fa-lightbulb"></i></div>
+                                <span class="srv-name">Electricity</span>
+                            </button>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <button class="service-btn" onclick="openSrv('exam')">
+                                <div class="icon-wrapper" style="background:#e0e7ff; color:#4338ca;"><i class="fas fa-graduation-cap"></i></div>
+                                <span class="srv-name">Exam Pins</span>
+                            </button>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <button class="service-btn" onclick="openSrv('sms')">
+                                <div class="icon-wrapper" style="background:#fce7f3; color:#4f46e5;"><i class="fas fa-envelope"></i></div>
+                                <span class="srv-name">Bulk SMS</span>
+                            </button>
+                        </div>
+                        <!-- NEW VENDING SERVICES -->
+                        <div class="col-6 col-md-3">
+                            <button class="service-btn" onclick="openSrv('airtime_cash')">
+                                <div class="icon-wrapper" style="background:#ecfccb; color:#ca8a04;"><i class="fas fa-exchange-alt"></i></div>
+                                <span class="srv-name">Airtime to Cash</span>
+                            </button>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <button class="service-btn" onclick="alert('USD Accounts coming soon! (Requires Advanced KYC)')">
+                                <div class="icon-wrapper" style="background:#dcfce7; color:#16a34a;"><i class="fas fa-dollar-sign"></i></div>
+                                <span class="srv-name">USD Wallet</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-6 col-md-3">
-                    <button class="service-btn" onclick="openSrv('airtime')">
-                        <div class="icon-wrapper" style="background:#fef3c7; color:#d97706;"><i class="fas fa-phone"></i></div>
-                        <span class="srv-name">Airtime</span>
-                    </button>
+
+                <!-- TAB 2: IDENTITY & KYC -->
+                <div class="tab-pane fade" id="pills-kyc" role="tabpanel">
+                    <div class="row g-3 g-md-4">
+                        <div class="col-6 col-md-3">
+                            <button class="service-btn" onclick="openSrv('nin')">
+                                <div class="icon-wrapper" style="background:#dcfce7; color:#15803d;"><i class="fas fa-id-card"></i></div>
+                                <span class="srv-name">NIN Search</span>
+                            </button>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <button class="service-btn" onclick="openSrv('bvn')">
+                                <div class="icon-wrapper" style="background:#f3e8ff; color:#6d28d9;"><i class="fas fa-university"></i></div>
+                                <span class="srv-name">BVN Lookup</span>
+                            </button>
+                        </div>
+                        <!-- Future Expansion Slots -->
+                        <div class="col-6 col-md-3">
+                            <button class="service-btn" style="opacity:0.6;" disabled>
+                                <div class="icon-wrapper bg-light text-secondary"><i class="fas fa-passport"></i></div>
+                                <span class="srv-name">Passport Ver.</span>
+                            </button>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <button class="service-btn" style="opacity:0.6;" disabled>
+                                <div class="icon-wrapper bg-light text-secondary"><i class="fas fa-car"></i></div>
+                                <span class="srv-name">Drivers License</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-6 col-md-3">
-                    <button class="service-btn" onclick="openSrv('tv')">
-                        <div class="icon-wrapper" style="background:#fee2e2; color:#dc2626;"><i class="fas fa-tv"></i></div>
-                        <span class="srv-name">Cable TV</span>
-                    </button>
-                </div>
-                <div class="col-6 col-md-3">
-                    <button class="service-btn" onclick="openSrv('power')">
-                        <div class="icon-wrapper" style="background:#fef08a; color:#b45309;"><i class="fas fa-lightbulb"></i></div>
-                        <span class="srv-name">Electricity</span>
-                    </button>
-                </div>
-                <div class="col-6 col-md-3">
-                    <button class="service-btn" onclick="openSrv('exam')">
-                        <div class="icon-wrapper" style="background:#e0e7ff; color:#4338ca;"><i class="fas fa-graduation-cap"></i></div>
-                        <span class="srv-name">Exam Pins</span>
-                    </button>
-                </div>
-                <div class="col-6 col-md-3">
-                    <button class="service-btn" onclick="openSrv('sms')">
-                        <div class="icon-wrapper" style="background:#fce7f3; color:#4f46e5;"><i class="fas fa-envelope"></i></div>
-                        <span class="srv-name">Bulk SMS</span>
-                    </button>
-                </div>
-                <div class="col-6 col-md-3">
-                    <button class="service-btn" onclick="openSrv('nin')">
-                        <div class="icon-wrapper" style="background:#dcfce7; color:#15803d;"><i class="fas fa-id-card"></i></div>
-                        <span class="srv-name">NIN Search</span>
-                    </button>
-                </div>
-                <div class="col-6 col-md-3">
-                    <button class="service-btn" onclick="openSrv('bvn')">
-                        <div class="icon-wrapper" style="background:#f3e8ff; color:#6d28d9;"><i class="fas fa-university"></i></div>
-                        <span class="srv-name">BVN Lookup</span>
-                    </button>
-                </div>
+
             </div>
         </div>
     </div>
@@ -175,15 +215,13 @@
 <!-- Dynamic Modal -->
 <div class="modal fade" id="srvModal" tabindex="-1" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0" style="border-radius: 20px;">
+    <div class="modal-content border-0">
       <div class="modal-header border-0">
           <h5 class="modal-title fw-bold" id="srvTitle">Service</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body p-4">
-          <!-- FIX: Process Button is at the TOP -->
           <button class="btn btn-primary w-100 fw-bold mb-4" id="procBtn" style="display:none;"></button>
-          
           <div id="srvBody"></div>
           <div class="loader" id="srvLoader"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Processing...</div>
           <div id="srvExtra"></div>
@@ -210,27 +248,18 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
-    
-    // IMPORTANT: Check your render URL!
     const RENDER_URL = "https://usmandata.onrender.com";
 
     window.activeService = {};
-    window.allFetchedPlans = []; 
 
-    // ====================================================
-    // THIS IS THE CODE THAT UPDATES YOUR BALANCE LIVE
-    // ====================================================
     onAuthStateChanged(auth, (user) => {
         if (user) {
             onValue(ref(db, 'users/' + user.uid), (snapshot) => {
                 const data = snapshot.val();
                 if(data) {
                     document.getElementById('userName').innerText = data.fullName || "User";
-                    
-                    // THIS LINE UPDATES YOUR BALANCE ON SCREEN!
                     const bal = parseFloat(data.balance);
                     document.getElementById('userBalance').innerText = isNaN(bal) ? "0.00" : bal.toLocaleString('en-NG', {minimumFractionDigits: 2});
-                    
                     document.getElementById('roleBadge').innerText = (data.role || "user").toUpperCase();
                     
                     if(data.virtual_account) {
@@ -246,9 +275,6 @@
                                 <h3 style="color: #004a99; font-weight: 900; letter-spacing: 2px; margin: 0; font-family: monospace; position: relative; z-index: 2;">
                                     ${data.virtual_account}
                                 </h3>
-                                <div style="margin-top: 5px; font-size: 0.85rem; color: #334155; font-weight: 600; text-transform: uppercase; position: relative; z-index: 2;">
-                                    ${data.fullName}
-                                </div>
                             </div>
                         `;
                     } else {
@@ -264,7 +290,7 @@
                                 <input type="number" id="kycNumber" class="form-control" placeholder="Enter 11-digit number">
                             </div>
                             <button class="btn btn-primary w-100 fw-bold shadow-sm" id="btn-gen-acc" onclick="window.genAcc()">
-                                <i class="fas fa-plus"></i> Generate Funding Account
+                                <i class="fas fa-plus"></i> Generate Account
                             </button>
                         `;
                     }
@@ -273,7 +299,6 @@
         } else { window.location.href = "login.html"; }
     });
 
-    // --- MODAL GENERATOR ---
     window.openSrv = (type) => {
         const modal = new bootstrap.Modal(document.getElementById('srvModal'));
         const body = document.getElementById('srvBody');
@@ -294,12 +319,6 @@
                     <option value="mtn">MTN</option><option value="airtel">Airtel</option>
                     <option value="glo">GLO</option><option value="9mobile">9Mobile</option>
                 </select>
-                <select id="inp_category" class="form-select mb-3" onchange="window.filterDataByCategory()" style="display:none;">
-                    <option value="ALL">2. All Categories</option>
-                    <option value="SME">SME</option>
-                    <option value="CG">Corporate Gifting (CG)</option>
-                    <option value="GIFTING">Direct Gifting</option>
-                </select>
                 <select id="inp_plan" class="form-select mb-3"><option value="">3. Select Plan</option></select>
                 <input type="number" id="inp_phone" class="form-control mb-3" placeholder="Recipient Phone Number">
             `;
@@ -314,6 +333,18 @@
                 </select>
                 <input type="number" id="inp_amount" class="form-control mb-3" placeholder="Amount (₦)">
                 <input type="number" id="inp_phone" class="form-control mb-3" placeholder="Phone Number">
+            `;
+            btn.onclick = () => window.executeTransaction();
+        }
+        else if (type === 'airtime_cash') {
+            title.innerHTML = '<i class="fas fa-exchange-alt text-success"></i> Airtime to Wallet';
+            body.innerHTML = `
+                <select id="inp_network" class="form-select mb-3">
+                    <option value="mtn">MTN</option><option value="airtel">Airtel</option>
+                    <option value="glo">GLO</option><option value="9mobile">9Mobile</option>
+                </select>
+                <input type="number" id="inp_amount" class="form-control mb-3" placeholder="Amount to Send (₦)">
+                <input type="number" id="inp_phone" class="form-control mb-3" placeholder="Phone Number sending from">
             `;
             btn.onclick = () => window.executeTransaction();
         }
@@ -364,13 +395,9 @@
             title.innerHTML = '<i class="fas fa-envelope text-primary"></i> Bulk SMS';
             body.innerHTML = `
                 <input type="text" id="inp_sender" class="form-control mb-3" placeholder="Sender ID (e.g. MySchool)" maxlength="11">
-                <div class="mb-3 p-3 bg-light border rounded">
-                    <label class="form-label fw-bold small">Upload Contacts (Excel/CSV)</label>
-                    <input type="file" id="smsExcel" accept=".xlsx,.xls,.csv" class="form-control form-control-sm" onchange="window.handleSmsExcel(this)">
-                </div>
-                <textarea id="inp_phone" class="form-control mb-3" rows="3" placeholder="Or type Phone Numbers (Comma separated)" oninput="window.calcSmsCost()"></textarea>
+                <textarea id="inp_phone" class="form-control mb-3" rows="3" placeholder="Phone Numbers (Comma separated)" oninput="window.calcSmsCost()"></textarea>
                 <textarea id="inp_message" class="form-control mb-3" rows="4" placeholder="Type your message here..." oninput="window.calcSmsCost()"></textarea>
-                <div class="alert alert-info fw-bold text-center" id="smsCostPreview">Cost: ₦0.00 (0 numbers, 0 pages)</div>
+                <div class="alert alert-info fw-bold text-center" id="smsCostPreview">Cost: ₦0.00</div>
             `;
             btn.onclick = () => window.executeTransaction();
         }
@@ -383,328 +410,94 @@
         modal.show();
     };
 
-    // --- ARRAY EXTRACTOR ---
-    const getArraySafely = (apiResponse) => {
-        if (!apiResponse) return [];
-        let payload = apiResponse.data || apiResponse;
-        
-        if (Array.isArray(payload)) return payload;
-        if (payload.message) {
-            if (Array.isArray(payload.message.details)) return payload.message.details;
-            if (Array.isArray(payload.message)) return payload.message;
-        }
-        if (payload.details && Array.isArray(payload.details)) return payload.details;
-        
-        for (let key in payload) {
-            if (Array.isArray(payload[key])) return payload[key];
-            if (payload[key] && typeof payload[key] === 'object') {
-                for (let subKey in payload[key]) {
-                    if (Array.isArray(payload[key][subKey])) return payload[key][subKey];
-                }
-            }
-        }
-        return [];
-    };
-
-    // --- FETCHERS ---
     window.fetchDataPlans = async () => {
         const network = document.getElementById('inp_network').value;
         if(!network) return;
-        
         const planSelect = document.getElementById('inp_plan');
-        const catSelect = document.getElementById('inp_category');
-        
-        planSelect.innerHTML = "<option>Loading plans... <i class='fas fa-spinner fa-spin'></i></option>";
-        catSelect.style.display = "none";
-        
+        planSelect.innerHTML = "<option>Loading plans...</option>";
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=data_plans&network=${network}`);
             const data = await res.json();
-            
-            if (!data.success) throw new Error(data.message);
-
-            let plans = [];
-            if (data.data?.message?.details?.[0]?.plans) plans = data.data.message.details[0].plans;
-            else plans = getArraySafely(data);
-
-            if (plans.length === 0) throw new Error("No plans available");
-
-            window.allFetchedPlans = plans;
-            catSelect.style.display = "block";
-            window.filterDataByCategory();
-
-        } catch(e) { planSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
-    };
-
-    window.filterDataByCategory = () => {
-        const category = document.getElementById('inp_category').value;
-        const planSelect = document.getElementById('inp_plan');
-        planSelect.innerHTML = "<option value=''>3. Select Plan...</option>";
-
-        window.allFetchedPlans.forEach(p => {
-            const name = p.name || p.title || "Data Plan";
-            const price = p.amount || 0;
-            const code = p.plan_code || p.id || "";
-            const nUpper = name.toUpperCase();
-
-            let match = false;
-            if (category === "ALL") match = true;
-            else if (category === "SME" && nUpper.includes("SME")) match = true;
-            else if (category === "CG" && (nUpper.includes("CG") || nUpper.includes("CORPORATE"))) match = true;
-            else if (category === "GIFTING" && (nUpper.includes("GIFTING") || nUpper.includes("DIRECT"))) match = true;
-
-            if (match && code) {
-                planSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
-            }
-        });
+            const plans = data.data?.message?.details?.[0]?.plans || [];
+            planSelect.innerHTML = "<option value=''>Select Plan...</option>";
+            plans.forEach(p => {
+                planSelect.innerHTML += `<option value="${p.plan_code}" data-price="${p.amount}">${p.name} - ₦${p.amount}</option>`;
+            });
+        } catch(e) { planSelect.innerHTML = `<option value="">Error</option>`; }
     };
 
     window.fetchTVPlans = async () => {
         const service = document.getElementById('inp_service').value;
         if(!service) return;
         const planSelect = document.getElementById('inp_plan');
-        planSelect.innerHTML = "<option>Loading bouquets... <i class='fas fa-spinner fa-spin'></i></option>";
-        
+        planSelect.innerHTML = "<option>Loading bouquets...</option>";
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=tv_bouquets&service=${service}`);
             const data = await res.json();
-            
-            if (!data.success) throw new Error(data.message);
-
-            const plans = getArraySafely(data);
+            const plans = data.data?.message?.details || [];
             planSelect.innerHTML = "<option value=''>Select Bouquet...</option>";
             plans.forEach(p => {
-                const name = p.name || "Bouquet";
-                const price = p.amount || p.price || 0;
-                const code = p.id || p.plan_code || ""; 
-                if(code) planSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
+                planSelect.innerHTML += `<option value="${p.id}" data-price="${p.amount}">${p.name} - ₦${p.amount}</option>`;
             });
-        } catch(e) { planSelect.innerHTML = `<option value="">Error: ${e.message}</option>`; }
+        } catch(e) { planSelect.innerHTML = `<option value="">Error</option>`; }
     };
 
-// --- EXAM PINS FETCHER (ULTIMATE FAILSAFE) ---
     window.fetchExamPins = async () => {
         const examSelect = document.getElementById('inp_exam_id');
-        if (!examSelect) return;
-        
-        examSelect.innerHTML = "<option>Loading Exams... <i class='fas fa-spinner fa-spin'></i></option>";
-        
+        examSelect.innerHTML = "<option>Loading Exams...</option>";
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
             const apiRes = await res.json();
-            
-            if (!apiRes.success) throw new Error(apiRes.message);
-
-            // 1. Dig out the payload
-            let payload = apiRes.data?.message?.details || apiRes.data?.details || apiRes.data?.data || apiRes.data;
-            
-            // 2. Convert to Array if Payscribe accidentally sent an Object
-            let pins = [];
-            if (Array.isArray(payload)) {
-                pins = payload;
-            } else if (typeof payload === 'object' && payload !== null) {
-                pins = Object.values(payload);
-            }
-
-            // 3. Populate Dropdown
-            if (pins.length > 0) {
-                examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
-                pins.forEach(pin => {
-                    const name = pin.title || pin.name || pin.description || "Exam Pin"; 
-                    const price = pin.amount || pin.price || 0;
-                    const code = pin.id || pin.plan_code || pin.code || ""; 
-                    
-                    if (code) {
-                        examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
-                    }
-                });
-            } else {
-                throw new Error("Empty array returned from Payscribe");
-            }
-
+            let pins = apiRes.data?.message?.details || [];
+            examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
+            pins.forEach(pin => {
+                examSelect.innerHTML += `<option value="${pin.id}" data-price="${pin.amount}">${pin.title} - ₦${pin.amount}</option>`;
+            });
         } catch(e) { 
-            console.warn("Exam Pin API failed or empty. Loading Fallback options...", e.message);
-            // 🌟 ULTIMATE FAILSAFE: If Payscribe's lookup fails, hardcode the standard pins 
-            // so your users can still purchase them!
             examSelect.innerHTML = `
-                <option value="">Select Exam Type...</option>
-                <option value="waec" data-price="3500">WAEC Result Checker - ₦3500</option>
-                <option value="neco" data-price="1200">NECO Result Checker - ₦1200</option>
-                <option value="nabteb" data-price="1000">NABTEB Result Checker - ₦1000</option>
+                <option value="waec" data-price="3500">WAEC - ₦3500</option>
+                <option value="neco" data-price="1200">NECO - ₦1200</option>
+                <option value="nabteb" data-price="1000">NABTEB - ₦1000</option>
             `;
         }
-    };
-    // --- EXECUTION FUNCTION (FIXED NIN/BVN COST) ---
-    window.executeTransaction = async () => {
-        const uid = auth.currentUser.uid;
-        const type = window.activeService.type;
-        const btn = document.getElementById('procBtn');
-        const payload = { uid, type, customer_name: window.activeService.customer_name };
-        let costAmount = 0;
-
-        if (type === 'data') {
-            const p = document.getElementById('inp_plan');
-            if(!p.value) return alert("Select a plan.");
-            payload.network = document.getElementById('inp_network').value;
-            payload.plan = p.value;
-            payload.phone = document.getElementById('inp_phone').value;
-            costAmount = parseFloat(p.options[p.selectedIndex].getAttribute('data-price')) + 10; 
-        } 
-        else if (type === 'airtime') {
-            payload.network = document.getElementById('inp_network').value;
-            payload.phone = document.getElementById('inp_phone').value;
-            payload.amount = document.getElementById('inp_amount').value;
-            costAmount = parseFloat(payload.amount); 
-        }
-else if (type === 'nin' || type === 'bvn') {
-    payload[type] = document.getElementById('inp_kyc_num').value;
-    costAmount = 150;
-    
-    // ADD THIS DEBUG CODE
-    console.log("NIN/BVN Transaction:");
-    console.log("Type:", type);
-    console.log("Number:", payload[type]);
-    console.log("Cost:", costAmount);
-    console.log("User UID:", uid);
-}
-
-
-
-        else if (type === 'tv') {
-            const p = document.getElementById('inp_plan');
-            payload.service = document.getElementById('inp_service').value;
-            payload.plan_id = p.value;
-            payload.account = document.getElementById('inp_account').value;
-            payload.phone = document.getElementById('inp_phone').value;
-            costAmount = parseFloat(p.options[p.selectedIndex].getAttribute('data-price')) + 30; 
-        }
-        else if (type === 'power') {
-            payload.service = document.getElementById('inp_service').value;
-            payload.meter_number = document.getElementById('inp_account').value;
-            payload.meter_type = document.getElementById('inp_meter_type').value;
-            payload.amount = document.getElementById('inp_amount').value;
-            payload.phone = document.getElementById('inp_phone').value;
-            costAmount = parseFloat(payload.amount) + 50; 
-        }
-        else if (type === 'exam') {
-            const p = document.getElementById('inp_exam_id');
-            if(!p.value) return alert("Select an Exam.");
-            payload.exam_id = p.value;
-            payload.qty = document.getElementById('inp_qty').value;
-            const unitPrice = parseFloat(p.options[p.selectedIndex].getAttribute('data-price'));
-            costAmount = (unitPrice * parseFloat(payload.qty)) + 50; 
-        }
-        else if (type === 'sms') {
-            payload.sender_id = document.getElementById('inp_sender').value || "Update";
-            payload.phone = document.getElementById('inp_phone').value;
-            payload.message = document.getElementById('inp_message').value;
-            if(!payload.phone || !payload.message) return alert("Numbers and message required.");
-            costAmount = window.calcSmsCost(); 
-        }
-
-        // FIX: Ensure costAmount is always sent!
-       // After calculating all costs, add this before payload.costAmount:
-console.log("Final costAmount before sending:", costAmount);
-console.log("Type of costAmount:", typeof costAmount);
-        payload.costAmount = costAmount; 
-        if(!confirm(`You will be charged ₦${costAmount.toLocaleString()}. Proceed?`)) return;
-
-        btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
-        document.getElementById('srvLoader').style.display = "block";
-
-        try {
-            const res = await fetch(`${RENDER_URL}/api/process`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
-            });
-            const out = await res.json();
-            document.getElementById('srvLoader').style.display = "none";
-            
-            if(out.success) {
-                document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success text-center fw-bold"><i class="fas fa-check-circle fa-2x"></i><br>Success!</div>`;
-                btn.style.display = "none"; 
-            } else {
-                alert(out.message);
-                btn.disabled = false; btn.innerText = "Try Again";
-            }
-        } catch(e) { 
-            alert("Network Error."); 
-            btn.disabled = false; btn.innerText = "Process"; 
-            document.getElementById('srvLoader').style.display = "none";
-        }
-    };
-    // --- BULK SMS HELPERS ---
-    window.handleSmsExcel = (input) => {
-        const file = input.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, {type: 'array'});
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(sheet, {header: 1});
-            
-            let phones = [];
-            rows.forEach(row => {
-                row.forEach(cell => {
-                    if(cell) {
-                        let str = String(cell).replace(/\D/g, '');
-                        if(str.length >= 10 && str.length <= 14) phones.push(str);
-                    }
-                });
-            });
-            
-            const existing = document.getElementById('inp_phone').value;
-            document.getElementById('inp_phone').value = existing ? existing + ',' + phones.join(',') : phones.join(',');
-            window.calcSmsCost();
-            alert(`Extracted ${phones.length} valid phone numbers!`);
-        };
-        reader.readAsArrayBuffer(file);
     };
 
     window.calcSmsCost = () => {
         const phonesStr = document.getElementById('inp_phone').value;
         const msgStr = document.getElementById('inp_message').value;
-        
         const count = phonesStr.split(',').filter(p => p.trim().length > 0).length;
         const pages = Math.ceil(msgStr.length / 160) || 1;
-        const cost = count * pages * 6; // ₦6 per SMS per page
-        
+        const cost = count * pages * 6; 
         document.getElementById('smsCostPreview').innerText = `Cost: ₦${cost.toLocaleString()} (${count} numbers, ${pages} pages)`;
         return cost;
     };
 
-    // --- VALIDATORS & EXECUTION ---
     window.validateMeterOrTV = async () => {
         const type = window.activeService.type;
         const btn = document.getElementById('procBtn');
         const payload = { type, account: document.getElementById('inp_account').value, service: document.getElementById('inp_service').value };
         
-        if(!payload.account || !payload.service) return alert("Fill all details.");
-
         if(type === 'power') {
             payload.meter_type = document.getElementById('inp_meter_type').value;
             payload.amount = document.getElementById('inp_amount').value;
         } else {
-            const planEl = document.getElementById('inp_plan');
-            if(!planEl.value) return alert("Select a Bouquet.");
-            payload.plan_id = planEl.value;
+            payload.plan_id = document.getElementById('inp_plan').value;
         }
 
         btn.disabled = true; btn.innerHTML = "Validating...";
         document.getElementById('srvLoader').style.display = "block";
 
         try {
-            const endpoint = `${RENDER_URL}/api/validate`;
-            const res = await fetch(endpoint, {
+            const res = await fetch(`${RENDER_URL}/api/validate`, {
                 method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
             });
             const out = await res.json();
             document.getElementById('srvLoader').style.display = "none";
 
             if (out.success) {
-                const custName = out.data?.message?.details?.customer_name || out.data?.message?.details?.name || "Customer Verified";
+                const custName = out.data?.data?.message?.details?.customer_name || out.data?.data?.message?.details?.name || "Verified";
                 window.activeService.customer_name = custName;
-                document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success fw-bold text-center border-2 border-success">Verified: ${custName}</div>`;
+                document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success fw-bold text-center">Verified: ${custName}</div>`;
                 btn.innerText = "Pay Now";
                 btn.disabled = false;
                 btn.onclick = () => window.executeTransaction();
@@ -715,7 +508,7 @@ console.log("Type of costAmount:", typeof costAmount);
         } catch(e) { alert("Network Error."); btn.disabled = false; document.getElementById('srvLoader').style.display = "none";}
     };
 
-  /*  window.executeTransaction = async () => {
+    window.executeTransaction = async () => {
         const uid = auth.currentUser.uid;
         const type = window.activeService.type;
         const btn = document.getElementById('procBtn');
@@ -724,17 +517,16 @@ console.log("Type of costAmount:", typeof costAmount);
 
         if (type === 'data') {
             const p = document.getElementById('inp_plan');
-            if(!p.value) return alert("Select a plan.");
             payload.network = document.getElementById('inp_network').value;
             payload.plan = p.value;
             payload.phone = document.getElementById('inp_phone').value;
             costAmount = parseFloat(p.options[p.selectedIndex].getAttribute('data-price')) + 10; 
         } 
-        else if (type === 'airtime') {
+        else if (type === 'airtime' || type === 'airtime_cash') {
             payload.network = document.getElementById('inp_network').value;
             payload.phone = document.getElementById('inp_phone').value;
             payload.amount = document.getElementById('inp_amount').value;
-            costAmount = parseFloat(payload.amount); 
+            costAmount = type === 'airtime' ? parseFloat(payload.amount) : 0; // Airtime to cash costs 0 to send
         }
         else if (type === 'nin' || type === 'bvn') {
             payload[type] = document.getElementById('inp_kyc_num').value;
@@ -767,7 +559,6 @@ console.log("Type of costAmount:", typeof costAmount);
             payload.sender_id = document.getElementById('inp_sender').value || "Update";
             payload.phone = document.getElementById('inp_phone').value;
             payload.message = document.getElementById('inp_message').value;
-            if(!payload.phone || !payload.message) return alert("Numbers and message required.");
             costAmount = window.calcSmsCost(); 
         }
 
@@ -778,12 +569,9 @@ console.log("Type of costAmount:", typeof costAmount);
         document.getElementById('srvLoader').style.display = "block";
 
         try {
-            const endpoint = `${RENDER_URL}/api/process`;
-            const res = await fetch(endpoint, {
+            const res = await fetch(`${RENDER_URL}/api/process`, {
                 method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
             });
-            if (res.status === 404) throw new Error("Endpoint not found.");
-            
             const out = await res.json();
             document.getElementById('srvLoader').style.display = "none";
             
@@ -799,7 +587,7 @@ console.log("Type of costAmount:", typeof costAmount);
             btn.disabled = false; btn.innerText = "Process"; 
             document.getElementById('srvLoader').style.display = "none";
         }
-    };*/
+    };
 
     window.genAcc = async () => {
         const kycType = document.getElementById('kycType').value;
@@ -807,28 +595,17 @@ console.log("Type of costAmount:", typeof costAmount);
         if (kycNumber.length !== 11) return alert(`Enter valid 11-digit ${kycType.toUpperCase()}.`);
 
         const btn = document.getElementById('btn-gen-acc');
-        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`; 
-        btn.disabled = true;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`; btn.disabled = true;
         
         try {
-            const endpoint = `${RENDER_URL}/api/gen-account`;
-            const res = await fetch(endpoint, {
+            const res = await fetch(`${RENDER_URL}/api/gen-account`, {
                 method: 'POST', headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ uid: auth.currentUser.uid, kycType, kycNumber })
             });
-            if (res.status === 404) throw new Error("Endpoint not found.");
-
             const out = await res.json();
             alert(out.message);
-            if(!out.success) { 
-                btn.innerHTML = `<i class="fas fa-plus"></i> Try Again`; 
-                btn.disabled = false; 
-            }
-        } catch(e) { 
-            alert("Error connecting."); 
-            btn.innerHTML = `<i class="fas fa-plus"></i> Try Again`; 
-            btn.disabled = false; 
-        }
+            if(!out.success) { btn.innerHTML = `<i class="fas fa-plus"></i> Try Again`; btn.disabled = false; }
+        } catch(e) { alert("Error connecting."); btn.innerHTML = `<i class="fas fa-plus"></i> Try Again`; btn.disabled = false; }
     };
 
     const logout = () => signOut(auth).then(() => window.location.href="login.html");
