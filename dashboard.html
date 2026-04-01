@@ -492,32 +492,20 @@ window.fetchExamPins = async () => {
         const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
         const result = await res.json();
         
-        console.log("Exam Pins API Response:", result); // Debug log
+        console.log("Exam Pins Response:", result); // Debug
         
         if (!result.success) throw new Error(result.message);
 
-        // Try to extract exam pins from various response structures
+        // Extract pins based on Payscribe API structure
         let pins = [];
         
-        // Check different possible response structures
-        if (result.data && result.data.data && Array.isArray(result.data.data)) {
-            pins = result.data.data;
-        } else if (result.data && result.data.message && result.data.message.details && Array.isArray(result.data.message.details)) {
+        // Check the actual response structure from Payscribe
+        if (result.data?.message?.details && Array.isArray(result.data.message.details)) {
             pins = result.data.message.details;
-        } else if (result.data && Array.isArray(result.data)) {
+        } else if (result.data?.details && Array.isArray(result.data.details)) {
+            pins = result.data.details;
+        } else if (Array.isArray(result.data)) {
             pins = result.data;
-        } else if (Array.isArray(result)) {
-            pins = result;
-        }
-        
-        // If still empty, try to find any array in the response
-        if (pins.length === 0 && result.data) {
-            for (let key in result.data) {
-                if (Array.isArray(result.data[key]) && result.data[key].length > 0) {
-                    pins = result.data[key];
-                    break;
-                }
-            }
         }
 
         if (pins.length === 0) {
@@ -528,11 +516,12 @@ window.fetchExamPins = async () => {
         examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
         
         pins.forEach(pin => {
-            const name = pin.title || pin.name || pin.description || pin.exam_name || "Exam Pin";
-            const price = pin.amount || pin.price || pin.cost || 0;
-            const code = pin.id || pin.plan_code || pin.code || pin.exam_id || "";
+            // Payscribe returns id, title, amount fields
+            const name = pin.title || pin.name || "Exam Pin";
+            const price = pin.amount || pin.price || 0;
+            const code = pin.id || pin.code || "";
             
-            if (code) {
+            if (code && price > 0) {
                 examSelect.innerHTML += `<option value="${code}" data-price="${price}">${name} - ₦${price}</option>`;
             }
         });
