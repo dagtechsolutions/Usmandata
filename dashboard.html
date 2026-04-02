@@ -889,152 +889,179 @@ body::before {
         window.activeService = { type };
 
 // Vending Services - Data & Smile
-if (type === 'data' || type === 'smile') {
-    if (type === 'smile') {
-        // Smile Data - Simple dropdown (Smile has fewer plans)
-        title.innerHTML = '<i class="fas fa-satellite-dish text-primary"></i> Smile Data';
-        body.innerHTML = `
-            <select id="inp_network" class="form-select mb-3" onchange="window.fetchDataPlans()">
-                <option value="smile">Smile</option>
+if (type === 'smile') {
+    // Smile Data - Simple dropdown
+    title.innerHTML = '<i class="fas fa-satellite-dish text-primary"></i> Smile Data';
+    body.innerHTML = `
+        <select id="inp_network" class="form-select mb-3">
+            <option value="smile">Smile</option>
+        </select>
+        <select id="inp_plan" class="form-select mb-3"><option value="">Select Plan</option></select>
+        <input type="number" id="inp_phone" class="form-control mb-3" placeholder="Recipient Phone Number">
+    `;
+    btn.onclick = () => window.executeTransaction();
+    window.fetchDataPlans();
+} 
+else if (type === 'data') {
+    // Regular Data - 3 column grid design
+    title.innerHTML = '<i class="fas fa-wifi text-primary"></i> Buy Data';
+    body.innerHTML = `
+        <div class="data-network-selector">
+            <select id="dataNetworkSimple" class="form-select" onchange="window.loadSimpleDataPlans()">
+                <option value="">Select Network</option>
+                <option value="mtn">MTN</option>
+                <option value="airtel">Airtel</option>
+                <option value="glo">GLO</option>
+                <option value="9mobile">9Mobile</option>
             </select>
-            <select id="inp_plan" class="form-select mb-3"><option value="">Select Plan</option></select>
-            <input type="number" id="inp_phone" class="form-control mb-3" placeholder="Recipient Phone Number">
-        `;
-        btn.onclick = () => window.executeTransaction();
-        window.fetchDataPlans(); // Load Smile plans immediately
-    } 
-    else {
-        // Regular Data - Dynamic category tabs
-        title.innerHTML = '<i class="fas fa-wifi text-primary"></i> Buy Data';
-        body.innerHTML = `
-            <div class="network-selector">
-                <select id="dataNetwork" class="form-select" onchange="window.loadDataPlansDynamic()">
-                    <option value="">Select Network...</option>
-                    <option value="mtn">MTN</option>
-                    <option value="airtel">Airtel</option>
-                    <option value="glo">GLO</option>
-                    <option value="9mobile">9Mobile</option>
-                </select>
-            </div>
-            <div id="dataPlansContainer">
-                <div class="data-category-tabs" id="dataCategoryTabs"></div>
-                <div id="dataPlansGrid" class="data-plans-grid">Select a network to view plans</div>
-            </div>
-            <div class="mt-3">
-                <label class="fw-bold mb-2">Recipient Phone Number</label>
-                <input type="number" id="inp_phone" class="form-control" placeholder="e.g., 08012345678">
-            </div>
-        `;
-        btn.innerText = "Purchase Selected Plan";
-        btn.onclick = () => {
-            const selectedPlan = window.activeService.selectedPlan;
-            if (!selectedPlan) {
-                alert("Please select a data plan first");
-                return;
-            }
-            const phone = document.getElementById('inp_phone').value;
-            if (!phone || phone.length < 10) {
-                alert("Please enter a valid phone number");
-                return;
-            }
-            window.executeTransaction();
-        };
+        </div>
+        <div id="simpleDataPlansContainer" class="data-plans-container">
+            <div class="data-category-tabs-simple" id="simpleCategoryTabs"></div>
+            <div id="simpleDataPlansGrid" class="data-plans-grid-simple"></div>
+        </div>
+        <div class="data-phone-input">
+            <label><i class="fas fa-mobile-alt me-2"></i> Recipient Phone Number</label>
+            <input type="tel" id="inp_phone_simple" class="form-control" placeholder="e.g., 08012345678" maxlength="11">
+        </div>
+    `;
+    btn.innerText = "Purchase Selected Plan";
+    btn.onclick = () => {
+        const selectedPlan = window.activeService.selectedPlanSimple;
+        if (!selectedPlan) {
+            alert("Please select a data plan first");
+            return;
+        }
+        const phone = document.getElementById('inp_phone_simple').value;
+        if (!phone || phone.length < 10) {
+            alert("Please enter a valid phone number");
+            return;
+        }
+        window.executeTransaction();
+    };
+    
+    // Load function for 3-column grid
+    window.loadSimpleDataPlans = async () => {
+        const network = document.getElementById('dataNetworkSimple').value;
+        if (!network) {
+            document.getElementById('simpleDataPlansGrid').innerHTML = '<div class="text-muted text-center">Please select a network</div>';
+            return;
+        }
         
-        // Dynamic load function for regular data
-        window.loadDataPlansDynamic = async () => {
-            const network = document.getElementById('dataNetwork').value;
-            if (!network) {
-                document.getElementById('dataPlansGrid').innerHTML = '<div class="text-muted">Please select a network</div>';
+        const plansGrid = document.getElementById('simpleDataPlansGrid');
+        const tabsContainer = document.getElementById('simpleCategoryTabs');
+        plansGrid.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading plans...</div>';
+        
+        try {
+            const res = await fetch(`${RENDER_URL}/api/fetch-data?action=data_plans&network=${network}`);
+            const data = await res.json();
+            const plans = data.data?.message?.details?.[0]?.plans || [];
+            
+            if (plans.length === 0) {
+                plansGrid.innerHTML = '<div class="text-warning text-center">No plans available</div>';
                 return;
             }
             
-            const plansGrid = document.getElementById('dataPlansGrid');
-            const tabsContainer = document.getElementById('dataCategoryTabs');
-            plansGrid.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading plans...</div>';
-            
-            try {
-                const res = await fetch(`${RENDER_URL}/api/fetch-data?action=data_plans&network=${network}`);
-                const data = await res.json();
-                const plans = data.data?.message?.details?.[0]?.plans || [];
+            // Format plans - extract size, duration, price
+            const formattedPlans = plans.map(plan => {
+                const name = plan.name.toUpperCase();
+                let size = '';
+                let duration = '';
                 
-                if (plans.length === 0) {
-                    plansGrid.innerHTML = '<div class="text-warning">No plans available for this network</div>';
+                const sizeMatch = name.match(/(\d+(?:\.\d+)?)\s*(MB|GB)/i);
+                if (sizeMatch) {
+                    size = `${sizeMatch[1]}${sizeMatch[2]}`;
+                } else {
+                    size = plan.name.split(' ')[0].substring(0, 10);
+                }
+                
+                if (name.includes('DAILY') || name.includes('24HR') || name.includes('1DAY')) duration = 'Daily';
+                else if (name.includes('WEEKLY') || name.includes('7 DAYS') || name.includes('7DAYS')) duration = 'Weekly';
+                else if (name.includes('MONTHLY') || name.includes('30 DAYS')) duration = 'Monthly';
+                else if (name.includes('YEARLY')) duration = 'Yearly';
+                else duration = 'Data';
+                
+                return { size, duration, price: plan.amount, code: plan.plan_code, name: plan.name };
+            });
+            
+            // Group by category
+            const categories = {
+                'SME': [], 'GIFTING': [], 'CORPORATE': [], 'SOCIAL': [],
+                'DAILY': [], 'WEEKLY': [], 'MONTHLY': [], 'STANDARD': []
+            };
+            
+            formattedPlans.forEach(plan => {
+                const name = plan.name.toLowerCase();
+                if (name.includes('sme')) categories['SME'].push(plan);
+                else if (name.includes('gift')) categories['GIFTING'].push(plan);
+                else if (name.includes('corporate')) categories['CORPORATE'].push(plan);
+                else if (name.includes('social')) categories['SOCIAL'].push(plan);
+                else if (plan.duration === 'Daily') categories['DAILY'].push(plan);
+                else if (plan.duration === 'Weekly') categories['WEEKLY'].push(plan);
+                else if (plan.duration === 'Monthly') categories['MONTHLY'].push(plan);
+                else categories['STANDARD'].push(plan);
+            });
+            
+            // Remove empty categories
+            Object.keys(categories).forEach(key => {
+                if (categories[key].length === 0) delete categories[key];
+            });
+            
+            // Build category tabs
+            tabsContainer.innerHTML = '';
+            const categoryNames = Object.keys(categories);
+            let activeCategory = categoryNames[0];
+            
+            categoryNames.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = `data-category-btn-simple ${cat === activeCategory ? 'active' : ''}`;
+                btn.textContent = `${cat} (${categories[cat].length})`;
+                btn.onclick = () => {
+                    document.querySelectorAll('.data-category-btn-simple').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    displaySimplePlans(categories[cat]);
+                };
+                tabsContainer.appendChild(btn);
+            });
+            
+            const displaySimplePlans = (planList) => {
+                plansGrid.innerHTML = '';
+                if (planList.length === 0) {
+                    plansGrid.innerHTML = '<div class="text-muted text-center">No plans in this category</div>';
                     return;
                 }
                 
-                // Dynamically extract categories from plan names
-                const categories = {};
-                plans.forEach(plan => {
-                    const name = plan.name.toLowerCase();
-                    let category = 'OTHER';
-                    
-                    if (name.includes('sme')) category = 'SME';
-                    else if (name.includes('gift') || name.includes('gifting')) category = 'GIFTING';
-                    else if (name.includes('corporate')) category = 'CORPORATE';
-                    else if (name.includes('social')) category = 'SOCIAL';
-                    else if (name.includes('weekly') || name.includes('7 days') || name.includes('7day')) category = 'WEEKLY';
-                    else if (name.includes('month') || name.includes('30 days') || name.includes('30day')) category = 'MONTHLY';
-                    else if (name.includes('daily') || name.includes('24hr') || name.includes('24hrs')) category = 'DAILY';
-                    else if (name.includes('night')) category = 'NIGHT';
-                    else if (name.includes('student')) category = 'STUDENT';
-                    else category = 'STANDARD';
-                    
-                    if (!categories[category]) categories[category] = [];
-                    categories[category].push(plan);
-                });
-                
-                // Build category tabs dynamically
-                tabsContainer.innerHTML = '';
-                const categoryNames = Object.keys(categories).filter(cat => categories[cat].length > 0);
-                let activeCategory = categoryNames[0];
-                
-                categoryNames.forEach(cat => {
-                    const btn = document.createElement('button');
-                    btn.className = `data-category-btn ${cat === activeCategory ? 'active' : ''}`;
-                    btn.textContent = `${cat} (${categories[cat].length})`;
-                    btn.onclick = () => {
-                        document.querySelectorAll('.data-category-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        displayPlans(categories[cat], network);
-                    };
-                    tabsContainer.appendChild(btn);
-                });
-                
-                const displayPlans = (planList, net) => {
-                    plansGrid.innerHTML = '';
-                    planList.forEach(plan => {
-                        const card = document.createElement('div');
-                        card.className = 'data-plan-card';
-                        card.setAttribute('data-plan-code', plan.plan_code);
-                        card.setAttribute('data-plan-price', plan.amount);
-                        card.setAttribute('data-plan-name', plan.name);
-                        card.setAttribute('data-network', net);
-                        card.onclick = () => {
-                            document.querySelectorAll('.data-plan-card').forEach(c => c.classList.remove('selected'));
-                            card.classList.add('selected');
-                            window.activeService.selectedPlan = {
-                                plan_code: plan.plan_code,
-                                amount: plan.amount,
-                                name: plan.name,
-                                network: net
-                            };
+                planList.forEach(plan => {
+                    const card = document.createElement('div');
+                    card.className = 'data-plan-card-simple';
+                    card.setAttribute('data-code', plan.code);
+                    card.setAttribute('data-price', plan.price);
+                    card.setAttribute('data-name', plan.name);
+                    card.onclick = () => {
+                        document.querySelectorAll('.data-plan-card-simple').forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        window.activeService.selectedPlanSimple = {
+                            plan_code: plan.code,
+                            amount: plan.price,
+                            name: plan.name,
+                            network: network
                         };
-                        card.innerHTML = `
-                            <div class="data-plan-name">${plan.name}</div>
-                            <div class="data-plan-price">₦${parseInt(plan.amount).toLocaleString()}</div>
-                        `;
-                        plansGrid.appendChild(card);
-                    });
-                };
-                
-                displayPlans(categories[activeCategory], network);
-                
-            } catch (error) {
-                console.error("Error loading plans:", error);
-                plansGrid.innerHTML = '<div class="text-danger">Failed to load plans. Please try again.</div>';
-            }
-        };
-    }
+                    };
+                    card.innerHTML = `
+                        <div class="data-plan-size">${plan.size}</div>
+                        <div class="data-plan-duration">${plan.duration}</div>
+                        <div class="data-plan-price-simple">₦${parseInt(plan.price).toLocaleString()}</div>
+                    `;
+                    plansGrid.appendChild(card);
+                });
+            };
+            
+            displaySimplePlans(categories[activeCategory]);
+            
+        } catch (error) {
+            console.error("Error loading plans:", error);
+            plansGrid.innerHTML = '<div class="text-danger text-center">Failed to load plans. Please try again.</div>';
+        }
+    };
 }
         else if (type === 'airtime') {
             title.innerHTML = '<i class="fas fa-phone text-warning"></i> Buy Airtime';
@@ -1403,7 +1430,7 @@ if (type === 'data' || type === 'smile') {
         } catch(e) { alert("Network Error."); btn.disabled = false; document.getElementById('srvLoader').style.display = "none";}
     };
 
-    window.executeTransaction = async () => {
+  /*  window.executeTransaction = async () => {
         const uid = auth.currentUser.uid;
         const type = window.activeService.type;
         const btn = document.getElementById('procBtn');
@@ -1560,6 +1587,201 @@ if (type === 'data' || type === 'smile') {
                 document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success text-center fw-bold"><i class="fas fa-check-circle fa-2x"></i><br>Success!</div>`;
                 btn.style.display = "none"; 
                 setTimeout(() => location.reload(), 2000);
+            } else {
+                alert(out.message);
+                btn.disabled = false; btn.innerText = "Try Again";
+            }
+        } catch(e) { 
+            alert("Network Error."); 
+            btn.disabled = false; btn.innerText = "Process"; 
+            document.getElementById('srvLoader').style.display = "none";
+        }
+    };*/
+    window.executeTransaction = async () => {
+        const uid = auth.currentUser.uid;
+        const type = window.activeService.type;
+        const btn = document.getElementById('procBtn');
+        const payload = { uid, type, customer_name: window.activeService.customer_name };
+        let costAmount = 0;
+
+        // Vending cost calculations
+        if (type === 'data') {
+            const selectedPlan = window.activeService.selectedPlan;
+            if (!selectedPlan) {
+                alert("Please select a data plan first");
+                btn.disabled = false;
+                document.getElementById('srvLoader').style.display = "none";
+                return;
+            }
+            payload.network = selectedPlan.network;
+            payload.plan = selectedPlan.plan_code;
+            payload.phone = document.getElementById('inp_phone_simple').value;
+            costAmount = parseFloat(selectedPlan.amount) + 10;
+        }
+        else if (type === 'smile') {
+            const planSelect = document.getElementById('inp_plan');
+            const selectedOption = planSelect.options[planSelect.selectedIndex];
+            payload.network = 'smile';
+            payload.plan = planSelect.value;
+            payload.phone = document.getElementById('inp_phone').value;
+            costAmount = parseFloat(selectedOption?.getAttribute('data-price') || 0) + 10;
+        }
+        else if (type === 'airtime') {
+            payload.network = document.getElementById('inp_network').value;
+            payload.phone = document.getElementById('inp_phone').value;
+            payload.amount = document.getElementById('inp_amount').value;
+            costAmount = parseFloat(payload.amount);
+        }
+        else if (type === 'airtime_cash') {
+            payload.network = document.getElementById('inp_network').value;
+            payload.phone = document.getElementById('inp_phone').value;
+            payload.amount = document.getElementById('inp_amount').value;
+            costAmount = 0; // The user pays by transferring airtime, not from wallet
+        }
+        else if (type === 'tv') {
+            const p = document.getElementById('inp_plan');
+            payload.service = document.getElementById('inp_service').value;
+            payload.plan_id = p.value;
+            payload.account = document.getElementById('inp_account').value;
+            payload.phone = document.getElementById('inp_phone').value;
+            costAmount = parseFloat(p.options[p.selectedIndex].getAttribute('data-price')) + 30; 
+        }
+        else if (type === 'power') {
+            payload.service = document.getElementById('inp_service').value;
+            payload.meter_number = document.getElementById('inp_account').value;
+            payload.meter_type = document.getElementById('inp_meter_type').value;
+            payload.amount = document.getElementById('inp_amount').value;
+            payload.phone = document.getElementById('inp_phone').value;
+            costAmount = parseFloat(payload.amount) + 50; 
+        }
+        else if (type === 'exam') {
+            const examSelect = document.getElementById('inp_exam_id');
+            const selectedOption = examSelect.options[examSelect.selectedIndex];
+            if (!examSelect.value) {
+                alert("Please select an exam type");
+                btn.disabled = false;
+                document.getElementById('srvLoader').style.display = "none";
+                return;
+            }
+            payload.exam_id = examSelect.value;
+            payload.qty = document.getElementById('inp_qty').value;
+            const unitPrice = parseFloat(selectedOption?.getAttribute('data-price') || 0);
+            costAmount = (unitPrice * parseFloat(payload.qty)) + 50;
+        }
+        else if (type === 'sms') {
+            payload.sender_id = document.getElementById('inp_sender').value || "Update";
+            payload.phone = document.getElementById('inp_phone').value;
+            payload.message = document.getElementById('inp_message').value;
+            costAmount = window.calcSmsCost(); 
+        }
+        else if (type === 'recharge_card') {
+            payload.network = document.getElementById('card_network').value;
+            payload.amount = document.getElementById('card_amount').value;
+            payload.quantity = document.getElementById('card_quantity').value;
+            // Cost = (amount × quantity) - 2% discount + 10 service fee
+            const baseAmount = parseFloat(payload.amount) * parseInt(payload.quantity);
+            costAmount = (baseAmount * 0.98) + 10; 
+        }
+        // USD Card Services
+        else if (type === 'usd_card') {
+            payload.brand = document.getElementById('card_brand').value;
+            payload.amount = document.getElementById('card_amount').value;
+            costAmount = parseFloat(payload.amount) * 1600; 
+        }
+        else if (type === 'card_balance') {
+            payload.card_id = document.getElementById('card_id').value;
+            costAmount = 50; 
+        }
+        else if (type === 'card_freeze') {
+            payload.card_id = document.getElementById('card_id').value;
+            payload.action = document.getElementById('freeze_action').value;
+            costAmount = 0;
+        }
+        else if (type === 'card_topup') {
+            payload.card_id = document.getElementById('card_id').value;
+            payload.amount = document.getElementById('topup_amount').value;
+            costAmount = parseFloat(payload.amount) * 1600;
+        }
+        // Identity cost calculations
+        else if (type === 'nin1' || type === 'nin2' || type === 'nin3' || type === 'bvn') {
+            const kycType = type.startsWith('nin') ? 'nin' : 'bvn';
+            payload[kycType] = document.getElementById('inp_kyc_num').value;
+            if(!payload[kycType]) return alert(`Enter a valid number.`);
+            costAmount = 150;
+        }
+        else if (type === 'demographic') {
+            payload.surname = document.getElementById('demo_surname').value;
+            payload.first_name = document.getElementById('demo_firstname').value;
+            payload.birth_date = document.getElementById('demo_dob').value;
+            payload.gender = document.getElementById('demo_gender').value;
+            costAmount = 200;
+        }
+        else if (type === 'nin_phone' || type === 'bvn_phone') {
+            payload.phone = document.getElementById('inp_phone_num').value;
+            costAmount = 150;
+        }
+        else if (type === 'instant_validation') {
+            payload.value = document.getElementById('inp_value').value;
+            costAmount = 180;
+        }
+
+        payload.costAmount = costAmount; 
+        
+        // Skip confirmation for Airtime to Cash since it costs ₦0 from wallet
+        if(type !== 'airtime_cash') {
+            if(!confirm(`You will be charged ₦${costAmount.toLocaleString()}. Proceed?`)) return;
+        }
+
+        btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+        document.getElementById('srvLoader').style.display = "block";
+
+        try {
+            const endpoint = `${RENDER_URL}/api/process`;
+            const res = await fetch(endpoint, {
+                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+            });
+            if (res.status === 404) throw new Error("Endpoint not found.");
+            
+            const out = await res.json();
+            document.getElementById('srvLoader').style.display = "none";
+            
+            if(out.success) {
+                // 🌟 SPECIAL HANDLING FOR RECHARGE CARDS
+                if (type === 'recharge_card' && out.data?.message?.details) {
+                    const pinsArray = out.data.message.details;
+                    let pinsHtml = `<div class="text-start mt-3 p-3 bg-light border rounded">
+                        <h6 class="fw-bold text-success mb-3"><i class="fas fa-check-circle"></i> Pins Generated!</h6>`;
+                    
+                    pinsArray.forEach((pin, i) => {
+                        pinsHtml += `
+                            <div class="mb-2 p-2 border-bottom">
+                                <span class="badge bg-primary">PIN ${i+1}</span>
+                                <strong class="fs-5 ms-2" style="letter-spacing: 2px;">${pin.pin}</strong>
+                                <br><small class="text-muted">S/N: ${pin.serial_number}</small>
+                            </div>`;
+                    });
+                    pinsHtml += `</div>`;
+                    
+                    document.getElementById('srvExtra').innerHTML = pinsHtml;
+                    btn.style.display = "none"; 
+                } 
+                // 🌟 SPECIAL HANDLING FOR AIRTIME TO CASH
+                else if (type === 'airtime_cash' && out.data?.message) {
+                    const instructions = out.data.message.description || out.data.message;
+                    document.getElementById('srvExtra').innerHTML = `
+                        <div class="alert alert-info text-start mt-3">
+                            <h6 class="fw-bold"><i class="fas fa-info-circle"></i> Instructions:</h6>
+                            <p class="mb-0">${instructions}</p>
+                            <small class="d-block mt-2 text-muted">Transfer the airtime to the number provided. Your wallet will be credited automatically once confirmed.</small>
+                        </div>`;
+                    btn.style.display = "none";
+                }
+                // STANDARD SUCCESS MESSAGE
+                else {
+                    document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success text-center fw-bold"><i class="fas fa-check-circle fa-2x"></i><br>Success!</div>`;
+                    btn.style.display = "none"; 
+                    setTimeout(() => location.reload(), 2000);
+                }
             } else {
                 alert(out.message);
                 btn.disabled = false; btn.innerText = "Try Again";
