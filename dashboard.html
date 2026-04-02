@@ -10,12 +10,220 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
 
     <style>
-        body { background: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1e293b; }
+        body { 
+    background: #f8fafc; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    color: #1e293b;
+    position: relative;
+}
+
+/* Optional: Add subtle dots pattern */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+    background-size: 30px 30px;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: -1;
+}
         
         .sidebar { background: #0f172a; color: white; min-height: 100vh; padding: 20px; position: sticky; top: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.05); }
         .nav-link-side { color: #94a3b8; font-weight: 600; padding: 12px 15px; border-radius: 8px; margin-bottom: 5px; transition: 0.3s; display: block; text-decoration: none;}
         .nav-link-side:hover, .nav-link-side.active { background: rgba(255,255,255,0.1); color: #fff; }
-        
+        /* Welcome Header - Aesthetic Design */
+.welcome-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 20px 25px;
+    border-radius: 28px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(4, 120, 87, 0.1);
+}
+
+.welcome-left {
+    flex: 1;
+}
+
+.welcome-greeting {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.welcome-greeting i {
+    font-size: 1.2rem;
+    color: #f59e0b;
+    animation: wave 1.5s ease-in-out infinite;
+    transform-origin: 70% 70%;
+}
+
+@keyframes wave {
+    0% { transform: rotate(0deg); }
+    20% { transform: rotate(15deg); }
+    40% { transform: rotate(-10deg); }
+    60% { transform: rotate(8deg); }
+    80% { transform: rotate(-5deg); }
+    100% { transform: rotate(0deg); }
+}
+
+.welcome-greeting span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+    letter-spacing: 0.5px;
+}
+
+.user-name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.user-icon {
+    font-size: 2.2rem;
+    color: #047857;
+    background: #ecfdf5;
+    padding: 8px;
+    border-radius: 50%;
+}
+
+.user-name-text {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.5px;
+}
+
+/* Online Status - Green Glowing Button */
+.online-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    padding: 6px 16px;
+    border-radius: 50px;
+    box-shadow: 0 0 12px rgba(5, 150, 105, 0.6), 0 2px 4px rgba(0, 0, 0, 0.05);
+    animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 5px rgba(5, 150, 105, 0.4), 0 0 10px rgba(5, 150, 105, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(5, 150, 105, 0.8), 0 0 30px rgba(5, 150, 105, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 5px rgba(5, 150, 105, 0.4), 0 0 10px rgba(5, 150, 105, 0.2);
+    }
+}
+
+.online-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #4ade80;
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 5px #4ade80;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(0.95);
+        opacity: 1;
+    }
+}
+
+.online-text {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.5px;
+}
+
+/* Role Badge Styling */
+.welcome-right {
+    display: flex;
+    align-items: center;
+}
+
+.role-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    padding: 10px 20px;
+    border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.role-wrapper i {
+    font-size: 1.2rem;
+    color: #fbbf24;
+}
+
+.role-badge {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 1px;
+    background: transparent;
+    padding: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .welcome-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 15px 20px;
+    }
+    
+    .user-name-text {
+        font-size: 1.3rem;
+    }
+    
+    .user-icon {
+        font-size: 1.6rem;
+        padding: 5px;
+    }
+    
+    .online-status {
+        padding: 4px 12px;
+    }
+    
+    .online-text {
+        font-size: 0.7rem;
+    }
+    
+    .role-wrapper {
+        padding: 6px 15px;
+    }
+}
         .balance-card { 
             background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); 
             color: white; border-radius: 20px; padding: 35px 30px; margin-bottom: 25px; 
@@ -28,14 +236,45 @@
         .balance-card h1 { font-size: 3rem; font-weight: 800; letter-spacing: -1px; margin: 5px 0 15px 0;}
         
         /* Inline Tabs - Side by Side */
-        .inline-tabs { display: flex; gap: 12px; margin-bottom: 30px; border-bottom: 2px solid #e2e8f0; padding-bottom: 0; overflow-x: auto; }
-        .inline-tab { padding: 12px 28px; font-weight: 700; font-size: 1rem; border: none; background: transparent; color: #64748b; transition: 0.3s; cursor: pointer; border-radius: 12px 12px 0 0; white-space: nowrap; }
+        .inline-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0;
+        }
+        .inline-tab {
+            padding: 12px 28px;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            transition: 0.3s;
+            cursor: pointer;
+            border-radius: 12px 12px 0 0;
+            position: relative;
+        }
         .inline-tab:hover { color: #0f172a; background: #f1f5f9; }
-        .inline-tab.active { color: #047857; background: white; border-bottom: 3px solid #047857; }
+        .inline-tab.active {
+            color: #047857;
+            background: white;
+            border-bottom: 3px solid #047857;
+        }
         
-        .service-btn { background: white; border: 1px solid #e2e8f0; border-radius: 18px; padding: 25px 15px; text-align: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; height: 100%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .service-btn:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border-color: #3b82f6; }
-        .icon-wrapper { width: 60px; height: 60px; border-radius: 15px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 15px; }
+        .service-btn { 
+            background: white; border: 1px solid #e2e8f0; border-radius: 18px; padding: 25px 15px; 
+            text-align: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            width: 100%; height: 100%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .service-btn:hover { 
+            transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); 
+            border-color: #3b82f6; 
+        }
+        .icon-wrapper {
+            width: 60px; height: 60px; border-radius: 15px; background: #eff6ff; color: #2563eb;
+            display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 15px;
+        }
         .srv-name { font-weight: 700; font-size: 0.95rem; color: #334155; }
         
         .vacc-box { background: white; border: 1px solid #e2e8f0; border-left: 5px solid #10b981; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);}
@@ -48,23 +287,211 @@
         #procBtn { border-radius: 12px; font-size: 1.1rem; padding: 14px; box-shadow: 0 4px 15px rgba(37,99,235,0.3); transition: 0.3s; }
         #procBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,99,235,0.4); }
         
-        /* Data Plan Grid Aesthetics */
-        .nav-pills .nav-link { border-radius: 50px; font-weight: bold; color: #64748b; padding: 8px 20px; margin-right: 10px; transition: 0.3s; border: 1px solid #e2e8f0; background: white; }
-        .nav-pills .nav-link.active { background-color: #047857; color: white; border-color: #047857; box-shadow: 0 4px 10px rgba(4,120,87,0.2); }
+        /* Floating WhatsApp Icon */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+        .whatsapp-float a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 65px;
+            height: 65px;
+            background: #25D366;
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+            transition: all 0.3s ease;
+        }
+        .whatsapp-float a:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 25px rgba(37, 211, 102, 0.5);
+        }
+        .whatsapp-float i {
+            font-size: 2.5rem;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        /* Data Plans Category Tabs */
+.data-category-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+.data-category-btn {
+    padding: 8px 20px;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #475569;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+.data-category-btn:hover {
+    background: #e2e8f0;
+    transform: translateY(-2px);
+}
+.data-category-btn.active {
+    background: #047857;
+    color: white;
+}
+
+/* Data Plans Grid */
+.data-plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    margin-top: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 5px;
+}
+.data-plan-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.data-plan-card:hover {
+    border-color: #047857;
+    background: #f0fdf4;
+    transform: scale(1.02);
+}
+.data-plan-card.selected {
+    border-color: #047857;
+    background: #f0fdf4;
+    box-shadow: 0 2px 8px rgba(4,120,87,0.2);
+}
+.data-plan-name {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #1e293b;
+    margin-bottom: 5px;
+}
+.data-plan-price {
+    font-weight: 800;
+    font-size: 1rem;
+    color: #047857;
+}
+
+/* Excel Upload Styles */
+.excel-upload-area {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 15px;
+}
+.excel-upload-area:hover {
+    border-color: #047857;
+    background: #f0fdf4;
+}
+.excel-upload-area i {
+    font-size: 2rem;
+    color: #047857;
+    margin-bottom: 10px;
+}
+.excel-preview {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #f1f5f9;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 0.8rem;
+}
+.network-selector {
+    margin-bottom: 20px;
+}
+.network-selector select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    font-weight: 600;
+}
         
-        .plan-card { border: 2px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: all 0.2s; background: white; height: 100%; display: flex; flex-direction: column; justify-content: center; }
-        .plan-card:hover { border-color: #94a3b8; }
-        .plan-card.selected { border-color: #047857; background: #ecfdf5; box-shadow: 0 4px 10px rgba(4, 120, 87, 0.15); transform: scale(1.02); }
+/* Footer Styles */
+.footer {
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    padding: 25px 0;
+    margin-top: 50px;
+    text-align: center;
+}
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+.footer .copyright {
+    margin: 0 0 8px 0;
+    color: #64748b;
+    font-size: 0.85rem;
+}
+.footer .credit {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 0.7rem;
+}
+.footer .credit a {
+    color: #64748b;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+.footer .credit a:hover {
+    color: #047857;
+    text-decoration: underline;
+}
+        /* Badge for identity services */
+        .badge-humanity {
+            background: #eef2ff;
+            color: #1e40af;
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-top: 8px;
+            display: inline-block;
+        }
         
-        .whatsapp-float { position: fixed; bottom: 30px; right: 30px; z-index: 1000; animation: pulse 2s infinite; }
-        .whatsapp-float a { display: flex; align-items: center; justify-content: center; width: 65px; height: 65px; background: #25D366; color: white; border-radius: 50%; text-decoration: none; box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4); transition: all 0.3s ease; }
-        .whatsapp-float a:hover { transform: scale(1.1); box-shadow: 0 12px 25px rgba(37, 211, 102, 0.5); }
-        .whatsapp-float i { font-size: 2.5rem; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        /* USD Card Badge */
+        .usd-badge {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0f172a;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-top: 8px;
+            display: inline-block;
+        }
         
-        .footer { background: white; border-top: 1px solid #e2e8f0; padding: 25px 0; margin-top: 50px; text-align: center; }
-        .badge-humanity { background: #eef2ff; color: #1e40af; font-size: 0.65rem; padding: 3px 8px; border-radius: 20px; margin-top: 8px; display: inline-block; }
-        .usd-badge { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; font-size: 0.7rem; font-weight: bold; padding: 4px 10px; border-radius: 20px; margin-top: 8px; display: inline-block; }
+        @media (max-width: 768px) {
+            .inline-tabs { gap: 5px; }
+            .inline-tab { padding: 8px 16px; font-size: 0.85rem; }
+            .whatsapp-float { bottom: 20px; right: 20px; }
+            .whatsapp-float a { width: 55px; height: 55px; }
+            .whatsapp-float i { font-size: 2rem; }
+        }
     </style>
 </head>
 <body>
@@ -76,6 +503,7 @@
 
 <div class="container-fluid">
     <div class="row">
+        <!-- Desktop Sidebar -->
         <div class="col-md-2 sidebar d-none d-md-block">
             <h4 class="fw-bold mb-4 text-white"><i class="fas fa-bolt text-warning"></i> USMAN DATA</h4>
             <nav class="nav flex-column">
@@ -87,14 +515,36 @@
             </nav>
         </div>
 
+        <!-- Main Content -->
         <div class="col-md-10 p-4 p-md-5">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+           <!-- <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <p class="text-muted mb-0 fw-bold">Welcome back,</p>
                     <h3 class="fw-bold text-dark text-capitalize" id="userName">Loading...</h3>
                 </div>
                 <span id="roleBadge" class="badge bg-primary px-3 py-2" style="border-radius:20px;">USER</span>
+            </div>-->
+            <div class="welcome-header">
+    <div class="welcome-left">
+        <div class="welcome-greeting">
+            <span>Welcome back,</span>
+        </div>
+        <div class="user-name-wrapper">
+            <i class="fas fa-user-circle user-icon"></i>
+            <h3 class="user-name-text text-capitalize" id="userName">Loading...</h3>
+            <div class="online-status">
+                <span class="online-dot"></span>
+                <span class="online-text">Active</span>
             </div>
+        </div>
+    </div>
+    <div class="welcome-right">
+        <div class="role-wrapper">
+            <i class="fas fa-user-shield-alt"></i>
+            <span id="roleBadge" class="role-badge">USER</span>
+        </div>
+    </div>
+</div>
 
             <!-- Premium Unified Wallet -->
             <div class="balance-card">
@@ -105,6 +555,7 @@
                 </button>
             </div>
 
+            <!-- Virtual Account Display -->
             <div class="vacc-box" id="vAccCard">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h6 class="fw-bold text-dark mb-0"><i class="fas fa-university text-success me-2"></i> Unified Funding Account</h6>
@@ -128,141 +579,157 @@
                 </button>
             </div>
 
-            <!-- 🌟 TAB CONTENT 🌟 -->
-            <div class="tab-content" id="pills-tabContent">
-                
-                <!-- TAB 1: VENDING SERVICES -->
-                <div class="tab-pane fade show active" id="pills-vending" role="tabpanel">
-                    <div class="row g-3 g-md-4">
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('data')">
-                                <div class="icon-wrapper"><i class="fas fa-wifi"></i></div>
-                                <span class="srv-name">Buy Data</span>
-                            </button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('airtime')">
-                                <div class="icon-wrapper" style="background:#fef3c7; color:#d97706;"><i class="fas fa-phone"></i></div>
-                                <span class="srv-name">Airtime</span>
-                            </button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('tv')">
-                                <div class="icon-wrapper" style="background:#fee2e2; color:#dc2626;"><i class="fas fa-tv"></i></div>
-                                <span class="srv-name">Cable TV</span>
-                            </button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('power')">
-                                <div class="icon-wrapper" style="background:#fef08a; color:#b45309;"><i class="fas fa-lightbulb"></i></div>
-                                <span class="srv-name">Electricity</span>
-                            </button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('exam')">
-                                <div class="icon-wrapper" style="background:#e0e7ff; color:#4338ca;"><i class="fas fa-graduation-cap"></i></div>
-                                <span class="srv-name">Exam Pins</span>
-                            </button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('sms')">
-                                <div class="icon-wrapper" style="background:#fce7f3; color:#4f46e5;"><i class="fas fa-envelope"></i></div>
-                                <span class="srv-name">Bulk SMS</span>
-                            </button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('airtime_cash')">
-                                <div class="icon-wrapper" style="background:#ecfccb; color:#ca8a04;"><i class="fas fa-exchange-alt"></i></div>
-                                <span class="srv-name">Airtime to Cash</span>
-                            </button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('recharge_card')">
-                                <div class="icon-wrapper" style="background:#fef9c3; color:#ca8a04;"><i class="fas fa-print"></i></div>
-                                <span class="srv-name">Print Recharge Card</span>
-                            </button>
-                        </div>
+            <!-- 🌟 TAB 1: VENDING SERVICES 🌟 -->
+            <div id="vendingContent">
+                <div class="row g-3 g-md-4">
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('data')">
+                            <div class="icon-wrapper"><i class="fas fa-wifi"></i></div>
+                            <span class="srv-name">Buy Data</span>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('airtime')">
+                            <div class="icon-wrapper" style="background:#fef3c7; color:#d97706;"><i class="fas fa-phone"></i></div>
+                            <span class="srv-name">Airtime</span>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('tv')">
+                            <div class="icon-wrapper" style="background:#fee2e2; color:#dc2626;"><i class="fas fa-tv"></i></div>
+                            <span class="srv-name">Cable TV</span>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('power')">
+                            <div class="icon-wrapper" style="background:#fef08a; color:#b45309;"><i class="fas fa-lightbulb"></i></div>
+                            <span class="srv-name">Electricity</span>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('exam')">
+                            <div class="icon-wrapper" style="background:#e0e7ff; color:#4338ca;"><i class="fas fa-graduation-cap"></i></div>
+                            <span class="srv-name">Exam Pins</span>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('sms')">
+                            <div class="icon-wrapper" style="background:#fce7f3; color:#4f46e5;"><i class="fas fa-envelope"></i></div>
+                            <span class="srv-name">Bulk SMS</span>
+                        </button>
+                    </div>
+            <div class="col-6 col-md-3">
+    <button class="service-btn" onclick="openSrv('airtime_cash')">
+        <div class="icon-wrapper" style="background:#ecfccb; color:#ca8a04;"><i class="fas fa-exchange-alt"></i></div>
+        <span class="srv-name">Airtime to Cash</span>
+    </button>
+</div>
+<!-- PRINT RECHARGE CARD -->
+<div class="col-6 col-md-3">
+    <button class="service-btn" onclick="openSrv('recharge_card')">
+        <div class="icon-wrapper" style="background:#fef9c3; color:#ca8a04;"><i class="fas fa-print"></i></div>
+        <span class="srv-name">Print Recharge Card</span>
+        <div class="badge-humanity" style="background:#fef3c7;">Easy</div>
+    </button>
+</div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('smile')">
+                            <div class="icon-wrapper" style="background:#e9d8fd; color:#7c3aed;"><i class="fas fa-satellite-dish"></i></div>
+                            <span class="srv-name">Smile Data</span>
+                        </button>
                     </div>
                 </div>
+            </div>
 
-                <!-- TAB 2: IDENTITY & KYC (Humanity Services) -->
-                <div class="tab-pane fade" id="pills-kyc" role="tabpanel">
-                    <div class="row g-3 g-md-4">
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('nin1')">
-                                <div class="icon-wrapper" style="background:#dcfce7; color:#15803d;"><i class="fas fa-id-card"></i></div>
-                                <span class="srv-name">NIN Search v1</span>
-                                <div class="badge-humanity">Simple</div>
-                            </button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('nin2')">
-                                <div class="icon-wrapper" style="background:#e0e7ff; color:#3730a3;"><i class="fas fa-id-card"></i></div>
-                                <span class="srv-name">NIN Search v2</span>
-                                <div class="badge-humanity">Premium</div>
-                            </button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('nin3')">
-                                <div class="icon-wrapper" style="background:#fff0e0; color:#c2410c;"><i class="fas fa-fingerprint"></i></div>
-                                <span class="srv-name">NIN Search v3</span>
-                                <div class="badge-humanity">Advanced</div>
-                            </button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('bvn')">
-                                <div class="icon-wrapper" style="background:#f3e8ff; color:#6d28d9;"><i class="fas fa-university"></i></div>
-                                <span class="srv-name">BVN Lookup</span>
-                                <div class="badge-humanity">Standard</div>
-                            </button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('demographic')">
-                                <div class="icon-wrapper" style="background:#d9f99d; color:#4d7c0f;"><i class="fas fa-users"></i></div>
-                                <span class="srv-name">Demographic Search</span>
-                                <div class="badge-humanity">Name/DOB</div>
-                            </button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('nin_phone')">
-                                <div class="icon-wrapper" style="background:#fbcfe8; color:#be185d;"><i class="fas fa-phone-alt"></i></div>
-                                <span class="srv-name">NIN by Phone</span>
-                                <div class="badge-humanity">Quick Search</div>
-                            </button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('bvn_phone')">
-                                <div class="icon-wrapper" style="background:#fed7aa; color:#b45309;"><i class="fas fa-mobile-alt"></i></div>
-                                <span class="srv-name">BVN by Phone</span>
-                                <div class="badge-humanity">Mobile Lookup</div>
-                            </button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('instant_validation')">
-                                <div class="icon-wrapper" style="background:#fef3c7; color:#b45309;"><i class="fas fa-bolt"></i></div>
-                                <span class="srv-name">Instant Validation</span>
-                                <div class="badge-humanity">Fast KYC</div>
-                            </button>
-                        </div>
+            <!-- 🌟 TAB 2: IDENTITY & KYC (Humanity Services) 🌟 -->
+            <div id="identityContent" style="display: none;">
+                <div class="row g-3 g-md-4">
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('nin1')">
+                            <div class="icon-wrapper" style="background:#dcfce7; color:#15803d;"><i class="fas fa-id-card"></i></div>
+                            <span class="srv-name">NIN Search v1</span>
+                            <div class="badge-humanity">Simple</div>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('nin2')">
+                            <div class="icon-wrapper" style="background:#e0e7ff; color:#3730a3;"><i class="fas fa-id-card"></i></div>
+                            <span class="srv-name">NIN Search v2</span>
+                            <div class="badge-humanity">Premium</div>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('nin3')">
+                            <div class="icon-wrapper" style="background:#fff0e0; color:#c2410c;"><i class="fas fa-fingerprint"></i></div>
+                            <span class="srv-name">NIN Search v3</span>
+                            <div class="badge-humanity">Advanced</div>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('bvn')">
+                            <div class="icon-wrapper" style="background:#f3e8ff; color:#6d28d9;"><i class="fas fa-university"></i></div>
+                            <span class="srv-name">BVN Lookup</span>
+                            <div class="badge-humanity">Standard</div>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('demographic')">
+                            <div class="icon-wrapper" style="background:#d9f99d; color:#4d7c0f;"><i class="fas fa-users"></i></div>
+                            <span class="srv-name">Demographic Search</span>
+                            <div class="badge-humanity">Name/DOB</div>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('nin_phone')">
+                            <div class="icon-wrapper" style="background:#fbcfe8; color:#be185d;"><i class="fas fa-phone-alt"></i></div>
+                            <span class="srv-name">NIN by Phone</span>
+                            <div class="badge-humanity">Quick Search</div>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('bvn_phone')">
+                            <div class="icon-wrapper" style="background:#fed7aa; color:#b45309;"><i class="fas fa-mobile-alt"></i></div>
+                            <span class="srv-name">BVN by Phone</span>
+                            <div class="badge-humanity">Mobile Lookup</div>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('instant_validation')">
+                            <div class="icon-wrapper" style="background:#fef3c7; color:#b45309;"><i class="fas fa-bolt"></i></div>
+                            <span class="srv-name">Instant Validation</span>
+                            <div class="badge-humanity">Fast KYC</div>
+                        </button>
                     </div>
                 </div>
+            </div>
             
-                <!-- TAB 3: CARDS & BANKING (USD Card Feature) -->
-                <div class="tab-pane fade" id="pills-cards" role="tabpanel">
-                    <div class="row g-3 g-md-4">
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('usd_card')">
-                                <div class="icon-wrapper" style="background:linear-gradient(135deg, #fbbf24, #f59e0b); color:#0f172a;"><i class="fas fa-dollar-sign"></i></div>
-                                <span class="srv-name">Issue USD Card</span>
-                                <div class="usd-badge">Virtual Card</div>
-                            </button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <button class="service-btn" onclick="openSrv('card_balance')">
-                                <div class="icon-wrapper" style="background:#dbeafe; color:#1e40af;"><i class="fas fa-chart-line"></i></div>
-                                <span class="srv-name">Card Balance</span>
-                            </button>
-                        </div>
+            <!-- 🌟 TAB 3: CARDS & BANKING (USD Card Feature) 🌟 -->
+            <div id="cardsContent" style="display: none;">
+                <div class="row g-3 g-md-4">
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('usd_card')">
+                            <div class="icon-wrapper" style="background:linear-gradient(135deg, #fbbf24, #f59e0b); color:#0f172a;"><i class="fas fa-dollar-sign"></i></div>
+                            <span class="srv-name">Issue USD Card</span>
+                            <div class="usd-badge">Virtual Card</div>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('card_balance')">
+                            <div class="icon-wrapper" style="background:#dbeafe; color:#1e40af;"><i class="fas fa-chart-line"></i></div>
+                            <span class="srv-name">Card Balance</span>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('card_freeze')">
+                            <div class="icon-wrapper" style="background:#fee2e2; color:#991b1b;"><i class="fas fa-snowflake"></i></div>
+                            <span class="srv-name">Freeze Card</span>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="service-btn" onclick="openSrv('card_topup')">
+                            <div class="icon-wrapper" style="background:#dcfce7; color:#166534;"><i class="fas fa-arrow-up"></i></div>
+                            <span class="srv-name">Top-up Card</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -278,6 +745,7 @@
 </div>
 
 <!-- Footer -->
+<!-- Footer -->
 <footer class="footer">
     <div class="footer-content">
         <p class="copyright">© 2024 Usman Data Sub. All rights reserved.</p>
@@ -290,13 +758,11 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0">
       <div class="modal-header border-0">
-          <h5 class="modal-title fw-bold text-dark" id="srvTitle">Service</h5>
+          <h5 class="modal-title fw-bold" id="srvTitle">Service</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body p-4">
-          <!-- FIX: Moved Process Button to the TOP -->
           <button class="btn btn-primary w-100 fw-bold mb-4" id="procBtn" style="display:none;"></button>
-          
           <div id="srvBody"></div>
           <div class="loader" id="srvLoader"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Processing...</div>
           <div id="srvExtra"></div>
@@ -326,24 +792,41 @@
     const RENDER_URL = "https://usmandata.onrender.com";
 
     window.activeService = {};
-    window.allFetchedPlans = []; 
 
     // Tab switching logic
     const tabVending = document.getElementById('tabVending');
     const tabIdentity = document.getElementById('tabIdentity');
     const tabCards = document.getElementById('tabCards');
-    const vendingContent = document.getElementById('pills-vending');
-    const identityContent = document.getElementById('pills-kyc');
-    const cardsContent = document.getElementById('pills-cards');
+    const vendingContent = document.getElementById('vendingContent');
+    const identityContent = document.getElementById('identityContent');
+    const cardsContent = document.getElementById('cardsContent');
     
-    const resetTabs = () => {
-        [tabVending, tabIdentity, tabCards].forEach(t => t.classList.remove('active'));
-        [vendingContent, identityContent, cardsContent].forEach(c => { c.style.display = 'none'; c.classList.remove('show', 'active'); });
-    };
-
-    tabVending.addEventListener('click', () => { resetTabs(); tabVending.classList.add('active'); vendingContent.style.display = 'block'; vendingContent.classList.add('show', 'active'); });
-    tabIdentity.addEventListener('click', () => { resetTabs(); tabIdentity.classList.add('active'); identityContent.style.display = 'block'; identityContent.classList.add('show', 'active'); });
-    tabCards.addEventListener('click', () => { resetTabs(); tabCards.classList.add('active'); cardsContent.style.display = 'block'; cardsContent.classList.add('show', 'active'); });
+    tabVending.addEventListener('click', () => {
+        tabVending.classList.add('active');
+        tabIdentity.classList.remove('active');
+        tabCards.classList.remove('active');
+        vendingContent.style.display = 'block';
+        identityContent.style.display = 'none';
+        cardsContent.style.display = 'none';
+    });
+    
+    tabIdentity.addEventListener('click', () => {
+        tabIdentity.classList.add('active');
+        tabVending.classList.remove('active');
+        tabCards.classList.remove('active');
+        identityContent.style.display = 'block';
+        vendingContent.style.display = 'none';
+        cardsContent.style.display = 'none';
+    });
+    
+    tabCards.addEventListener('click', () => {
+        tabCards.classList.add('active');
+        tabVending.classList.remove('active');
+        tabIdentity.classList.remove('active');
+        cardsContent.style.display = 'block';
+        vendingContent.style.display = 'none';
+        identityContent.style.display = 'none';
+    });
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -392,7 +875,7 @@
         } else { window.location.href = "login.html"; }
     });
 
-    // --- MODAL GENERATOR ---
+    // Open Service Function
     window.openSrv = (type) => {
         const modal = new bootstrap.Modal(document.getElementById('srvModal'));
         const body = document.getElementById('srvBody');
@@ -405,38 +888,154 @@
         btn.innerText = "Process Transaction";
         window.activeService = { type };
 
-        // 🌟 DATA TABS & GRID LOGIC 🌟
-        if (type === 'data') {
-            title.innerHTML = '<i class="fas fa-wifi text-primary"></i> Buy Data';
-            body.innerHTML = `
-                <select id="inp_network" class="form-select mb-3" onchange="window.fetchDataPlans()">
-                    <option value="">1. Select Network...</option>
-                    <option value="mtn">MTN</option><option value="airtel">Airtel</option>
-                    <option value="glo">GLO</option><option value="9mobile">9Mobile</option>
+// Vending Services - Data & Smile
+if (type === 'data' || type === 'smile') {
+    if (type === 'smile') {
+        // Smile Data - Simple dropdown (Smile has fewer plans)
+        title.innerHTML = '<i class="fas fa-satellite-dish text-primary"></i> Smile Data';
+        body.innerHTML = `
+            <select id="inp_network" class="form-select mb-3" onchange="window.fetchDataPlans()">
+                <option value="smile">Smile</option>
+            </select>
+            <select id="inp_plan" class="form-select mb-3"><option value="">Select Plan</option></select>
+            <input type="number" id="inp_phone" class="form-control mb-3" placeholder="Recipient Phone Number">
+        `;
+        btn.onclick = () => window.executeTransaction();
+        window.fetchDataPlans(); // Load Smile plans immediately
+    } 
+    else {
+        // Regular Data - Dynamic category tabs
+        title.innerHTML = '<i class="fas fa-wifi text-primary"></i> Buy Data';
+        body.innerHTML = `
+            <div class="network-selector">
+                <select id="dataNetwork" class="form-select" onchange="window.loadDataPlansDynamic()">
+                    <option value="">Select Network...</option>
+                    <option value="mtn">MTN</option>
+                    <option value="airtel">Airtel</option>
+                    <option value="glo">GLO</option>
+                    <option value="9mobile">9Mobile</option>
                 </select>
+            </div>
+            <div id="dataPlansContainer">
+                <div class="data-category-tabs" id="dataCategoryTabs"></div>
+                <div id="dataPlansGrid" class="data-plans-grid">Select a network to view plans</div>
+            </div>
+            <div class="mt-3">
+                <label class="fw-bold mb-2">Recipient Phone Number</label>
+                <input type="number" id="inp_phone" class="form-control" placeholder="e.g., 08012345678">
+            </div>
+        `;
+        btn.innerText = "Purchase Selected Plan";
+        btn.onclick = () => {
+            const selectedPlan = window.activeService.selectedPlan;
+            if (!selectedPlan) {
+                alert("Please select a data plan first");
+                return;
+            }
+            const phone = document.getElementById('inp_phone').value;
+            if (!phone || phone.length < 10) {
+                alert("Please enter a valid phone number");
+                return;
+            }
+            window.executeTransaction();
+        };
+        
+        // Dynamic load function for regular data
+        window.loadDataPlansDynamic = async () => {
+            const network = document.getElementById('dataNetwork').value;
+            if (!network) {
+                document.getElementById('dataPlansGrid').innerHTML = '<div class="text-muted">Please select a network</div>';
+                return;
+            }
+            
+            const plansGrid = document.getElementById('dataPlansGrid');
+            const tabsContainer = document.getElementById('dataCategoryTabs');
+            plansGrid.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading plans...</div>';
+            
+            try {
+                const res = await fetch(`${RENDER_URL}/api/fetch-data?action=data_plans&network=${network}`);
+                const data = await res.json();
+                const plans = data.data?.message?.details?.[0]?.plans || [];
                 
-                <div id="dataTabsContainer" style="display:none;">
-                    <ul class="nav nav-pills mb-3 justify-content-center" id="dataTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active py-1 px-3" data-bs-toggle="pill" type="button" onclick="window.renderDataGrid('SME')">SME</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link py-1 px-3" data-bs-toggle="pill" type="button" onclick="window.renderDataGrid('CG')">CG</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link py-1 px-3" data-bs-toggle="pill" type="button" onclick="window.renderDataGrid('GIFTING')">Gifting</button>
-                        </li>
-                    </ul>
-                </div>
-
-                <div id="dataGridContainer" class="row g-2 mb-3" style="max-height: 250px; overflow-y: auto; overflow-x: hidden;"></div>
-
-                <input type="hidden" id="inp_plan">
-                <input type="hidden" id="inp_plan_price">
-                <input type="number" id="inp_phone" class="form-control mb-3" placeholder="Recipient Phone Number">
-            `;
-            btn.onclick = () => window.executeTransaction();
-        } 
+                if (plans.length === 0) {
+                    plansGrid.innerHTML = '<div class="text-warning">No plans available for this network</div>';
+                    return;
+                }
+                
+                // Dynamically extract categories from plan names
+                const categories = {};
+                plans.forEach(plan => {
+                    const name = plan.name.toLowerCase();
+                    let category = 'OTHER';
+                    
+                    if (name.includes('sme')) category = 'SME';
+                    else if (name.includes('gift') || name.includes('gifting')) category = 'GIFTING';
+                    else if (name.includes('corporate')) category = 'CORPORATE';
+                    else if (name.includes('social')) category = 'SOCIAL';
+                    else if (name.includes('weekly') || name.includes('7 days') || name.includes('7day')) category = 'WEEKLY';
+                    else if (name.includes('month') || name.includes('30 days') || name.includes('30day')) category = 'MONTHLY';
+                    else if (name.includes('daily') || name.includes('24hr') || name.includes('24hrs')) category = 'DAILY';
+                    else if (name.includes('night')) category = 'NIGHT';
+                    else if (name.includes('student')) category = 'STUDENT';
+                    else category = 'STANDARD';
+                    
+                    if (!categories[category]) categories[category] = [];
+                    categories[category].push(plan);
+                });
+                
+                // Build category tabs dynamically
+                tabsContainer.innerHTML = '';
+                const categoryNames = Object.keys(categories).filter(cat => categories[cat].length > 0);
+                let activeCategory = categoryNames[0];
+                
+                categoryNames.forEach(cat => {
+                    const btn = document.createElement('button');
+                    btn.className = `data-category-btn ${cat === activeCategory ? 'active' : ''}`;
+                    btn.textContent = `${cat} (${categories[cat].length})`;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.data-category-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        displayPlans(categories[cat], network);
+                    };
+                    tabsContainer.appendChild(btn);
+                });
+                
+                const displayPlans = (planList, net) => {
+                    plansGrid.innerHTML = '';
+                    planList.forEach(plan => {
+                        const card = document.createElement('div');
+                        card.className = 'data-plan-card';
+                        card.setAttribute('data-plan-code', plan.plan_code);
+                        card.setAttribute('data-plan-price', plan.amount);
+                        card.setAttribute('data-plan-name', plan.name);
+                        card.setAttribute('data-network', net);
+                        card.onclick = () => {
+                            document.querySelectorAll('.data-plan-card').forEach(c => c.classList.remove('selected'));
+                            card.classList.add('selected');
+                            window.activeService.selectedPlan = {
+                                plan_code: plan.plan_code,
+                                amount: plan.amount,
+                                name: plan.name,
+                                network: net
+                            };
+                        };
+                        card.innerHTML = `
+                            <div class="data-plan-name">${plan.name}</div>
+                            <div class="data-plan-price">₦${parseInt(plan.amount).toLocaleString()}</div>
+                        `;
+                        plansGrid.appendChild(card);
+                    });
+                };
+                
+                displayPlans(categories[activeCategory], network);
+                
+            } catch (error) {
+                console.error("Error loading plans:", error);
+                plansGrid.innerHTML = '<div class="text-danger">Failed to load plans. Please try again.</div>';
+            }
+        };
+    }
+}
         else if (type === 'airtime') {
             title.innerHTML = '<i class="fas fa-phone text-warning"></i> Buy Airtime';
             body.innerHTML = `<select id="inp_network" class="form-select mb-3"><option value="mtn">MTN</option><option value="airtel">Airtel</option><option value="glo">GLO</option><option value="9mobile">9Mobile</option></select><input type="number" id="inp_amount" class="form-control mb-3" placeholder="Amount (₦)"><input type="number" id="inp_phone" class="form-control mb-3" placeholder="Phone Number">`;
@@ -466,27 +1065,178 @@
             btn.onclick = () => window.executeTransaction();
         }
         else if (type === 'sms') {
-            title.innerHTML = '<i class="fas fa-envelope text-primary"></i> Bulk SMS';
+    title.innerHTML = '<i class="fas fa-envelope text-primary"></i> Bulk SMS';
+    body.innerHTML = `
+        <input type="text" id="inp_sender" class="form-control mb-3" placeholder="Sender ID (e.g., MySchool)" maxlength="11">
+        
+        <div class="excel-upload-area" id="excelUploadArea">
+            <i class="fas fa-file-excel"></i>
+            <p class="mb-0"><strong>Upload Excel/CSV File</strong></p>
+            <small class="text-muted">Click to upload phone numbers (Column: 'phone' or 'number')</small>
+            <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display: none;">
+        </div>
+        
+        <div class="mb-3">
+            <label class="fw-bold mb-2">Or enter manually (comma separated)</label>
+            <textarea id="inp_phone" class="form-control" rows="3" placeholder="e.g., 08012345678, 08098765432, 08123456789"></textarea>
+        </div>
+        
+        <div id="phonePreview" class="excel-preview" style="display: none;"></div>
+        
+        <div class="mb-3">
+            <label class="fw-bold mb-2">Message</label>
+            <textarea id="inp_message" class="form-control" rows="4" placeholder="Type your message here..." oninput="window.calcSmsCost()"></textarea>
+        </div>
+        
+        <div class="alert alert-info fw-bold text-center" id="smsCostPreview">Cost: ₦0.00 (0 numbers, 0 pages)</div>
+    `;
+    
+    // Handle Excel upload
+    setTimeout(() => {
+        const uploadArea = document.getElementById('excelUploadArea');
+        const fileInput = document.getElementById('excelFileInput');
+        const phoneTextarea = document.getElementById('inp_phone');
+        const phonePreview = document.getElementById('phonePreview');
+        
+        if (uploadArea) {
+            uploadArea.onclick = () => fileInput.click();
+        }
+        
+        if (fileInput) {
+            fileInput.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const data = new Uint8Array(event.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(firstSheet);
+                    
+                    let phoneNumbers = [];
+                    rows.forEach(row => {
+                        // Dynamic column detection
+                        const keys = Object.keys(row);
+                        let phoneValue = null;
+                        
+                        for (let key of keys) {
+                            const lowerKey = key.toLowerCase();
+                            if (lowerKey.includes('phone') || lowerKey.includes('number') || lowerKey.includes('mobile') || lowerKey === 'tel') {
+                                phoneValue = row[key];
+                                break;
+                            }
+                        }
+                        
+                        if (phoneValue) {
+                            let cleaned = phoneValue.toString().replace(/\D/g, '');
+                            if (cleaned.startsWith('0') && cleaned.length === 11) {
+                                phoneNumbers.push(cleaned);
+                            } else if (cleaned.startsWith('234') && cleaned.length === 13) {
+                                phoneNumbers.push('0' + cleaned.slice(3));
+                            } else if (cleaned.length === 10) {
+                                phoneNumbers.push('0' + cleaned);
+                            }
+                        }
+                    });
+                    
+                    if (phoneNumbers.length > 0) {
+                        phoneTextarea.value = phoneNumbers.join(', ');
+                        phonePreview.innerHTML = `<strong>📱 ${phoneNumbers.length} numbers loaded:</strong><br>${phoneNumbers.slice(0, 10).join(', ')}${phoneNumbers.length > 10 ? ` ... and ${phoneNumbers.length - 10} more` : ''}`;
+                        phonePreview.style.display = 'block';
+                        if (window.calcSmsCost) window.calcSmsCost();
+                    } else {
+                        alert('No valid phone numbers found. Please ensure your file has a column with phone numbers.');
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            };
+        }
+        
+        if (phoneTextarea) {
+            phoneTextarea.oninput = () => {
+                const phones = phoneTextarea.value.split(',').filter(p => p.trim());
+                if (phones.length > 0) {
+                    phonePreview.innerHTML = `<strong>📱 ${phones.length} numbers entered:</strong><br>${phones.slice(0, 10).join(', ')}${phones.length > 10 ? ` ... and ${phones.length - 10} more` : ''}`;
+                    phonePreview.style.display = 'block';
+                } else {
+                    phonePreview.style.display = 'none';
+                }
+                if (window.calcSmsCost) window.calcSmsCost();
+            };
+        }
+    }, 100);
+    
+    btn.onclick = () => window.executeTransaction();
+    
+    window.calcSmsCost = () => {
+        const phonesStr = document.getElementById('inp_phone')?.value || '';
+        const msgStr = document.getElementById('inp_message')?.value || '';
+        const count = phonesStr.split(',').filter(p => p.trim().length > 0).length;
+        const pages = Math.ceil(msgStr.length / 140) || 1;
+        const cost = count * pages * 6;
+        const previewDiv = document.getElementById('smsCostPreview');
+        if (previewDiv) {
+            previewDiv.innerText = `Cost: ₦${cost.toLocaleString()} (${count} numbers, ${pages} page${pages > 1 ? 's' : ''})`;
+        }
+        return cost;
+    };
+}
+        else if (type === 'recharge_card') {
+    title.innerHTML = '<i class="fas fa-print text-warning"></i> Print Recharge Card';
+    body.innerHTML = `
+        <select id="card_network" class="form-select mb-3">
+            <option value="mtn">MTN</option>
+            <option value="glo">GLO</option>
+            <option value="airtel">Airtel</option>
+            <option value="9mobile">9Mobile</option>
+        </select>
+        <input type="number" id="card_amount" class="form-control mb-3" placeholder="Amount (₦)" min="100">
+        <input type="number" id="card_quantity" class="form-control mb-3" placeholder="Quantity" value="1" min="1">
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> Recharge card pins will be displayed after payment
+        </div>
+    `;
+    btn.innerText = "Generate & Print";
+    btn.onclick = () => window.executeTransaction();
+}
+        // USD Card Services
+        else if (type === 'usd_card') {
+            title.innerHTML = '<i class="fas fa-dollar-sign text-warning"></i> Issue USD Virtual Card';
             body.innerHTML = `
-                <input type="text" id="inp_sender" class="form-control mb-3" placeholder="Sender ID (e.g. MySchool)" maxlength="11">
-                <div class="mb-3 p-3 bg-light border rounded">
-                    <label class="form-label fw-bold small">Upload Contacts (Excel/CSV)</label>
-                    <input type="file" id="smsExcel" accept=".xlsx,.xls,.csv" class="form-control form-control-sm" onchange="window.handleSmsExcel(this)">
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle"></i> Virtual USD Card for international payments
                 </div>
-                <textarea id="inp_phone" class="form-control mb-3" rows="3" placeholder="Or type Phone Numbers (Comma separated)" oninput="window.calcSmsCost()"></textarea>
-                <textarea id="inp_message" class="form-control mb-3" rows="4" placeholder="Type your message here..." oninput="window.calcSmsCost()"></textarea>
-                <div class="alert alert-info fw-bold text-center" id="smsCostPreview">Cost: ₦0.00</div>
+                <select id="card_brand" class="form-select mb-3">
+                    <option value="VISA">VISA</option>
+                    <option value="MASTERCARD">Mastercard</option>
+                </select>
+                <input type="number" id="card_amount" class="form-control mb-3" placeholder="Initial Funding Amount (USD)" value="10">
+                <small class="text-muted">Minimum $10 USD for card issuance</small>
             `;
+            btn.innerText = "Issue USD Card";
             btn.onclick = () => window.executeTransaction();
         }
-        else if (type === 'recharge_card') {
-            title.innerHTML = '<i class="fas fa-print text-warning"></i> Print Recharge Card';
-            body.innerHTML = `<select id="card_network" class="form-select mb-3"><option value="mtn">MTN</option><option value="glo">GLO</option><option value="airtel">Airtel</option><option value="9mobile">9Mobile</option></select><input type="number" id="card_amount" class="form-control mb-3" placeholder="Amount (₦)" min="100"><input type="number" id="card_quantity" class="form-control mb-3" placeholder="Quantity" value="1" min="1">`;
-            btn.innerText = "Generate & Print";
+        else if (type === 'card_balance') {
+            title.innerHTML = '<i class="fas fa-chart-line"></i> USD Card Balance';
+            body.innerHTML = `<input type="text" id="card_id" class="form-control mb-3" placeholder="Enter Card ID (optional)">`;
+            btn.innerText = "Check Balance";
+            btn.onclick = () => window.executeTransaction();
+        }
+        else if (type === 'card_freeze') {
+            title.innerHTML = '<i class="fas fa-snowflake"></i> Freeze/Unfreeze Card';
+            body.innerHTML = `<input type="text" id="card_id" class="form-control mb-3" placeholder="Enter Card ID"><select id="freeze_action" class="form-select"><option value="freeze">Freeze Card</option><option value="unfreeze">Unfreeze Card</option></select>`;
+            btn.innerText = "Apply";
+            btn.onclick = () => window.executeTransaction();
+        }
+        else if (type === 'card_topup') {
+            title.innerHTML = '<i class="fas fa-arrow-up"></i> Top-up USD Card';
+            body.innerHTML = `<input type="text" id="card_id" class="form-control mb-3" placeholder="Enter Card ID"><input type="number" id="topup_amount" class="form-control mb-3" placeholder="Amount (USD)" min="5">`;
+            btn.innerText = "Top-up Card";
             btn.onclick = () => window.executeTransaction();
         }
         // Identity Services (Humanity)
-        else if (type.startsWith('nin')) {
+        else if (type === 'nin1' || type === 'nin2' || type === 'nin3') {
             title.innerHTML = `<i class="fas fa-id-card text-success"></i> ${type === 'nin1' ? 'NIN Search (v1)' : (type === 'nin2' ? 'NIN Search (v2)' : 'NIN Search (v3)')}`;
             body.innerHTML = `<input type="number" id="inp_kyc_num" class="form-control mb-3" placeholder="Enter 11 Digit NIN">`;
             btn.onclick = () => window.executeTransaction();
@@ -501,8 +1251,13 @@
             body.innerHTML = `<input type="text" id="demo_surname" class="form-control mb-2" placeholder="Surname"><input type="text" id="demo_firstname" class="form-control mb-2" placeholder="First Name"><input type="date" id="demo_dob" class="form-control mb-2" placeholder="Birth Date"><select id="demo_gender" class="form-select mb-3"><option value="M">Male</option><option value="F">Female</option></select>`;
             btn.onclick = () => window.executeTransaction();
         }
-        else if (type === 'nin_phone' || type === 'bvn_phone') {
-            title.innerHTML = `<i class="fas fa-phone-alt text-success"></i> ${type === 'nin_phone' ? 'NIN' : 'BVN'} by Phone Number`;
+        else if (type === 'nin_phone') {
+            title.innerHTML = '<i class="fas fa-phone-alt text-success"></i> NIN by Phone Number';
+            body.innerHTML = `<input type="number" id="inp_phone_num" class="form-control mb-3" placeholder="Enter Phone Number">`;
+            btn.onclick = () => window.executeTransaction();
+        }
+        else if (type === 'bvn_phone') {
+            title.innerHTML = '<i class="fas fa-mobile-alt text-primary"></i> BVN by Phone Number';
             body.innerHTML = `<input type="number" id="inp_phone_num" class="form-control mb-3" placeholder="Enter Phone Number">`;
             btn.onclick = () => window.executeTransaction();
         }
@@ -515,184 +1270,72 @@
         modal.show();
     };
 
-    const getArraySafely = (apiResponse) => {
-        if (!apiResponse) return [];
-        let payload = apiResponse.data || apiResponse;
-        if (Array.isArray(payload)) return payload;
-        if (payload.message) {
-            if (Array.isArray(payload.message.details)) return payload.message.details;
-            if (Array.isArray(payload.message)) return payload.message;
-        }
-        if (payload.details && Array.isArray(payload.details)) return payload.details;
-        for (let key in payload) {
-            if (Array.isArray(payload[key])) return payload[key];
-        }
-        return [];
-    };
-
-    // 🌟 DATA PLANS GRID FETCHER 🌟
+    // Existing helper functions remain unchanged
     window.fetchDataPlans = async () => {
+    const network = document.getElementById('inp_network')?.value;
+    if (!network) return;
+    const planSelect = document.getElementById('inp_plan');
+    if (!planSelect) return;
+    
+    planSelect.innerHTML = "<option>Loading plans...</option>";
+    try {
+        const res = await fetch(`${RENDER_URL}/api/fetch-data?action=data_plans&network=${network}`);
+        const data = await res.json();
+        const plans = data.data?.message?.details?.[0]?.plans || [];
+        planSelect.innerHTML = "<option value=''>Select Plan...</option>";
+        plans.forEach(p => {
+            planSelect.innerHTML += `<option value="${p.plan_code}" data-price="${p.amount}">${p.name} - ₦${p.amount}</option>`;
+        });
+    } catch(e) { 
+        planSelect.innerHTML = `<option value="">Error loading plans</option>`;
+    }
+};
+   /* window.fetchDataPlans = async () => {
         const network = document.getElementById('inp_network').value;
-        const gridContainer = document.getElementById('dataGridContainer');
-        const tabsContainer = document.getElementById('dataTabsContainer');
-        
-        if(!network) {
-            tabsContainer.style.display = "none";
-            gridContainer.innerHTML = "";
-            return;
-        }
-        
-        gridContainer.innerHTML = "<div class='col-12 text-center py-4'><i class='fas fa-spinner fa-spin fa-2x text-primary'></i><br>Loading plans...</div>";
-        tabsContainer.style.display = "none";
-        
+        if(!network) return;
+        const planSelect = document.getElementById('inp_plan');
+        planSelect.innerHTML = "<option>Loading plans...</option>";
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=data_plans&network=${network}`);
             const data = await res.json();
-            
-            if (!data.success) throw new Error(data.message);
-
-            let plans = [];
-            if (data.data?.message?.details?.[0]?.plans) plans = data.data.message.details[0].plans;
-            else plans = getArraySafely(data);
-
-            if (plans.length === 0) throw new Error("No plans available");
-
-            window.allFetchedPlans = plans;
-            tabsContainer.style.display = "block";
-            
-            // Automatically click the SME tab to render default view
-            document.querySelector('#dataTabs .nav-link.active').click();
-
-        } catch(e) { 
-            gridContainer.innerHTML = `<div class='col-12 text-center text-danger'>Error: ${e.message}</div>`; 
-        }
-    };
-
-    window.renderDataGrid = (category) => {
-        const gridContainer = document.getElementById('dataGridContainer');
-        gridContainer.innerHTML = "";
-        document.getElementById('inp_plan').value = "";
-        document.getElementById('inp_plan_price').value = "";
-        
-        let matchedPlans = 0;
-
-        window.allFetchedPlans.forEach(p => {
-            const name = p.name || p.title || "Data Plan";
-            const price = p.amount || 0;
-            const code = p.plan_code || p.id || "";
-            const nUpper = name.toUpperCase();
-
-            let match = false;
-            if (category === "ALL") match = true;
-            else if (category === "SME" && nUpper.includes("SME")) match = true;
-            else if (category === "CG" && (nUpper.includes("CG") || nUpper.includes("CORPORATE"))) match = true;
-            else if (category === "GIFTING" && (nUpper.includes("GIFTING") || nUpper.includes("DIRECT") || (!nUpper.includes("SME") && !nUpper.includes("CG") && !nUpper.includes("CORPORATE")))) match = true;
-
-            if (match && code) {
-                matchedPlans++;
-                gridContainer.innerHTML += `
-                    <div class="col-6 col-md-4">
-                        <div class="plan-card text-center p-2" onclick="window.selectPlan('${code}', ${price}, this)">
-                            <div style="font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:5px;">${name}</div>
-                            <div style="font-size:1.1rem; font-weight:900; color:#047857;">₦${price}</div>
-                        </div>
-                    </div>
-                `;
-            }
-        });
-
-        if(matchedPlans === 0) {
-             gridContainer.innerHTML = `<div class='col-12 text-center text-muted py-3'>No plans found in this category.</div>`;
-        }
-    };
-
-    window.selectPlan = (code, price, element) => {
-        document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
-        element.classList.add('selected');
-        document.getElementById('inp_plan').value = code;
-        document.getElementById('inp_plan_price').value = price;
-    };
+            const plans = data.data?.message?.details?.[0]?.plans || [];
+            planSelect.innerHTML = "<option value=''>Select Plan...</option>";
+            plans.forEach(p => {
+                planSelect.innerHTML += `<option value="${p.plan_code}" data-price="${p.amount}">${p.name} - ₦${p.amount}</option>`;
+            });
+        } catch(e) { planSelect.innerHTML = `<option value="">Error</option>`; }
+    };*/
 
     window.fetchTVPlans = async () => {
         const service = document.getElementById('inp_service').value;
         if(!service) return;
         const planSelect = document.getElementById('inp_plan');
-        planSelect.innerHTML = "<option>Loading bouquets... <i class='fas fa-spinner fa-spin'></i></option>";
+        planSelect.innerHTML = "<option>Loading bouquets...</option>";
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=tv_bouquets&service=${service}`);
             const data = await res.json();
-            if (!data.success) throw new Error(data.message);
-            const plans = getArraySafely(data);
+            const plans = data.data?.message?.details || [];
             planSelect.innerHTML = "<option value=''>Select Bouquet...</option>";
             plans.forEach(p => {
-                const name = p.name || "Bouquet";
-                const code = p.id || p.plan_code || ""; 
-                if(code) planSelect.innerHTML += `<option value="${code}" data-price="${p.amount}">${name} - ₦${p.amount}</option>`;
+                planSelect.innerHTML += `<option value="${p.id}" data-price="${p.amount}">${p.name} - ₦${p.amount}</option>`;
             });
-        } catch(e) { planSelect.innerHTML = `<option value="">Error connecting</option>`; }
+        } catch(e) { planSelect.innerHTML = `<option value="">Error</option>`; }
     };
 
     window.fetchExamPins = async () => {
         const examSelect = document.getElementById('inp_exam_id');
-        if (!examSelect) return;
-        examSelect.innerHTML = "<option>Loading exams... <i class='fas fa-spinner fa-spin'></i></option>";
+        examSelect.innerHTML = "<option>Loading Exams...</option>";
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
             const apiRes = await res.json();
-            
-            let pins = [];
-            if (apiRes.data?.message?.details) pins = apiRes.data.message.details;
-            else if (apiRes.data?.details) pins = apiRes.data.details;
-            else if (Array.isArray(apiRes.data)) pins = apiRes.data;
-
-            if (pins && pins.length > 0) {
-                examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
-                pins.forEach(pin => {
-                    const pinId = pin.id || pin.pin_id || pin.code;
-                    const pinTitle = pin.title || pin.name || pin.exam_name;
-                    const pinAmount = pin.amount || pin.price || pin.cost;
-                    if (pinId && pinTitle && pinAmount) {
-                        examSelect.innerHTML += `<option value="${pinId}" data-price="${pinAmount}">${pinTitle} - ₦${pinAmount}</option>`;
-                    }
-                });
-            } else {
-                throw new Error("No exams returned");
-            }
-        } catch (error) {
-            console.error("Exam Pin Error:", error);
-            examSelect.innerHTML = `
-                <option value="">Select Exam Type...</option>
-                <option value="waec" data-price="3500">WAEC - ₦3500</option>
-                <option value="neco" data-price="1200">NECO - ₦1200</option>
-                <option value="nabteb" data-price="1000">NABTEB - ₦1000</option>
-            `;
-        }
-    };
-
-    window.handleSmsExcel = (input) => {
-        const file = input.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, {type: 'array'});
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(sheet, {header: 1});
-            let phones = [];
-            rows.forEach(row => {
-                row.forEach(cell => {
-                    if(cell) {
-                        let str = String(cell).replace(/\D/g, '');
-                        if(str.length >= 10 && str.length <= 14) phones.push(str);
-                    }
-                });
+            let pins = apiRes.data?.message?.details || [];
+            examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
+            pins.forEach(pin => {
+                examSelect.innerHTML += `<option value="${pin.id}" data-price="${pin.amount}">${pin.title} - ₦${pin.amount}</option>`;
             });
-            const existing = document.getElementById('inp_phone').value;
-            document.getElementById('inp_phone').value = existing ? existing + ',' + phones.join(',') : phones.join(',');
-            window.calcSmsCost();
-            alert(`Extracted ${phones.length} valid phone numbers!`);
-        };
-        reader.readAsArrayBuffer(file);
+        } catch(e) { 
+            examSelect.innerHTML = `<option value="waec" data-price="3500">WAEC - ₦3500</option><option value="neco" data-price="1200">NECO - ₦1200</option><option value="nabteb" data-price="1000">NABTEB - ₦1000</option>`;
+        }
     };
 
     window.calcSmsCost = () => {
@@ -710,15 +1353,11 @@
         const btn = document.getElementById('procBtn');
         const payload = { type, account: document.getElementById('inp_account').value, service: document.getElementById('inp_service').value };
         
-        if(!payload.account || !payload.service) return alert("Fill all details.");
-
         if(type === 'power') {
             payload.meter_type = document.getElementById('inp_meter_type').value;
             payload.amount = document.getElementById('inp_amount').value;
         } else {
-            const planEl = document.getElementById('inp_plan');
-            if(!planEl.value) return alert("Select a Bouquet.");
-            payload.plan_id = planEl.value;
+            payload.plan_id = document.getElementById('inp_plan').value;
         }
 
         btn.disabled = true; btn.innerHTML = "Validating...";
@@ -732,9 +1371,9 @@
             document.getElementById('srvLoader').style.display = "none";
 
             if (out.success) {
-                const custName = out.data?.message?.details?.customer_name || out.data?.message?.details?.name || out.data?.data?.message?.details?.customer_name || "Verified";
+                const custName = out.data?.data?.message?.details?.customer_name || out.data?.data?.message?.details?.name || "Verified";
                 window.activeService.customer_name = custName;
-                document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success fw-bold text-center border-2 border-success">Verified: ${custName}</div>`;
+                document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success fw-bold text-center">Verified: ${custName}</div>`;
                 btn.innerText = "Pay Now";
                 btn.disabled = false;
                 btn.onclick = () => window.executeTransaction();
@@ -752,17 +1391,28 @@
         const payload = { uid, type, customer_name: window.activeService.customer_name };
         let costAmount = 0;
 
-        if (type === 'data' || type === 'smile') {
-            const planCode = document.getElementById('inp_plan').value;
-            const planPrice = document.getElementById('inp_plan_price').value;
-            
-            if(!planCode) return alert("Please select a data plan from the grid.");
-            
-            payload.network = document.getElementById('inp_network').value;
-            payload.plan = planCode;
-            payload.phone = document.getElementById('inp_phone').value;
-            costAmount = parseFloat(planPrice) + 10; 
-        } 
+        // Vending cost calculations
+else if (type === 'data') {
+    const selectedPlan = window.activeService.selectedPlan;
+    if (!selectedPlan) {
+        alert("Please select a data plan first");
+        btn.disabled = false;
+        document.getElementById('srvLoader').style.display = "none";
+        return;
+    }
+    payload.network = selectedPlan.network;
+    payload.plan = selectedPlan.plan_code;
+    payload.phone = document.getElementById('inp_phone').value;
+    costAmount = parseFloat(selectedPlan.amount) + 10;
+}
+else if (type === 'smile') {
+    const planSelect = document.getElementById('inp_plan');
+    const selectedOption = planSelect.options[planSelect.selectedIndex];
+    payload.network = 'smile';
+    payload.plan = planSelect.value;
+    payload.phone = document.getElementById('inp_phone').value;
+    costAmount = parseFloat(selectedOption?.getAttribute('data-price') || 0) + 10;
+}
         else if (type === 'airtime' || type === 'airtime_cash') {
             payload.network = document.getElementById('inp_network').value;
             payload.phone = document.getElementById('inp_phone').value;
@@ -786,14 +1436,11 @@
             costAmount = parseFloat(payload.amount) + 50; 
         }
         else if (type === 'exam') {
-            const examSelect = document.getElementById('inp_exam_id');
-            const selectedOption = examSelect.options[examSelect.selectedIndex];
-            if (!examSelect.value) return alert("Please select an exam type");
-            
-            payload.exam_id = examSelect.value;
+            const p = document.getElementById('inp_exam_id');
+            payload.exam_id = p.value;
             payload.qty = document.getElementById('inp_qty').value;
-            const unitPrice = parseFloat(selectedOption?.getAttribute('data-price') || 0);
-            costAmount = (unitPrice * parseFloat(payload.qty)) + 50;
+            const unitPrice = parseFloat(p.options[p.selectedIndex].getAttribute('data-price'));
+            costAmount = (unitPrice * parseFloat(payload.qty)) + 50; 
         }
         else if (type === 'sms') {
             payload.sender_id = document.getElementById('inp_sender').value || "Update";
@@ -802,20 +1449,35 @@
             costAmount = window.calcSmsCost(); 
         }
         else if (type === 'recharge_card') {
-            payload.network = document.getElementById('card_network').value;
+    payload.network = document.getElementById('card_network').value;
+    payload.amount = document.getElementById('card_amount').value;
+    payload.quantity = document.getElementById('card_quantity').value;
+    // Cost = amount × quantity (plus service fee)
+    costAmount = (parseFloat(payload.amount) * parseInt(payload.quantity)) + 50;
+}
+        // USD Card Services
+        else if (type === 'usd_card') {
+            payload.brand = document.getElementById('card_brand').value;
             payload.amount = document.getElementById('card_amount').value;
-            payload.quantity = document.getElementById('card_quantity').value;
-            costAmount = (parseFloat(payload.amount) * parseInt(payload.quantity)) + 50;
+            costAmount = parseFloat(payload.amount) * 1600; // Convert USD to NGN (approx rate)
         }
-        // 🌟 HUMANITY TRUST SERVICES 🌟
-        else if (type.startsWith('nin')) {
-            payload.nin = document.getElementById('inp_kyc_num').value;
-            if(!payload.nin) return alert(`Enter a valid NIN number.`);
-            costAmount = 150;
+        else if (type === 'card_balance') {
+            payload.card_id = document.getElementById('card_id').value;
+            costAmount = 50; // Query fee
         }
-        else if (type === 'bvn') {
-            payload.bvn = document.getElementById('inp_kyc_num').value;
-            if(!payload.bvn) return alert(`Enter a valid BVN number.`);
+        else if (type === 'card_freeze') {
+            payload.card_id = document.getElementById('card_id').value;
+            payload.action = document.getElementById('freeze_action').value;
+            costAmount = 0;
+        }
+        else if (type === 'card_topup') {
+            payload.card_id = document.getElementById('card_id').value;
+            payload.amount = document.getElementById('topup_amount').value;
+            costAmount = parseFloat(payload.amount) * 1600;
+        }
+        // Identity cost calculations
+        else if (type === 'nin1' || type === 'nin2' || type === 'nin3' || type === 'bvn') {
+            payload[type === 'bvn' ? 'bvn' : 'nin'] = document.getElementById('inp_kyc_num').value;
             costAmount = 150;
         }
         else if (type === 'demographic') {
@@ -825,19 +1487,17 @@
             payload.gender = document.getElementById('demo_gender').value;
             costAmount = 200;
         }
-        else if (type === 'nin_phone' || type === 'bvn_phone') {
+        else if (type === 'nin_phone') {
+            payload.phone = document.getElementById('inp_phone_num').value;
+            costAmount = 150;
+        }
+        else if (type === 'bvn_phone') {
             payload.phone = document.getElementById('inp_phone_num').value;
             costAmount = 150;
         }
         else if (type === 'instant_validation') {
             payload.value = document.getElementById('inp_value').value;
             costAmount = 180;
-        }
-        // 🌟 USD CARDS 🌟
-        else if (type === 'usd_card') {
-            payload.brand = document.getElementById('card_brand').value;
-            payload.amount = document.getElementById('card_amount').value;
-            costAmount = parseFloat(payload.amount) * 1600; 
         }
 
         payload.costAmount = costAmount; 
@@ -883,7 +1543,8 @@
             });
             const out = await res.json();
             alert(out.message);
-            if(!out.success) { btn.innerHTML = `<i class="fas fa-plus"></i> Try Again`; btn.disabled = false; }
+            if(out.success) location.reload();
+            else { btn.innerHTML = `<i class="fas fa-plus"></i> Try Again`; btn.disabled = false; }
         } catch(e) { alert("Error connecting."); btn.innerHTML = `<i class="fas fa-plus"></i> Try Again`; btn.disabled = false; }
     };
 
