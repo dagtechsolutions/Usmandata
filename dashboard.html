@@ -1324,21 +1324,40 @@ if (type === 'data' || type === 'smile') {
 
     window.fetchExamPins = async () => {
         const examSelect = document.getElementById('inp_exam_id');
+        if (!examSelect) return;
         examSelect.innerHTML = "<option>Loading Exams...</option>";
         try {
             const res = await fetch(`${RENDER_URL}/api/fetch-data?action=exam_pins`);
-            const apiRes = await res.json();
-            let pins = apiRes.data?.message?.details || [];
-            examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
-            pins.forEach(pin => {
-                examSelect.innerHTML += `<option value="${pin.id}" data-price="${pin.amount}">${pin.title} - ₦${pin.amount}</option>`;
-            });
+            const result = await res.json();
+            let pins = [];
+            if (result.data?.message?.details) {
+                pins = result.data.message.details;
+            } else if (result.data?.details) {
+                pins = result.data.details;
+            } else if (Array.isArray(result.data)) {
+                pins = result.data;
+            }
+            
+            if (pins.length > 0) {
+                examSelect.innerHTML = "<option value=''>Select Exam Type...</option>";
+                pins.forEach(pin => {
+                    const id = pin.id || pin.code;
+                    const title = pin.title || pin.name;
+                    const amount = pin.amount || pin.price;
+                    if (id && title && amount) {
+                        examSelect.innerHTML += `<option value="${id}" data-price="${amount}">${title} - ₦${amount}</option>`;
+                    }
+                });
+            } else {
+                examSelect.innerHTML = "<option value=''>No exam pins available</option>";
+            }
         } catch(e) { 
-            examSelect.innerHTML = `<option value="waec" data-price="3500">WAEC - ₦3500</option><option value="neco" data-price="1200">NECO - ₦1200</option><option value="nabteb" data-price="1000">NABTEB - ₦1000</option>`;
+            console.error("Error loading exam pins:", e);
+            examSelect.innerHTML = "<option value=''>Failed to load exams. Please try again.</option>";
         }
     };
 
-    window.calcSmsCost = () => {
+    /*window.calcSmsCost = () => {
         const phonesStr = document.getElementById('inp_phone').value;
         const msgStr = document.getElementById('inp_message').value;
         const count = phonesStr.split(',').filter(p => p.trim().length > 0).length;
@@ -1346,7 +1365,7 @@ if (type === 'data' || type === 'smile') {
         const cost = count * pages * 6; 
         document.getElementById('smsCostPreview').innerText = `Cost: ₦${cost.toLocaleString()} (${count} numbers, ${pages} pages)`;
         return cost;
-    };
+    };*/
 
     window.validateMeterOrTV = async () => {
         const type = window.activeService.type;
@@ -1392,7 +1411,7 @@ if (type === 'data' || type === 'smile') {
         let costAmount = 0;
 
         // Vending cost calculations
-else if (type === 'data') {
+ if (type === 'data') {
     const selectedPlan = window.activeService.selectedPlan;
     if (!selectedPlan) {
         alert("Please select a data plan first");
