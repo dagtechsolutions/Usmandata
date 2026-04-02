@@ -1412,26 +1412,44 @@ if (type === 'data' || type === 'smile') {
 
         // Vending cost calculations
  if (type === 'data') {
-    const selectedPlan = window.activeService.selectedPlan;
-    if (!selectedPlan) {
-        alert("Please select a data plan first");
-        btn.disabled = false;
-        document.getElementById('srvLoader').style.display = "none";
-        return;
-    }
-    payload.network = selectedPlan.network;
-    payload.plan = selectedPlan.plan_code;
-    payload.phone = document.getElementById('inp_phone').value;
-    costAmount = parseFloat(selectedPlan.amount) + 10;
-}
-else if (type === 'smile') {
-    const planSelect = document.getElementById('inp_plan');
-    const selectedOption = planSelect.options[planSelect.selectedIndex];
-    payload.network = 'smile';
-    payload.plan = planSelect.value;
-    payload.phone = document.getElementById('inp_phone').value;
-    costAmount = parseFloat(selectedOption?.getAttribute('data-price') || 0) + 10;
-}
+            const p = document.getElementById('inp_plan');
+            if(!p.value) {
+                alert("Please select a data plan from the grid.");
+                btn.disabled = false;
+                document.getElementById('srvLoader').style.display = "none";
+                return;
+            }
+            
+            // Use the globally saved selectedPlan object
+            const selectedPlan = window.activeService.selectedPlan;
+            
+            if (selectedPlan) {
+                payload.network = selectedPlan.network;
+                payload.plan = selectedPlan.plan_code;
+                costAmount = parseFloat(selectedPlan.amount) + 10; 
+            } else {
+                // Fallback if they somehow skipped the grid
+                payload.network = document.getElementById('inp_network').value;
+                payload.plan = p.value;
+                costAmount = parseFloat(p.options[p.selectedIndex].getAttribute('data-price')) + 10;
+            }
+            
+            payload.phone = document.getElementById('inp_phone').value;
+        } 
+        else if (type === 'smile') {
+            const planSelect = document.getElementById('inp_plan');
+            if(!planSelect.value) {
+                alert("Please select a Smile plan.");
+                btn.disabled = false;
+                document.getElementById('srvLoader').style.display = "none";
+                return;
+            }
+            const selectedOption = planSelect.options[planSelect.selectedIndex];
+            payload.network = 'smile';
+            payload.plan = planSelect.value;
+            payload.phone = document.getElementById('inp_phone').value;
+            costAmount = parseFloat(selectedOption?.getAttribute('data-price') || 0) + 10;
+        }
         else if (type === 'airtime' || type === 'airtime_cash') {
             payload.network = document.getElementById('inp_network').value;
             payload.phone = document.getElementById('inp_phone').value;
@@ -1456,6 +1474,12 @@ else if (type === 'smile') {
         }
         else if (type === 'exam') {
             const p = document.getElementById('inp_exam_id');
+            if(!p.value) {
+                alert("Select an Exam.");
+                btn.disabled = false;
+                document.getElementById('srvLoader').style.display = "none";
+                return;
+            }
             payload.exam_id = p.value;
             payload.qty = document.getElementById('inp_qty').value;
             const unitPrice = parseFloat(p.options[p.selectedIndex].getAttribute('data-price'));
