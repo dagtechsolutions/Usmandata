@@ -1183,7 +1183,7 @@ else if (type === 'data') {
 }
         else if (type === 'airtime') {
             title.innerHTML = '<i class="fas fa-phone text-warning"></i> Buy Airtime';
-            body.innerHTML = `<select id="inp_network" class="form-select mb-3"><option value="mtn">MTN</option><option value="airtel">Airtel</option><option value="glo">GLO</option><option value="9mobile">9Mobile</option></select><input type="number" id="inp_amount" class="form-control mb-3" placeholder="Amount (₦)"><input type="number" id="inp_phone" class="form-control mb-3" placeholder="Phone Number">`;
+            body.innerHTML = `<select id="inp_network" class="form-select mb-3"><option value="mtn">MTN</option><option value="airtel">Airtel</option><option value="glo">GLO</option><option value="9mobile">9Mobile</option></select><input type="number" id="inp_amount" class="form-control mb-3" placeholder="Amount (min.₦100)"><input type="number" id="inp_phone" class="form-control mb-3" placeholder="Phone Number">`;
             btn.onclick = () => window.executeTransaction();
         }
         else if (type === 'airtime_cash') {
@@ -1327,7 +1327,7 @@ else if (type === 'data') {
         return cost;
     };
 }
-        else if (type === 'recharge_card') {
+else if (type === 'recharge_card') {
     title.innerHTML = '<i class="fas fa-print text-warning"></i> Print Recharge Card';
     body.innerHTML = `
         <select id="card_network" class="form-select mb-3">
@@ -1336,8 +1336,9 @@ else if (type === 'data') {
             <option value="airtel">Airtel</option>
             <option value="9mobile">9Mobile</option>
         </select>
-        <input type="number" id="card_amount" class="form-control mb-3" placeholder="Amount (₦)" min="100">
-        <input type="number" id="card_quantity" class="form-control mb-3" placeholder="Quantity" value="1" min="1">
+        <input type="text" id="display_name" class="form-control mb-3" placeholder="Display Name (e.g., Usman Data)" value="Usman Data">
+        <input type="number" id="card_amount" class="form-control mb-3" placeholder="Amount (₦50 - ₦50,000)" min="50" max="50000">
+        <input type="number" id="card_quantity" class="form-control mb-3" placeholder="Quantity (1-50,000)" value="1" min="1" max="50000">
         <div class="alert alert-info">
             <i class="fas fa-info-circle"></i> Recharge card pins will be displayed after payment
         </div>
@@ -1356,8 +1357,8 @@ else if (type === 'data') {
                     <option value="VISA">VISA</option>
                     <option value="MASTERCARD">Mastercard</option>
                 </select>
-                <input type="number" id="card_amount" class="form-control mb-3" placeholder="Initial Funding Amount (USD)" value="10">
-                <small class="text-muted">Minimum $10 USD for card issuance</small>
+                <input type="number" id="card_amount" class="form-control mb-3" placeholder="Initial Funding Amount (USD)" value="2">
+                <small class="text-muted">Minimum $2 USD for card issuance</small>
             `;
             btn.innerText = "Issue USD Card";
             btn.onclick = () => window.executeTransaction();
@@ -1548,369 +1549,260 @@ else if (type === 'data') {
         } catch(e) { alert("Network Error."); btn.disabled = false; document.getElementById('srvLoader').style.display = "none";}
     };
 
-  /*  window.executeTransaction = async () => {
-        const uid = auth.currentUser.uid;
-        const type = window.activeService.type;
-        const btn = document.getElementById('procBtn');
-        const payload = { uid, type, customer_name: window.activeService.customer_name };
-        let costAmount = 0;
 
-        // Vending cost calculations
- if (type === 'data') {
-            const p = document.getElementById('inp_plan');
-            if(!p.value) {
-                alert("Please select a data plan from the grid.");
-                btn.disabled = false;
-                document.getElementById('srvLoader').style.display = "none";
-                return;
-            }
-            
-            // Use the globally saved selectedPlan object
-            const selectedPlan = window.activeService.selectedPlan;
-            
-            if (selectedPlan) {
-                payload.network = selectedPlan.network;
-                payload.plan = selectedPlan.plan_code;
-                costAmount = parseFloat(selectedPlan.amount) + 10; 
-            } else {
-                // Fallback if they somehow skipped the grid
-                payload.network = document.getElementById('inp_network').value;
-                payload.plan = p.value;
-                costAmount = parseFloat(p.options[p.selectedIndex].getAttribute('data-price')) + 10;
-            }
-            
-            payload.phone = document.getElementById('inp_phone').value;
-        } 
-        else if (type === 'smile') {
-            const planSelect = document.getElementById('inp_plan');
-            if(!planSelect.value) {
-                alert("Please select a Smile plan.");
-                btn.disabled = false;
-                document.getElementById('srvLoader').style.display = "none";
-                return;
-            }
-            const selectedOption = planSelect.options[planSelect.selectedIndex];
-            payload.network = 'smile';
-            payload.plan = planSelect.value;
-            payload.phone = document.getElementById('inp_phone').value;
-            costAmount = parseFloat(selectedOption?.getAttribute('data-price') || 0) + 10;
-        }
-        else if (type === 'airtime' || type === 'airtime_cash') {
-            payload.network = document.getElementById('inp_network').value;
-            payload.phone = document.getElementById('inp_phone').value;
-            payload.amount = document.getElementById('inp_amount').value;
-            costAmount = type === 'airtime' ? parseFloat(payload.amount) : 0;
-        }
-        else if (type === 'tv') {
-            const p = document.getElementById('inp_plan');
-            payload.service = document.getElementById('inp_service').value;
-            payload.plan_id = p.value;
-            payload.account = document.getElementById('inp_account').value;
-            payload.phone = document.getElementById('inp_phone').value;
-            costAmount = parseFloat(p.options[p.selectedIndex].getAttribute('data-price')) + 30; 
-        }
-        else if (type === 'power') {
-            payload.service = document.getElementById('inp_service').value;
-            payload.meter_number = document.getElementById('inp_account').value;
-            payload.meter_type = document.getElementById('inp_meter_type').value;
-            payload.amount = document.getElementById('inp_amount').value;
-            payload.phone = document.getElementById('inp_phone').value;
-            costAmount = parseFloat(payload.amount) + 50; 
-        }
-        else if (type === 'exam') {
-            const p = document.getElementById('inp_exam_id');
-            if(!p.value) {
-                alert("Select an Exam.");
-                btn.disabled = false;
-                document.getElementById('srvLoader').style.display = "none";
-                return;
-            }
-            payload.exam_id = p.value;
-            payload.qty = document.getElementById('inp_qty').value;
-            const unitPrice = parseFloat(p.options[p.selectedIndex].getAttribute('data-price'));
-            costAmount = (unitPrice * parseFloat(payload.qty)) + 50; 
-        }
-        else if (type === 'sms') {
-            payload.sender_id = document.getElementById('inp_sender').value || "Update";
-            payload.phone = document.getElementById('inp_phone').value;
-            payload.message = document.getElementById('inp_message').value;
-            costAmount = window.calcSmsCost(); 
-        }
-        else if (type === 'recharge_card') {
-    payload.network = document.getElementById('card_network').value;
-    payload.amount = document.getElementById('card_amount').value;
-    payload.quantity = document.getElementById('card_quantity').value;
-    // Cost = amount × quantity (plus service fee)
-    costAmount = (parseFloat(payload.amount) * parseInt(payload.quantity)) + 50;
-}
-        // USD Card Services
-        else if (type === 'usd_card') {
-            payload.brand = document.getElementById('card_brand').value;
-            payload.amount = document.getElementById('card_amount').value;
-            costAmount = parseFloat(payload.amount) * 1600; // Convert USD to NGN (approx rate)
-        }
-        else if (type === 'card_balance') {
-            payload.card_id = document.getElementById('card_id').value;
-            costAmount = 50; // Query fee
-        }
-        else if (type === 'card_freeze') {
-            payload.card_id = document.getElementById('card_id').value;
-            payload.action = document.getElementById('freeze_action').value;
-            costAmount = 0;
-        }
-        else if (type === 'card_topup') {
-            payload.card_id = document.getElementById('card_id').value;
-            payload.amount = document.getElementById('topup_amount').value;
-            costAmount = parseFloat(payload.amount) * 1600;
-        }
-        // Identity cost calculations
-        else if (type === 'nin1' || type === 'nin2' || type === 'nin3' || type === 'bvn') {
-            payload[type === 'bvn' ? 'bvn' : 'nin'] = document.getElementById('inp_kyc_num').value;
-            costAmount = 150;
-        }
-        else if (type === 'demographic') {
-            payload.surname = document.getElementById('demo_surname').value;
-            payload.first_name = document.getElementById('demo_firstname').value;
-            payload.birth_date = document.getElementById('demo_dob').value;
-            payload.gender = document.getElementById('demo_gender').value;
-            costAmount = 200;
-        }
-        else if (type === 'nin_phone') {
-            payload.phone = document.getElementById('inp_phone_num').value;
-            costAmount = 150;
-        }
-        else if (type === 'bvn_phone') {
-            payload.phone = document.getElementById('inp_phone_num').value;
-            costAmount = 150;
-        }
-        else if (type === 'instant_validation') {
-            payload.value = document.getElementById('inp_value').value;
-            costAmount = 180;
-        }
+window.executeTransaction = async () => {
+    const uid = auth.currentUser.uid;
+    const type = window.activeService.type;
+    const btn = document.getElementById('procBtn');
+    const payload = { uid, type, customer_name: window.activeService.customer_name };
+    let costAmount = 0;
 
-        payload.costAmount = costAmount; 
-        if(!confirm(`You will be charged ₦${costAmount.toLocaleString()}. Proceed?`)) return;
-
-        btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
-        document.getElementById('srvLoader').style.display = "block";
-
-        try {
-            const res = await fetch(`${RENDER_URL}/api/process`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
-            });
-            const out = await res.json();
+    // Vending cost calculations
+    if (type === 'data') {
+        const selectedPlan = window.activeService.selectedPlanSimple;
+        if (!selectedPlan) {
+            alert("Please select a data plan first");
+            btn.disabled = false;
             document.getElementById('srvLoader').style.display = "none";
-            
-            if(out.success) {
-                document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success text-center fw-bold"><i class="fas fa-check-circle fa-2x"></i><br>Success!</div>`;
-                btn.style.display = "none"; 
-                setTimeout(() => location.reload(), 2000);
-            } else {
-                alert(out.message);
-                btn.disabled = false; btn.innerText = "Try Again";
-            }
-        } catch(e) { 
-            alert("Network Error."); 
-            btn.disabled = false; btn.innerText = "Process"; 
-            document.getElementById('srvLoader').style.display = "none";
+            return;
         }
-    };*/
-    window.executeTransaction = async () => {
-        const uid = auth.currentUser.uid;
-        const type = window.activeService.type;
-        const btn = document.getElementById('procBtn');
-        const payload = { uid, type, customer_name: window.activeService.customer_name };
-        let costAmount = 0;
-
-        // Vending cost calculations
-        if (type === 'data') {
-            const selectedPlan = window.activeService.selectedPlan;
-            if (!selectedPlan) {
-                alert("Please select a data plan first");
-                btn.disabled = false;
-                document.getElementById('srvLoader').style.display = "none";
-                return;
-            }
-            payload.network = selectedPlan.network;
-            payload.plan = selectedPlan.plan_code;
-            payload.phone = document.getElementById('inp_phone_simple').value;
-            costAmount = parseFloat(selectedPlan.amount) + 10;
-        }
-        else if (type === 'smile') {
-            const planSelect = document.getElementById('inp_plan');
-            const selectedOption = planSelect.options[planSelect.selectedIndex];
-            payload.network = 'smile';
-            payload.plan = planSelect.value;
-            payload.phone = document.getElementById('inp_phone').value;
-            costAmount = parseFloat(selectedOption?.getAttribute('data-price') || 0) + 10;
-        }
-        else if (type === 'airtime') {
-            payload.network = document.getElementById('inp_network').value;
-            payload.phone = document.getElementById('inp_phone').value;
-            payload.amount = document.getElementById('inp_amount').value;
-            costAmount = parseFloat(payload.amount);
-        }
-        else if (type === 'airtime_cash') {
-            payload.network = document.getElementById('inp_network').value;
-            payload.phone = document.getElementById('inp_phone').value;
-            payload.amount = document.getElementById('inp_amount').value;
-            costAmount = 0; // The user pays by transferring airtime, not from wallet
-        }
-        else if (type === 'tv') {
-            const p = document.getElementById('inp_plan');
-            payload.service = document.getElementById('inp_service').value;
-            payload.plan_id = p.value;
-            payload.account = document.getElementById('inp_account').value;
-            payload.phone = document.getElementById('inp_phone').value;
-            costAmount = parseFloat(p.options[p.selectedIndex].getAttribute('data-price')) + 30; 
-        }
-        else if (type === 'power') {
-            payload.service = document.getElementById('inp_service').value;
-            payload.meter_number = document.getElementById('inp_account').value;
-            payload.meter_type = document.getElementById('inp_meter_type').value;
-            payload.amount = document.getElementById('inp_amount').value;
-            payload.phone = document.getElementById('inp_phone').value;
-            costAmount = parseFloat(payload.amount) + 50; 
-        }
-        else if (type === 'exam') {
-            const examSelect = document.getElementById('inp_exam_id');
-            const selectedOption = examSelect.options[examSelect.selectedIndex];
-            if (!examSelect.value) {
-                alert("Please select an exam type");
-                btn.disabled = false;
-                document.getElementById('srvLoader').style.display = "none";
-                return;
-            }
-            payload.exam_id = examSelect.value;
-            payload.qty = document.getElementById('inp_qty').value;
-            const unitPrice = parseFloat(selectedOption?.getAttribute('data-price') || 0);
-            costAmount = (unitPrice * parseFloat(payload.qty)) + 50;
-        }
-        else if (type === 'sms') {
-            payload.sender_id = document.getElementById('inp_sender').value || "Update";
-            payload.phone = document.getElementById('inp_phone').value;
-            payload.message = document.getElementById('inp_message').value;
-            costAmount = window.calcSmsCost(); 
-        }
-        else if (type === 'recharge_card') {
-            payload.network = document.getElementById('card_network').value;
-            payload.amount = document.getElementById('card_amount').value;
-            payload.quantity = document.getElementById('card_quantity').value;
-            // Cost = (amount × quantity) - 2% discount + 10 service fee
-            const baseAmount = parseFloat(payload.amount) * parseInt(payload.quantity);
-            costAmount = (baseAmount * 0.98) + 10; 
-        }
-        // USD Card Services
-        else if (type === 'usd_card') {
-            payload.brand = document.getElementById('card_brand').value;
-            payload.amount = document.getElementById('card_amount').value;
-            costAmount = parseFloat(payload.amount) * 1600; 
-        }
-        else if (type === 'card_balance') {
-            payload.card_id = document.getElementById('card_id').value;
-            costAmount = 50; 
-        }
-        else if (type === 'card_freeze') {
-            payload.card_id = document.getElementById('card_id').value;
-            payload.action = document.getElementById('freeze_action').value;
-            costAmount = 0;
-        }
-        else if (type === 'card_topup') {
-            payload.card_id = document.getElementById('card_id').value;
-            payload.amount = document.getElementById('topup_amount').value;
-            costAmount = parseFloat(payload.amount) * 1600;
-        }
-        // Identity cost calculations
-        else if (type === 'nin1' || type === 'nin2' || type === 'nin3' || type === 'bvn') {
-            const kycType = type.startsWith('nin') ? 'nin' : 'bvn';
-            payload[kycType] = document.getElementById('inp_kyc_num').value;
-            if(!payload[kycType]) return alert(`Enter a valid number.`);
-            costAmount = 150;
-        }
-        else if (type === 'demographic') {
-            payload.surname = document.getElementById('demo_surname').value;
-            payload.first_name = document.getElementById('demo_firstname').value;
-            payload.birth_date = document.getElementById('demo_dob').value;
-            payload.gender = document.getElementById('demo_gender').value;
-            costAmount = 200;
-        }
-        else if (type === 'nin_phone' || type === 'bvn_phone') {
-            payload.phone = document.getElementById('inp_phone_num').value;
-            costAmount = 150;
-        }
-        else if (type === 'instant_validation') {
-            payload.value = document.getElementById('inp_value').value;
-            costAmount = 180;
-        }
-
-        payload.costAmount = costAmount; 
+        payload.network = selectedPlan.network;
+        payload.plan = selectedPlan.plan_code;
+        payload.phone = document.getElementById('inp_phone_simple').value;
+        costAmount = parseFloat(selectedPlan.amount) + 10;
+    }
+    else if (type === 'smile') {
+        const planSelect = document.getElementById('inp_plan');
+        const selectedOption = planSelect.options[planSelect.selectedIndex];
+        payload.network = 'smile';
+        payload.plan = planSelect.value;
+        payload.phone = document.getElementById('inp_phone').value;
+        costAmount = parseFloat(selectedOption?.getAttribute('data-price') || 0) + 10;
+    }
+    else if (type === 'airtime') {
+        payload.network = document.getElementById('inp_network').value;
+        payload.phone = document.getElementById('inp_phone').value;
+        payload.amount = document.getElementById('inp_amount').value;
+        costAmount = parseFloat(payload.amount);
+    }
+    else if (type === 'airtime_cash') {
+        const network = document.getElementById('inp_network').value;
+        const phone = document.getElementById('inp_phone').value;
+        const amount = document.getElementById('inp_amount').value;
         
-        // Skip confirmation for Airtime to Cash since it costs ₦0 from wallet
-        if(type !== 'airtime_cash') {
-            if(!confirm(`You will be charged ₦${costAmount.toLocaleString()}. Proceed?`)) return;
-        }
-
-        btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
-        document.getElementById('srvLoader').style.display = "block";
-
-        try {
-            const endpoint = `${RENDER_URL}/api/process`;
-            const res = await fetch(endpoint, {
-                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
-            });
-            if (res.status === 404) throw new Error("Endpoint not found.");
-            
-            const out = await res.json();
+        if (!network || !phone || !amount) {
+            alert("Please fill in all fields");
+            btn.disabled = false;
             document.getElementById('srvLoader').style.display = "none";
-            
-            if(out.success) {
-                // 🌟 SPECIAL HANDLING FOR RECHARGE CARDS
-                if (type === 'recharge_card' && out.data?.message?.details) {
-                    const pinsArray = out.data.message.details;
-                    let pinsHtml = `<div class="text-start mt-3 p-3 bg-light border rounded">
-                        <h6 class="fw-bold text-success mb-3"><i class="fas fa-check-circle"></i> Pins Generated!</h6>`;
-                    
+            return;
+        }
+        
+        if (parseFloat(amount) < 500) {
+            alert("Minimum amount for Airtime to Cash is ₦500");
+            btn.disabled = false;
+            document.getElementById('srvLoader').style.display = "none";
+            return;
+        }
+        
+        if (parseFloat(amount) > 20000) {
+            alert("Maximum amount for Airtime to Cash is ₦20,000");
+            btn.disabled = false;
+            document.getElementById('srvLoader').style.display = "none";
+            return;
+        }
+        
+        payload.network = network;
+        payload.phone = phone;
+        payload.amount = amount;
+        costAmount = 0;
+    }
+    else if (type === 'tv') {
+        const p = document.getElementById('inp_plan');
+        payload.service = document.getElementById('inp_service').value;
+        payload.plan_id = p.value;
+        payload.account = document.getElementById('inp_account').value;
+        payload.phone = document.getElementById('inp_phone').value;
+        costAmount = parseFloat(p.options[p.selectedIndex].getAttribute('data-price')) + 30; 
+    }
+    else if (type === 'power') {
+        payload.service = document.getElementById('inp_service').value;
+        payload.meter_number = document.getElementById('inp_account').value;
+        payload.meter_type = document.getElementById('inp_meter_type').value;
+        payload.amount = document.getElementById('inp_amount').value;
+        payload.phone = document.getElementById('inp_phone').value;
+        costAmount = parseFloat(payload.amount) + 50; 
+    }
+    else if (type === 'exam') {
+        const examSelect = document.getElementById('inp_exam_id');
+        const selectedOption = examSelect.options[examSelect.selectedIndex];
+        if (!examSelect.value) {
+            alert("Please select an exam type");
+            btn.disabled = false;
+            document.getElementById('srvLoader').style.display = "none";
+            return;
+        }
+        payload.exam_id = examSelect.value;
+        payload.qty = document.getElementById('inp_qty').value;
+        const unitPrice = parseFloat(selectedOption?.getAttribute('data-price') || 0);
+        costAmount = (unitPrice * parseFloat(payload.qty)) + 50;
+    }
+    else if (type === 'sms') {
+        payload.sender_id = document.getElementById('inp_sender').value || "Update";
+        payload.phone = document.getElementById('inp_phone').value;
+        payload.message = document.getElementById('inp_message').value;
+        costAmount = window.calcSmsCost(); 
+    }
+    else if (type === 'recharge_card') {
+        const network = document.getElementById('card_network').value;
+        const amount = document.getElementById('card_amount').value;
+        const quantity = document.getElementById('card_quantity').value;
+        const displayName = document.getElementById('display_name').value || "Usman Data";
+        
+        if (!network || !amount || !quantity) {
+            alert("Please fill in all fields");
+            btn.disabled = false;
+            document.getElementById('srvLoader').style.display = "none";
+            return;
+        }
+        
+        if (parseFloat(amount) < 50) {
+            alert("Minimum amount is ₦50");
+            btn.disabled = false;
+            document.getElementById('srvLoader').style.display = "none";
+            return;
+        }
+        
+        if (parseInt(quantity) < 1 || parseInt(quantity) > 50000) {
+            alert("Quantity must be between 1 and 50,000");
+            btn.disabled = false;
+            document.getElementById('srvLoader').style.display = "none";
+            return;
+        }
+        
+        payload.network = network;
+        payload.amount = amount;
+        payload.quantity = quantity;
+        payload.display_name = displayName;
+        costAmount = (parseFloat(amount) * parseInt(quantity)) + 50;
+    }
+    else if (type === 'usd_card') {
+        payload.brand = document.getElementById('card_brand').value;
+        payload.amount = document.getElementById('card_amount').value;
+        costAmount = parseFloat(payload.amount) * 1600; 
+    }
+    else if (type === 'card_balance') {
+        payload.card_id = document.getElementById('card_id').value;
+        costAmount = 50; 
+    }
+    else if (type === 'card_freeze') {
+        payload.card_id = document.getElementById('card_id').value;
+        payload.action = document.getElementById('freeze_action').value;
+        costAmount = 0;
+    }
+    else if (type === 'card_topup') {
+        payload.card_id = document.getElementById('card_id').value;
+        payload.amount = document.getElementById('topup_amount').value;
+        costAmount = parseFloat(payload.amount) * 1600;
+    }
+    else if (type === 'nin1' || type === 'nin2' || type === 'nin3' || type === 'bvn') {
+        const kycType = type.startsWith('nin') ? 'nin' : 'bvn';
+        payload[kycType] = document.getElementById('inp_kyc_num').value;
+        if(!payload[kycType]) return alert("Enter a valid number.");
+        costAmount = 150;
+    }
+    else if (type === 'demographic') {
+        payload.surname = document.getElementById('demo_surname').value;
+        payload.first_name = document.getElementById('demo_firstname').value;
+        payload.birth_date = document.getElementById('demo_dob').value;
+        payload.gender = document.getElementById('demo_gender').value;
+        costAmount = 200;
+    }
+    else if (type === 'nin_phone' || type === 'bvn_phone') {
+        payload.phone = document.getElementById('inp_phone_num').value;
+        costAmount = 150;
+    }
+    else if (type === 'instant_validation') {
+        payload.value = document.getElementById('inp_value').value;
+        costAmount = 180;
+    }
+
+    payload.costAmount = costAmount; 
+    
+    // Skip confirmation for Airtime to Cash since it costs ₦0 from wallet
+    if (type !== 'airtime_cash') {
+        if (!confirm(`You will be charged ₦${costAmount.toLocaleString()}. Proceed?`)) {
+            btn.disabled = false;
+            document.getElementById('srvLoader').style.display = "none";
+            return;
+        }
+    }
+
+    btn.disabled = true; 
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+    document.getElementById('srvLoader').style.display = "block";
+
+    try {
+        const res = await fetch(`${RENDER_URL}/api/process`, {
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify(payload)
+        });
+        const out = await res.json();
+        document.getElementById('srvLoader').style.display = "none";
+        
+        if(out.success) {
+            // SPECIAL HANDLING FOR RECHARGE CARDS
+            if (type === 'recharge_card' && out.data?.message?.details) {
+                const pinsArray = out.data.message.details;
+                let pinsHtml = `<div class="text-start mt-3 p-3 bg-light border rounded">
+                    <h6 class="fw-bold text-success mb-3"><i class="fas fa-check-circle"></i> Pins Generated!</h6>`;
+                
+                if (Array.isArray(pinsArray)) {
                     pinsArray.forEach((pin, i) => {
                         pinsHtml += `
                             <div class="mb-2 p-2 border-bottom">
                                 <span class="badge bg-primary">PIN ${i+1}</span>
-                                <strong class="fs-5 ms-2" style="letter-spacing: 2px;">${pin.pin}</strong>
-                                <br><small class="text-muted">S/N: ${pin.serial_number}</small>
+                                <strong class="fs-5 ms-2" style="letter-spacing: 2px;">${pin.pin || pin}</strong>
+                                <br><small class="text-muted">S/N: ${pin.serial_number || 'N/A'}</small>
                             </div>`;
                     });
-                    pinsHtml += `</div>`;
-                    
-                    document.getElementById('srvExtra').innerHTML = pinsHtml;
-                    btn.style.display = "none"; 
-                } 
-                // 🌟 SPECIAL HANDLING FOR AIRTIME TO CASH
-                else if (type === 'airtime_cash' && out.data?.message) {
-                    const instructions = out.data.message.description || out.data.message;
-                    document.getElementById('srvExtra').innerHTML = `
-                        <div class="alert alert-info text-start mt-3">
-                            <h6 class="fw-bold"><i class="fas fa-info-circle"></i> Instructions:</h6>
-                            <p class="mb-0">${instructions}</p>
-                            <small class="d-block mt-2 text-muted">Transfer the airtime to the number provided. Your wallet will be credited automatically once confirmed.</small>
-                        </div>`;
-                    btn.style.display = "none";
+                } else {
+                    pinsHtml += `<div class="mb-2 p-2">${JSON.stringify(pinsArray)}</div>`;
                 }
-                // STANDARD SUCCESS MESSAGE
-                else {
-                    document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success text-center fw-bold"><i class="fas fa-check-circle fa-2x"></i><br>Success!</div>`;
-                    btn.style.display = "none"; 
-                    setTimeout(() => location.reload(), 2000);
-                }
-            } else {
-                alert(out.message);
-                btn.disabled = false; btn.innerText = "Try Again";
+                pinsHtml += `</div>`;
+                document.getElementById('srvExtra').innerHTML = pinsHtml;
+                btn.style.display = "none"; 
+            } 
+            // SPECIAL HANDLING FOR AIRTIME TO CASH
+            else if (type === 'airtime_cash') {
+                const instructions = out.data?.message?.description || out.message || "Transfer airtime to complete transaction";
+                document.getElementById('srvExtra').innerHTML = `
+                    <div class="alert alert-info text-start mt-3">
+                        <h6 class="fw-bold"><i class="fas fa-info-circle"></i> Instructions:</h6>
+                        <p class="mb-0">${instructions}</p>
+                        <small class="d-block mt-2 text-muted">Transfer the airtime to the number provided. Your wallet will be credited automatically once confirmed.</small>
+                    </div>`;
+                btn.style.display = "none";
             }
-        } catch(e) { 
-            alert("Network Error."); 
-            btn.disabled = false; btn.innerText = "Process"; 
-            document.getElementById('srvLoader').style.display = "none";
+            // STANDARD SUCCESS MESSAGE
+            else {
+                document.getElementById('srvExtra').innerHTML = `<div class="alert alert-success text-center fw-bold"><i class="fas fa-check-circle fa-2x"></i><br>Success!</div>`;
+                btn.style.display = "none"; 
+                setTimeout(() => location.reload(), 2000);
+            }
+        } else {
+            alert(out.message || "Transaction failed");
+            btn.disabled = false; 
+            btn.innerText = "Try Again";
         }
-    };
-
+    } catch(e) { 
+        console.error("Transaction error:", e);
+        alert("Network Error. Please try again."); 
+        btn.disabled = false; 
+        btn.innerText = "Process"; 
+        document.getElementById('srvLoader').style.display = "none";
+    }
+};
     window.genAcc = async () => {
         const kycType = document.getElementById('kycType').value;
         const kycNumber = document.getElementById('kycNumber').value.trim();
