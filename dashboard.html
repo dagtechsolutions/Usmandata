@@ -1469,7 +1469,7 @@ else if (type === 'recharge_card') {
             <input type="text" id="narration" class="form-control" placeholder="e.g., Withdrawal, Payment, etc.">
         </div>
         <div class="alert alert-info" id="feePreview">
-            <i class="fas fa-calculator"></i> Transfer Fee: ₦50 | Total Deduction: ₦0.00
+            <i class="fas fa-calculator"></i> Transfer Fee: ₦10 | Total Deduction: ₦0.00
         </div>
         <div class="alert alert-warning">
             <i class="fas fa-shield-alt"></i> <strong>Note:</strong> Transfers are final and cannot be reversed. Please verify account details carefully.
@@ -1481,7 +1481,7 @@ else if (type === 'recharge_card') {
     // Calculate total with fee
     window.calculateTransferTotal = () => {
         const amount = document.getElementById('transfer_amount')?.value || 0;
-        const fee = 50;
+        const fee = 10;
         const total = parseFloat(amount) + fee;
         const feePreview = document.getElementById('feePreview');
         if (feePreview) {
@@ -1937,7 +1937,7 @@ window.executeTransaction = async () => {
         return;
     }
     
-    const fee = 50;
+    const fee = 10;
     const totalAmount = parseFloat(amount) + fee;
     
     // Check if account was verified
