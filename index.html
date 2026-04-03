@@ -4,179 +4,178 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Usman Data Sub | NIN, BVN & Data Services</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #004a99; --secondary: #ffd700; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f8f9fa; }
-        .navbar { background-color: var(--primary); }
-        .hero { background: linear-gradient(rgba(0,74,153,0.8), rgba(0,74,153,0.8)), url('https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80'); 
-                background-size: cover; color: white; padding: 100px 0; text-align: center; }
-        .service-card { border: none; transition: 0.3s; border-radius: 15px; }
-        .service-card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .btn-primary { background-color: var(--primary); border: none; }
-        .btn-warning { background-color: var(--secondary); color: #000; font-weight: bold; }
+        :root { --primary: #0f172a; --secondary: #047857; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8fafc; }
+        .navbar { background: var(--primary); padding: 15px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .navbar-brand { font-weight: 800; font-size: 1.5rem; letter-spacing: -0.5px; }
+        .hero { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: white; padding: 80px 0; position: relative; overflow: hidden; }
+        .hero::after { content: '\f0d6'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; right: -30px; bottom: -50px; font-size: 15rem; opacity: 0.05; }
+        .service-card { background: white; border: 1px solid #e2e8f0; border-radius: 20px; padding: 25px 20px; text-align: center; transition: all 0.3s ease; cursor: pointer; height: 100%; }
+        .service-card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1); border-color: var(--secondary); }
+        .service-icon { width: 70px; height: 70px; background: #eff6ff; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: #2563eb; font-size: 1.8rem; }
+        .btn-primary { background: var(--secondary); border: none; border-radius: 50px; padding: 12px 30px; font-weight: 600; }
+        .btn-primary:hover { background: #065f46; transform: translateY(-2px); }
+        .btn-outline-light { border-radius: 50px; padding: 8px 24px; }
+        footer { background: white; border-top: 1px solid #e2e8f0; padding: 25px 0; margin-top: 60px; }
     </style>
 </head>
 <body>
 
-<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="#">USMAN DATA SUB</a>
+        <a class="navbar-brand fw-bold" href="#"><i class="fas fa-bolt text-warning me-2"></i>USMAN DATA</a>
         <div class="d-flex align-items-center">
-            <select id="langSwitcher" class="form-select form-select-sm me-3" style="width: auto;">
-                <option value="en">English</option>
-                <option value="ha">Hausa</option>
+            <select id="langSwitcher" class="form-select form-select-sm me-3" style="width: auto; background: rgba(255,255,255,0.15); color: white; border: none; border-radius: 30px;">
+                <option value="en" style="color: #000;">English</option>
+                <option value="ha" style="color: #000;">Hausa</option>
             </select>
-            <a href="login.html" class="btn btn-outline-light btn-sm me-2" id="nav-login">Login</a>
-            <a href="register.html" class="btn btn-warning btn-sm" id="nav-register">Register</a>
+            <a href="login.html" class="btn btn-outline-light btn-sm me-2" id="navLogin">Login</a>
+            <a href="register.html" class="btn btn-primary btn-sm" id="navRegister">Register</a>
         </div>
     </div>
 </nav>
 
-<!-- Hero Section -->
 <header class="hero">
-    <div class="container">
-        <h1 class="display-4 fw-bold" id="hero-title">Reliable NIN & BVN Services</h1>
-        <p class="lead" id="hero-sub">Fastest way to verify NIN, BVN, and buy cheap Data/Airtime.</p>
+    <div class="container text-center position-relative" style="z-index: 2;">
+        <h1 class="display-4 fw-bold" id="heroTitle">Reliable Identity & Utility Services</h1>
+        <p class="lead mt-3 opacity-75" id="heroSubtitle">Fastest way to verify NIN, BVN, and purchase data, airtime, and bills.</p>
         <div class="mt-4">
-            <a href="register.html" class="btn btn-warning btn-lg px-5 py-3 shadow" id="hero-btn">Get Started / Fara Yanzu</a>
+            <a href="register.html" class="btn btn-primary btn-lg px-5 py-3 shadow" id="heroBtn">Get Started</a>
         </div>
     </div>
 </header>
 
-<!-- Services Section Start -->
-<section class="container my-5" id="services">
-    <h2 class="text-center mb-5 fw-bold" id="services-main-title">Ayyukanmu / Our Services</h2>
+<section class="container my-5">
+    <h2 class="text-center mb-5 fw-bold" id="servicesTitle">Our Services</h2>
     <div class="row g-4">
-        
-        <!-- Service 1: NIN Search -->
         <div class="col-6 col-md-3">
-            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
-                <i class="fas fa-id-card fa-3x text-primary mb-3"></i>
-                <h5 id="s1-title" class="fw-bold">NIN Search</h5>
-                <p class="text-muted small mb-0" id="s1-desc">Instant demographic verification & validation.</p>
+            <div class="service-card" onclick="window.location.href='register.html'">
+                <div class="service-icon"><i class="fas fa-id-card"></i></div>
+                <h5 class="fw-bold mb-2" id="s1Title">NIN Search</h5>
+                <p class="text-muted small mb-0" id="s1Desc">Instant demographic verification</p>
             </div>
         </div>
-
-        <!-- Service 2: BVN Lookup -->
         <div class="col-6 col-md-3">
-            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
-                <i class="fas fa-university fa-3x text-primary mb-3"></i>
-                <h5 id="s2-title" class="fw-bold">BVN Lookup</h5>
-                <p class="text-muted small mb-0" id="s2-desc">Verify Bank Verification Numbers instantly.</p>
+            <div class="service-card" onclick="window.location.href='register.html'">
+                <div class="service-icon"><i class="fas fa-university"></i></div>
+                <h5 class="fw-bold mb-2" id="s2Title">BVN Lookup</h5>
+                <p class="text-muted small mb-0" id="s2Desc">Verify bank numbers instantly</p>
             </div>
         </div>
-
-        <!-- Service 3: Cheap Data -->
         <div class="col-6 col-md-3">
-            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
-                <i class="fas fa-wifi fa-3x text-primary mb-3"></i>
-                <h5 id="s3-title" class="fw-bold">Cheap Data</h5>
-                <p class="text-muted small mb-0" id="s3-desc">SME and Gifting for all Nigerian networks.</p>
+            <div class="service-card" onclick="window.location.href='register.html'">
+                <div class="service-icon"><i class="fas fa-wifi"></i></div>
+                <h5 class="fw-bold mb-2" id="s3Title">Data Plans</h5>
+                <p class="text-muted small mb-0" id="s3Desc">MTN, Glo, Airtel, 9Mobile</p>
             </div>
         </div>
-
-        <!-- Service 4: Airtime -->
         <div class="col-6 col-md-3">
-            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
-                <i class="fas fa-phone-alt fa-3x text-primary mb-3"></i>
-                <h5 id="s4-title" class="fw-bold">Airtime</h5>
-                <p class="text-muted small mb-0" id="s4-desc">Instant recharge with discounts for agents.</p>
+            <div class="service-card" onclick="window.location.href='register.html'">
+                <div class="service-icon"><i class="fas fa-phone"></i></div>
+                <h5 class="fw-bold mb-2" id="s4Title">Airtime</h5>
+                <p class="text-muted small mb-0" id="s4Desc">Instant recharge for all networks</p>
             </div>
         </div>
-
-        <!-- Service 5: Cable TV -->
         <div class="col-6 col-md-3">
-            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
-                <i class="fas fa-tv fa-3x text-primary mb-3"></i>
-                <h5 id="s5-title" class="fw-bold">Cable TV</h5>
-                <p class="text-muted small mb-0" id="s5-desc">Renew GOTV, DSTV, and Startimes easily.</p>
+            <div class="service-card" onclick="window.location.href='register.html'">
+                <div class="service-icon"><i class="fas fa-tv"></i></div>
+                <h5 class="fw-bold mb-2" id="s5Title">Cable TV</h5>
+                <p class="text-muted small mb-0" id="s5Desc">GOTV, DSTV, Startimes</p>
             </div>
         </div>
-
-        <!-- Service 6: Electricity -->
         <div class="col-6 col-md-3">
-            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
-                <i class="fas fa-lightbulb fa-3x text-primary mb-3"></i>
-                <h5 id="s6-title" class="fw-bold">Electricity</h5>
-                <p class="text-muted small mb-0" id="s6-desc">Pay all DisCos prepaid & postpaid bills.</p>
+            <div class="service-card" onclick="window.location.href='register.html'">
+                <div class="service-icon"><i class="fas fa-lightbulb"></i></div>
+                <h5 class="fw-bold mb-2" id="s6Title">Electricity</h5>
+                <p class="text-muted small mb-0" id="s6Desc">Pay all DisCo bills</p>
             </div>
         </div>
-
-        <!-- Service 7: Exam Pins -->
         <div class="col-6 col-md-3">
-            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
-                <i class="fas fa-graduation-cap fa-3x text-primary mb-3"></i>
-                <h5 id="s7-title" class="fw-bold">Exam Pins</h5>
-                <p class="text-muted small mb-0" id="s7-desc">Buy WAEC, NECO, and JAMB result checkers.</p>
+            <div class="service-card" onclick="window.location.href='register.html'">
+                <div class="service-icon"><i class="fas fa-graduation-cap"></i></div>
+                <h5 class="fw-bold mb-2" id="s7Title">Exam Pins</h5>
+                <p class="text-muted small mb-0" id="s7Desc">WAEC, NECO, JAMB</p>
             </div>
         </div>
-
-        <!-- Service 8: Bulk SMS -->
         <div class="col-6 col-md-3">
-            <div class="card service-card p-4 text-center h-100 shadow-sm border-0">
-                <i class="fas fa-envelope fa-3x text-primary mb-3"></i>
-                <h5 id="s8-title" class="fw-bold">Bulk SMS</h5>
-                <p class="text-muted small mb-0" id="s8-desc">Send mass messages at very low rates.</p>
+            <div class="service-card" onclick="window.location.href='register.html'">
+                <div class="service-icon"><i class="fas fa-envelope"></i></div>
+                <h5 class="fw-bold mb-2" id="s8Title">Bulk SMS</h5>
+                <p class="text-muted small mb-0" id="s8Desc">Mass messaging at low rates</p>
             </div>
         </div>
-
     </div>
 </section>
-<!-- Services Section End -->
-<!-- Footer -->
-<footer class="bg-dark text-white py-4 mt-5">
+
+<footer>
     <div class="container text-center">
-        <p>&copy; 2024 Usman Data Sub. All Rights Reserved.</p>
+        <p class="copyright" id="copyright">© 2024 Usman Data Sub. All rights reserved.</p>
+        <p class="credit" id="credit">Technology by <a href="https://primebit.page.gd" target="_blank">Prime Bit Tech</a></p>
     </div>
 </footer>
 
 <script>
     const translations = {
-    en: {
-        navLogin: "Login",
-        navRegister: "Register",
-        heroTitle: "Reliable NIN & Data Services",
-        s1Title: "NIN Search", s1Desc: "Instant demographic verification.",
-        s2Title: "BVN Lookup", s2Desc: "Verify bank numbers instantly.",
-        s3Title: "Cheap Data", s3Desc: "MTN, Glo, Airtel SME data.",
-        s4Title: "Airtime", s4Desc: "Instant recharge for all networks.",
-        s5Title: "Cable TV", s5Desc: "GOTV, DSTV & Startimes subscriptions.",
-        s6Title: "Electricity", s6Desc: "Pay all DisCo electric bills.",
-        s7Title: "Exam Pins", s7Desc: "WAEC, NECO & JAMB checkers.",
-        s8Title: "Bulk SMS", s8Desc: "Cheap mass messaging for agents."
-    },
-    ha: {
-        navLogin: "Shiga",
-        navRegister: "Yi Rajista",
-        heroTitle: "Ingantaccen Sabis na NIN da Data",
-        s1Title: "Neman NIN", s1Desc: "Nemo bayanan NIN nan take cikin sauki.",
-        s2Title: "Neman BVN", s2Desc: "Tabbatar da lambar BVN nan take.",
-        s3Title: "Data Mai Sauki", s3Desc: "Siyan Data na MTN, GLO, Airtel.",
-        s4Title: "Saka Kudi", s4Desc: "Recharge na dukkan layukan waya.",
-        s5Title: "Kallon TV", s5Desc: "Biyan kudin GOTV, DSTV da Startimes.",
-        s6Title: "Wutar Lantarki", s6Desc: "Biyan kudin wutar lantarki cikin sauri.",
-        s7Title: "Pin na Jarrabawa", s7Desc: "Siyan Pin na WAEC, NECO da JAMB.",
-        s8Title: "Sakon SMS", s8Desc: "Aika sakonni ga mutane da yawa."
-    }
-};
+        en: {
+            navLogin: "Login", navRegister: "Register",
+            heroTitle: "Reliable Identity & Utility Services",
+            heroSubtitle: "Fastest way to verify NIN, BVN, and purchase data, airtime, and bills.",
+            heroBtn: "Get Started",
+            servicesTitle: "Our Services",
+            s1Title: "NIN Search", s1Desc: "Instant demographic verification",
+            s2Title: "BVN Lookup", s2Desc: "Verify bank numbers instantly",
+            s3Title: "Data Plans", s3Desc: "MTN, Glo, Airtel, 9Mobile",
+            s4Title: "Airtime", s4Desc: "Instant recharge for all networks",
+            s5Title: "Cable TV", s5Desc: "GOTV, DSTV, Startimes",
+            s6Title: "Electricity", s6Desc: "Pay all DisCo bills",
+            s7Title: "Exam Pins", s7Desc: "WAEC, NECO, JAMB",
+            s8Title: "Bulk SMS", s8Desc: "Mass messaging at low rates",
+            copyright: "© 2024 Usman Data Sub. All rights reserved.",
+            credit: "Technology by Prime Bit Tech"
+        },
+        ha: {
+            navLogin: "Shiga", navRegister: "Yi Rajista",
+            heroTitle: "Ingantaccen Sabis na Identity da Kayan More",
+            heroSubtitle: "Hanya mafi sauri don tantance NIN, BVN, da siyan data, kudin waya, da takardun biyan kuɗi.",
+            heroBtn: "Fara Yanzu",
+            servicesTitle: "Ayyukan Mu",
+            s1Title: "Neman NIN", s1Desc: "Tabbatar da bayanai nan take",
+            s2Title: "Neman BVN", s2Desc: "Tabbatar da lambar banki nan take",
+            s3Title: "Data", s3Desc: "MTN, Glo, Airtel, 9Mobile",
+            s4Title: "Kudin Waya", s4Desc: "Saka kudi nan take ga dukkan wayoyi",
+            s5Title: "Talabijin", s5Desc: "GOTV, DSTV, Startimes",
+            s6Title: "Wutar Lantarki", s6Desc: "Biyan dukkan kudaden DisCo",
+            s7Title: "Pin na Jarrabawa", s7Desc: "WAEC, NECO, JAMB",
+            s8Title: "Sakon SMS", s8Desc: "Aika sakonni ga jama'a a farashi mai sauƙi",
+            copyright: "© 2024 Usman Data Sub. Duk haƙƙoƙi mallaki ne.",
+            credit: "Fasaha ta Prime Bit Tech"
+        }
+    };
 
-document.getElementById('langSwitcher').addEventListener('change', (e) => {
-    const lang = e.target.value;
-    const t = translations[lang];
-    // Update labels using IDs
-    document.getElementById('nav-login').innerText = t.navLogin;
-    document.getElementById('nav-register').innerText = t.navRegister;
-    document.getElementById('hero-title').innerText = t.heroTitle;
-    for (let i = 1; i <= 8; i++) {
-        document.getElementById(`s${i}-title`).innerText = t[`s${i}Title`];
-        document.getElementById(`s${i}-desc`).innerText = t[`s${i}Desc`];
+    const langSwitcher = document.getElementById('langSwitcher');
+    function updateLanguage(lang) {
+        const t = translations[lang];
+        if (!t) return;
+        document.getElementById('navLogin').innerText = t.navLogin;
+        document.getElementById('navRegister').innerText = t.navRegister;
+        document.getElementById('heroTitle').innerText = t.heroTitle;
+        document.getElementById('heroSubtitle').innerText = t.heroSubtitle;
+        document.getElementById('heroBtn').innerText = t.heroBtn;
+        document.getElementById('servicesTitle').innerText = t.servicesTitle;
+        for (let i = 1; i <= 8; i++) {
+            const titleEl = document.getElementById(`s${i}Title`);
+            const descEl = document.getElementById(`s${i}Desc`);
+            if (titleEl) titleEl.innerText = t[`s${i}Title`];
+            if (descEl) descEl.innerText = t[`s${i}Desc`];
+        }
+        document.getElementById('copyright').innerHTML = t.copyright;
+        document.getElementById('credit').innerHTML = t.credit;
     }
-});
+    langSwitcher.addEventListener('change', (e) => updateLanguage(e.target.value));
+    updateLanguage('en');
 </script>
 </body>
 </html>

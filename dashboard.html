@@ -610,10 +610,47 @@ body::before {
             .whatsapp-float a { width: 55px; height: 55px; }
             .whatsapp-float i { font-size: 2rem; }
         }
+        /* Language Switcher */
+.language-switcher {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+.language-switcher select {
+    padding: 8px 16px;
+    border-radius: 30px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.language-switcher select:focus {
+    outline: none;
+    border-color: #047857;
+}
+@media (max-width: 768px) {
+    .language-switcher {
+        top: 10px;
+        right: 10px;
+    }
+    .language-switcher select {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+}
     </style>
 </head>
 <body>
-
+<!-- Language Switcher -->
+<div class="language-switcher">
+    <select id="langSwitcher">
+        <option value="en">English</option>
+        <option value="ha">Hausa</option>
+    </select>
+</div>
 <nav class="navbar navbar-dark d-md-none px-3" style="background:#0f172a;">
     <span class="navbar-brand fw-bold mb-0 h1"><i class="fas fa-bolt text-warning"></i> USMAN DATA</span>
     <button class="btn btn-danger btn-sm fw-bold" id="btn-logout-mobile"><i class="fas fa-sign-out-alt"></i></button>
@@ -821,36 +858,44 @@ body::before {
                 </div>
             </div>
             
-            <!-- 🌟 TAB 3: CARDS & BANKING (USD Card Feature) 🌟 -->
-            <div id="cardsContent" style="display: none;">
-                <div class="row g-3 g-md-4">
-                    <div class="col-6 col-md-3">
-                        <button class="service-btn" onclick="openSrv('usd_card')">
-                            <div class="icon-wrapper" style="background:linear-gradient(135deg, #fbbf24, #f59e0b); color:#0f172a;"><i class="fas fa-dollar-sign"></i></div>
-                            <span class="srv-name">Issue USD Card</span>
-                            <div class="usd-badge">Virtual Card</div>
-                        </button>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <button class="service-btn" onclick="openSrv('card_balance')">
-                            <div class="icon-wrapper" style="background:#dbeafe; color:#1e40af;"><i class="fas fa-chart-line"></i></div>
-                            <span class="srv-name">Card Balance</span>
-                        </button>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <button class="service-btn" onclick="openSrv('card_freeze')">
-                            <div class="icon-wrapper" style="background:#fee2e2; color:#991b1b;"><i class="fas fa-snowflake"></i></div>
-                            <span class="srv-name">Freeze Card</span>
-                        </button>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <button class="service-btn" onclick="openSrv('card_topup')">
-                            <div class="icon-wrapper" style="background:#dcfce7; color:#166534;"><i class="fas fa-arrow-up"></i></div>
-                            <span class="srv-name">Top-up Card</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+<!-- 🌟 TAB 3: CARDS & BANKING (USD Card Feature + Transfer) 🌟 -->
+<div id="cardsContent" style="display: none;">
+    <div class="row g-3 g-md-4">
+        <div class="col-6 col-md-3">
+            <button class="service-btn" onclick="openSrv('usd_card')">
+                <div class="icon-wrapper" style="background:linear-gradient(135deg, #fbbf24, #f59e0b); color:#0f172a;"><i class="fas fa-dollar-sign"></i></div>
+                <span class="srv-name">Issue USD Card</span>
+                <div class="usd-badge">Virtual Card</div>
+            </button>
+        </div>
+        <div class="col-6 col-md-3">
+            <button class="service-btn" onclick="openSrv('card_balance')">
+                <div class="icon-wrapper" style="background:#dbeafe; color:#1e40af;"><i class="fas fa-chart-line"></i></div>
+                <span class="srv-name">Card Balance</span>
+            </button>
+        </div>
+        <div class="col-6 col-md-3">
+            <button class="service-btn" onclick="openSrv('card_freeze')">
+                <div class="icon-wrapper" style="background:#fee2e2; color:#991b1b;"><i class="fas fa-snowflake"></i></div>
+                <span class="srv-name">Freeze Card</span>
+            </button>
+        </div>
+        <div class="col-6 col-md-3">
+            <button class="service-btn" onclick="openSrv('card_topup')">
+                <div class="icon-wrapper" style="background:#dcfce7; color:#166534;"><i class="fas fa-arrow-up"></i></div>
+                <span class="srv-name">Top-up Card</span>
+            </button>
+        </div>
+        <!-- NEW: Transfer to Bank Button -->
+        <div class="col-6 col-md-3">
+            <button class="service-btn" onclick="openSrv('bank_transfer')">
+                <div class="icon-wrapper" style="background:#e0e7ff; color:#4338ca;"><i class="fas fa-exchange-alt"></i></div>
+                <span class="srv-name">Transfer to Bank</span>
+                <div class="badge-humanity">Payout</div>
+            </button>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </div>
@@ -1182,10 +1227,20 @@ else if (type === 'data') {
     };
 }
         else if (type === 'airtime') {
-            title.innerHTML = '<i class="fas fa-phone text-warning"></i> Buy Airtime';
-            body.innerHTML = `<select id="inp_network" class="form-select mb-3"><option value="mtn">MTN</option><option value="airtel">Airtel</option><option value="glo">GLO</option><option value="9mobile">9Mobile</option></select><input type="number" id="inp_amount" class="form-control mb-3" placeholder="Amount (min.₦100)"><input type="number" id="inp_phone" class="form-control mb-3" placeholder="Phone Number">`;
-            btn.onclick = () => window.executeTransaction();
-        }
+    title.innerHTML = '<i class="fas fa-phone text-warning"></i> Buy Airtime';
+    body.innerHTML = `
+        <select id="inp_network" class="form-select mb-3">
+            <option value="mtn">MTN</option>
+            <option value="airtel">Airtel</option>
+            <option value="glo">GLO</option>
+            <option value="9mobile">9Mobile</option>
+        </select>
+        <input type="number" id="inp_amount" class="form-control mb-3" placeholder="Amount (₦50 - ₦500,000)" min="50">
+        <input type="number" id="inp_phone" class="form-control mb-3" placeholder="Phone Number (e.g., 08012345678)">
+        <small class="text-muted">Minimum amount is ₦50</small>
+    `;
+    btn.onclick = () => window.executeTransaction();
+}
         else if (type === 'airtime_cash') {
             title.innerHTML = '<i class="fas fa-exchange-alt text-success"></i> Airtime to Wallet';
             body.innerHTML = `<select id="inp_network" class="form-select mb-3"><option value="mtn">MTN</option><option value="airtel">Airtel</option><option value="glo">GLO</option><option value="9mobile">9Mobile</option></select><input type="number" id="inp_amount" class="form-control mb-3" placeholder="Amount to Send (₦)"><input type="number" id="inp_phone" class="form-control mb-3" placeholder="Phone Number sending from">`;
@@ -1381,6 +1436,139 @@ else if (type === 'recharge_card') {
             btn.innerText = "Top-up Card";
             btn.onclick = () => window.executeTransaction();
         }
+        else if (type === 'bank_transfer') {
+    title.innerHTML = '<i class="fas fa-exchange-alt text-primary"></i> Transfer to Bank Account';
+    body.innerHTML = `
+        <div class="alert alert-info mb-3">
+            <i class="fas fa-info-circle"></i> Transfer funds from your wallet to any Nigerian bank account
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold mb-2">Select Bank</label>
+            <select id="bank_code" class="form-select mb-2">
+                <option value="">Loading banks...</option>
+            </select>
+            <small class="text-muted">Select your recipient's bank</small>
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold mb-2">Account Number</label>
+            <div class="input-group">
+                <input type="text" id="account_number" class="form-control" placeholder="10-digit account number" maxlength="10">
+                <button class="btn btn-outline-primary" type="button" onclick="window.verifyBankAccount()">
+                    <i class="fas fa-check-circle"></i> Verify
+                </button>
+            </div>
+            <div id="accountNamePreview" class="mt-2 small" style="display: none;"></div>
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold mb-2">Amount (₦)</label>
+            <input type="number" id="transfer_amount" class="form-control" placeholder="Enter amount to transfer" min="100" oninput="window.calculateTransferTotal()">
+            <small class="text-muted">Minimum transfer: ₦100</small>
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold mb-2">Narration (Optional)</label>
+            <input type="text" id="narration" class="form-control" placeholder="e.g., Withdrawal, Payment, etc.">
+        </div>
+        <div class="alert alert-info" id="feePreview">
+            <i class="fas fa-calculator"></i> Transfer Fee: ₦50 | Total Deduction: ₦0.00
+        </div>
+        <div class="alert alert-warning">
+            <i class="fas fa-shield-alt"></i> <strong>Note:</strong> Transfers are final and cannot be reversed. Please verify account details carefully.
+        </div>
+    `;
+    btn.innerText = "Process Transfer";
+    btn.onclick = () => window.executeTransaction();
+    
+    // Calculate total with fee
+    window.calculateTransferTotal = () => {
+        const amount = document.getElementById('transfer_amount')?.value || 0;
+        const fee = 50;
+        const total = parseFloat(amount) + fee;
+        const feePreview = document.getElementById('feePreview');
+        if (feePreview) {
+            feePreview.innerHTML = `<i class="fas fa-calculator"></i> Transfer Fee: ₦${fee} | Total Deduction: ₦${total.toLocaleString()}`;
+        }
+        return total;
+    };
+    
+    // Load banks list
+    window.loadBanksList = async () => {
+        const bankSelect = document.getElementById('bank_code');
+        if (!bankSelect) return;
+        
+        bankSelect.innerHTML = '<option>Loading banks...</option>';
+        try {
+            const res = await fetch(`${RENDER_URL}/api/banks`);
+            const data = await res.json();
+            
+            if (data.success && data.banks && data.banks.length > 0) {
+                bankSelect.innerHTML = '<option value="">Select Bank</option>';
+                data.banks.forEach(bank => {
+                    bankSelect.innerHTML += `<option value="${bank.code}">${bank.name}</option>`;
+                });
+            } else {
+                throw new Error("No banks returned");
+            }
+        } catch (error) {
+            console.error("Error loading banks:", error);
+            // Fallback banks
+            bankSelect.innerHTML = `
+                <option value="">Select Bank</option>
+                <option value="000023">Providus Bank</option>
+                <option value="000004">Zenith Bank</option>
+                <option value="000005">GTBank</option>
+                <option value="000006">UBA</option>
+                <option value="000007">First Bank of Nigeria</option>
+                <option value="000008">Access Bank</option>
+                <option value="000009">FCMB</option>
+                <option value="000010">Stanbic IBTC Bank</option>
+                <option value="100004">Paycom (Opay)</option>
+            `;
+        }
+    };
+    
+    // Verify account function
+    window.verifyBankAccount = async () => {
+        const bankCode = document.getElementById('bank_code').value;
+        const accountNumber = document.getElementById('account_number').value;
+        const previewDiv = document.getElementById('accountNamePreview');
+        
+        if (!bankCode) {
+            alert("Please select a bank first");
+            return;
+        }
+        if (!accountNumber || accountNumber.length !== 10) {
+            alert("Please enter a valid 10-digit account number");
+            return;
+        }
+        
+        previewDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying account...';
+        previewDiv.style.display = 'block';
+        previewDiv.style.color = '#64748b';
+        
+        try {
+            const res = await fetch(`${RENDER_URL}/api/verify-account`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bank_code: bankCode, account_number: accountNumber })
+            });
+            const data = await res.json();
+            
+            if (data.success && data.account_name) {
+                previewDiv.innerHTML = `<i class="fas fa-check-circle"></i> Account Name: <strong>${data.account_name}</strong>`;
+                previewDiv.style.color = '#047857';
+                window.activeService.verifiedAccountName = data.account_name;
+            } else {
+                previewDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${data.message || "Verification failed. Please check the account number."}`;
+                previewDiv.style.color = '#dc2626';
+            }
+        } catch (error) {
+            previewDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Unable to verify account. Please check the details.';
+            previewDiv.style.color = '#dc2626';
+        }
+    };
+    
+    window.loadBanksList();
+}
         // Identity Services (Humanity)
         else if (type === 'nin1' || type === 'nin2' || type === 'nin3') {
             title.innerHTML = `<i class="fas fa-id-card text-success"></i> ${type === 'nin1' ? 'NIN Search (v1)' : (type === 'nin2' ? 'NIN Search (v2)' : 'NIN Search (v3)')}`;
@@ -1580,11 +1768,29 @@ window.executeTransaction = async () => {
         costAmount = parseFloat(selectedOption?.getAttribute('data-price') || 0) + 10;
     }
     else if (type === 'airtime') {
-        payload.network = document.getElementById('inp_network').value;
-        payload.phone = document.getElementById('inp_phone').value;
-        payload.amount = document.getElementById('inp_amount').value;
-        costAmount = parseFloat(payload.amount);
+    const network = document.getElementById('inp_network').value;
+    const phone = document.getElementById('inp_phone').value;
+    const amount = document.getElementById('inp_amount').value;
+    
+    if (!network || !phone || !amount) {
+        alert("Please fill in all fields");
+        btn.disabled = false;
+        document.getElementById('srvLoader').style.display = "none";
+        return;
     }
+    
+    if (parseFloat(amount) < 50) {
+        alert("Minimum airtime amount is ₦50");
+        btn.disabled = false;
+        document.getElementById('srvLoader').style.display = "none";
+        return;
+    }
+    
+    payload.network = network;
+    payload.phone = phone;
+    payload.amount = amount;
+    costAmount = parseFloat(amount); // Add your ₦50 commission
+}
     else if (type === 'airtime_cash') {
         const network = document.getElementById('inp_network').value;
         const phone = document.getElementById('inp_phone').value;
@@ -1704,6 +1910,57 @@ window.executeTransaction = async () => {
         payload.amount = document.getElementById('topup_amount').value;
         costAmount = parseFloat(payload.amount) * 1600;
     }
+    else if (type === 'bank_transfer') {
+    const bankCode = document.getElementById('bank_code').value;
+    const accountNumber = document.getElementById('account_number').value;
+    const amount = document.getElementById('transfer_amount').value;
+    const narration = document.getElementById('narration').value || "Wallet Withdrawal";
+    
+    if (!bankCode) {
+        alert("Please select a bank");
+        btn.disabled = false;
+        document.getElementById('srvLoader').style.display = "none";
+        return;
+    }
+    
+    if (!accountNumber || accountNumber.length !== 10) {
+        alert("Please enter a valid 10-digit account number");
+        btn.disabled = false;
+        document.getElementById('srvLoader').style.display = "none";
+        return;
+    }
+    
+    if (!amount || parseFloat(amount) < 100) {
+        alert("Minimum transfer amount is ₦100");
+        btn.disabled = false;
+        document.getElementById('srvLoader').style.display = "none";
+        return;
+    }
+    
+    const fee = 50;
+    const totalAmount = parseFloat(amount) + fee;
+    
+    // Check if account was verified
+    if (!window.activeService.verifiedAccountName) {
+        if (!confirm("Account not verified. Are you sure you want to proceed?")) {
+            btn.disabled = false;
+            document.getElementById('srvLoader').style.display = "none";
+            return;
+        }
+    }
+    
+    if (!confirm(`Transfer Details:\n\nBank: ${bankCode}\nAccount: ${accountNumber}\nAmount: ₦${parseFloat(amount).toLocaleString()}\nFee: ₦${fee}\nTotal: ₦${totalAmount.toLocaleString()}\n\nProceed with transfer?`)) {
+        btn.disabled = false;
+        document.getElementById('srvLoader').style.display = "none";
+        return;
+    }
+    
+    payload.bank_code = bankCode;
+    payload.account_number = accountNumber;
+    payload.amount = amount;
+    payload.narration = narration;
+    costAmount = totalAmount;
+}
     else if (type === 'nin1' || type === 'nin2' || type === 'nin3' || type === 'bvn') {
         const kycType = type.startsWith('nin') ? 'nin' : 'bvn';
         payload[kycType] = document.getElementById('inp_kyc_num').value;
@@ -1826,6 +2083,257 @@ window.executeTransaction = async () => {
     const logout = () => signOut(auth).then(() => window.location.href="login.html");
     document.getElementById('btn-logout').onclick = logout;
     document.getElementById('btn-logout-mobile').onclick = logout;
+    
+    // ==========================================
+// LANGUAGE SWITCHER (English / Hausa)
+// ==========================================
+const dashboardTranslations = {
+    en: {
+        welcomeGreeting: "Welcome back,",
+        activeStatus: "Active",
+        unifiedWallet: "Unified Wallet Balance",
+        addMoney: "Add Money",
+        unifiedFunding: "Unified Funding Account",
+        instant: "Instant",
+        autoFunding: "Auto-Funding",
+        vendingServices: "Vending Services",
+        identityKyc: "Identity & KYC",
+        cardsBanking: "Cards & Banking",
+        buyData: "Buy Data",
+        airtime: "Airtime",
+        cableTv: "Cable TV",
+        electricity: "Electricity",
+        examPins: "Exam Pins",
+        bulkSms: "Bulk SMS",
+        airtimeToCash: "Airtime to Cash",
+        printRechargeCard: "Print Recharge Card",
+        smileData: "Smile Data",
+        ninSearchV1: "NIN Search v1",
+        ninSearchV2: "NIN Search v2",
+        ninSearchV3: "NIN Search v3",
+        bvnLookup: "BVN Lookup",
+        demographicSearch: "Demographic Search",
+        ninByPhone: "NIN by Phone",
+        bvnByPhone: "BVN by Phone",
+        instantValidation: "Instant Validation",
+        simple: "Simple",
+        premium: "Premium",
+        advanced: "Advanced",
+        standard: "Standard",
+        nameDob: "Name/DOB",
+        quickSearch: "Quick Search",
+        mobileLookup: "Mobile Lookup",
+        fastKyc: "Fast KYC",
+        issueUsdCard: "Issue USD Card",
+        cardBalance: "Card Balance",
+        freezeCard: "Freeze Card",
+        topUpCard: "Top-up Card",
+        virtualCard: "Virtual Card",
+        easy: "Easy",
+        processTransaction: "Process Transaction",
+        purchaseSelectedPlan: "Purchase Selected Plan",
+        validateSmartcard: "Validate Smartcard",
+        validateMeter: "Validate Meter",
+        generatePrint: "Generate & Print",
+        checkBalance: "Check Balance",
+        apply: "Apply",
+        topUp: "Top-up Card",
+        recipientPhone: "Recipient Phone Number",
+        selectNetwork: "Select Network...",
+        selectPlan: "Select Plan...",
+        loadingPlans: "Loading plans...",
+        noPlans: "No plans available",
+        failedLoadPlans: "Failed to load plans. Please try again.",
+        enterValidPhone: "Please enter a valid phone number",
+        selectPlanFirst: "Please select a data plan first",
+        processing: "Processing...",
+        tryAgain: "Try Again",
+        success: "Success!",
+        networkError: "Network Error. Please try again.",
+        confirmCharge: "You will be charged ₦",
+        proceed: "Proceed?",
+        walletBalance: "Wallet Balance",
+        technologyBy: "Technology by",
+        allRightsReserved: "All rights reserved."
+    },
+    ha: {
+        welcomeGreeting: "Barka da dawowa,",
+        activeStatus: "Aiki",
+        unifiedWallet: "Jimlar Kuɗin Wallet",
+        addMoney: "Ƙara Kuɗi",
+        unifiedFunding: "Asusun Kuɗi Na Haɗe",
+        instant: "Nan take",
+        autoFunding: "Auto-Funding",
+        vendingServices: "Sabis na Siyarwa",
+        identityKyc: "Identity & KYC",
+        cardsBanking: "Katin & Banki",
+        buyData: "Siyan Data",
+        airtime: "Kudin Waya",
+        cableTv: "Talabijin",
+        electricity: "Wutar Lantarki",
+        examPins: "Pin na Jarrabawa",
+        bulkSms: "Sakon SMS",
+        airtimeToCash: "Juya Kudin Waya zuwa Kuɗi",
+        printRechargeCard: "Buga Katin Recharge",
+        smileData: "Smile Data",
+        ninSearchV1: "Neman NIN v1",
+        ninSearchV2: "Neman NIN v2",
+        ninSearchV3: "Neman NIN v3",
+        bvnLookup: "Neman BVN",
+        demographicSearch: "Binciken Alƙaluma",
+        ninByPhone: "NIN ta Wayar",
+        bvnByPhone: "BVN ta Wayar",
+        instantValidation: "Tabbatarwa Nan take",
+        simple: "Mai Sauƙi",
+        premium: "Na Musamman",
+        advanced: "Ci gaba",
+        standard: "Daidaitacce",
+        nameDob: "Suna/Ranar Haihuwa",
+        quickSearch: "Bincike Mai Sauƙi",
+        mobileLookup: "Bincike ta Wayar",
+        fastKyc: "KYC Mai Sauƙi",
+        issueUsdCard: "Bada Katin USD",
+        cardBalance: "Adadin Katin",
+        freezeCard: "Daskare Katin",
+        topUpCard: "Ƙara Katin",
+        virtualCard: "Katin Virtual",
+        easy: "Mai Sauƙi",
+        processTransaction: "Gudanar da Ma'amala",
+        purchaseSelectedPlan: "Sayi Shirin Da Kuka Zaɓa",
+        validateSmartcard: "Tabbatar da Smartcard",
+        validateMeter: "Tabbatar da Mita",
+        generatePrint: "Ƙirƙira & Buga",
+        checkBalance: "Duba Adadin",
+        apply: "Aiwatar",
+        topUp: "Ƙara Katin",
+        recipientPhone: "Lambar Wayar Mai Karɓa",
+        selectNetwork: "Zaɓi Network...",
+        selectPlan: "Zaɓi Shirin...",
+        loadingPlans: "Ana loda shirye-shirye...",
+        noPlans: "Babu shirye-shirye",
+        failedLoadPlans: "An kasa loda shirye-shiryen. Da fatan za a sake gwadawa.",
+        enterValidPhone: "Da fatan za a shigar da lambar waya mai inganci",
+        selectPlanFirst: "Da fatan za a zaɓi shirin data farko",
+        processing: "Ana sarrafawa...",
+        tryAgain: "Sake Gwadawa",
+        success: "An yi nasara!",
+        networkError: "Matsalar Network. Da fatan za a sake gwadawa.",
+        confirmCharge: "Za a cire kuɗi ₦",
+        proceed: "Ci gaba?",
+        walletBalance: "Adadin Wallet",
+        technologyBy: "Fasaha ta",
+        allRightsReserved: "Duk haƙƙoƙi mallaki ne."
+    }
+};
+
+let currentLang = 'en';
+const langSwitcher = document.getElementById('langSwitcher');
+
+function updateDashboardLanguage(lang) {
+    const t = dashboardTranslations[lang];
+    if (!t) return;
+    
+    // Update welcome header
+    const greetingSpan = document.querySelector('.welcome-greeting span');
+    if (greetingSpan) greetingSpan.innerText = t.welcomeGreeting;
+    
+    const onlineText = document.querySelector('.online-text');
+    if (onlineText) onlineText.innerText = t.activeStatus;
+    
+    // Update balance card
+    const balanceLabel = document.querySelector('.balance-card p');
+    if (balanceLabel) balanceLabel.innerText = t.unifiedWallet;
+    
+    const addMoneyBtn = document.querySelector('.balance-card .btn-warning');
+    if (addMoneyBtn) addMoneyBtn.innerHTML = `<i class="fas fa-plus-circle me-1"></i> ${t.addMoney}`;
+    
+    // Update virtual account card
+    const fundingTitle = document.querySelector('.vacc-box h6');
+    if (fundingTitle) fundingTitle.innerHTML = `<i class="fas fa-university text-success me-2"></i> ${t.unifiedFunding}`;
+    
+    const instantBadge = document.querySelector('.vacc-box .badge');
+    if (instantBadge) instantBadge.innerText = t.instant;
+    
+    const autoFundingSpan = document.querySelector('.vacc-box .bg-success');
+    if (autoFundingSpan) autoFundingSpan.innerHTML = `<i class="fas fa-bolt"></i> ${t.autoFunding}`;
+    
+    // Update tabs
+    const vendingTab = document.getElementById('tabVending');
+    const identityTab = document.getElementById('tabIdentity');
+    const cardsTab = document.getElementById('tabCards');
+    if (vendingTab) vendingTab.innerHTML = `<i class="fas fa-shopping-cart me-2"></i> ${t.vendingServices}`;
+    if (identityTab) identityTab.innerHTML = `<i class="fas fa-fingerprint me-2"></i> ${t.identityKyc}`;
+    if (cardsTab) cardsTab.innerHTML = `<i class="fas fa-credit-card me-2"></i> ${t.cardsBanking}`;
+    
+    // Update vending service buttons
+    const serviceBtns = document.querySelectorAll('#vendingContent .service-btn');
+    const serviceNames = [
+        'buyData', 'airtime', 'cableTv', 'electricity', 'examPins', 'bulkSms', 'airtimeToCash', 'printRechargeCard', 'smileData'
+    ];
+    const serviceTranslations = [
+        t.buyData, t.airtime, t.cableTv, t.electricity, t.examPins, t.bulkSms, t.airtimeToCash, t.printRechargeCard, t.smileData
+    ];
+    serviceBtns.forEach((btn, index) => {
+        if (index < serviceTranslations.length) {
+            const nameSpan = btn.querySelector('.srv-name');
+            if (nameSpan) nameSpan.innerText = serviceTranslations[index];
+        }
+    });
+    
+    // Update identity service buttons
+    const identityBtns = document.querySelectorAll('#identityContent .service-btn');
+    const identityNames = [
+        t.ninSearchV1, t.ninSearchV2, t.ninSearchV3, t.bvnLookup, 
+        t.demographicSearch, t.ninByPhone, t.bvnByPhone, t.instantValidation
+    ];
+    const identityBadges = [t.simple, t.premium, t.advanced, t.standard, t.nameDob, t.quickSearch, t.mobileLookup, t.fastKyc];
+    
+    identityBtns.forEach((btn, index) => {
+        if (index < identityNames.length) {
+            const nameSpan = btn.querySelector('.srv-name');
+            if (nameSpan) nameSpan.innerText = identityNames[index];
+            const badgeSpan = btn.querySelector('.badge-humanity');
+            if (badgeSpan && index < identityBadges.length) badgeSpan.innerText = identityBadges[index];
+        }
+    });
+    
+    // Update cards service buttons
+    const cardsBtns = document.querySelectorAll('#cardsContent .service-btn');
+    const cardsNames = [t.issueUsdCard, t.cardBalance, t.freezeCard, t.topUpCard];
+    const cardsBadges = [t.virtualCard, '', '', ''];
+    
+    cardsBtns.forEach((btn, index) => {
+        if (index < cardsNames.length) {
+            const nameSpan = btn.querySelector('.srv-name');
+            if (nameSpan) nameSpan.innerText = cardsNames[index];
+            if (index === 0) {
+                const badgeSpan = btn.querySelector('.usd-badge');
+                if (badgeSpan) badgeSpan.innerText = t.virtualCard;
+            }
+        }
+    });
+    
+    // Update footer
+    const creditSpan = document.querySelector('.footer .credit');
+    if (creditSpan) {
+        creditSpan.innerHTML = `${t.technologyBy} <a href="https://primebit.page.gd" target="_blank">Prime Bit Tech</a>`;
+    }
+    
+    const copyrightSpan = document.querySelector('.footer .copyright');
+    if (copyrightSpan) {
+        copyrightSpan.innerText = `© 2024 Usman Data Sub. ${t.allRightsReserved}`;
+    }
+}
+
+if (langSwitcher) {
+    langSwitcher.addEventListener('change', (e) => {
+        currentLang = e.target.value;
+        updateDashboardLanguage(currentLang);
+    });
+}
+
+// Initialize with English
+updateDashboardLanguage('en');
 </script>
 </body>
 </html>
