@@ -1235,9 +1235,9 @@ else if (type === 'data') {
             <option value="glo">GLO</option>
             <option value="9mobile">9Mobile</option>
         </select>
-        <input type="number" id="inp_amount" class="form-control mb-3" placeholder="Amount (₦50 - ₦500,000)" min="50">
+        <input type="number" id="inp_amount" class="form-control mb-3" placeholder="Amount (₦100 - ₦500,000)" min="100">
         <input type="number" id="inp_phone" class="form-control mb-3" placeholder="Phone Number (e.g., 08012345678)">
-        <small class="text-muted">Minimum amount is ₦50</small>
+        <small class="text-muted">Minimum amount is ₦100</small>
     `;
     btn.onclick = () => window.executeTransaction();
 }
@@ -1392,7 +1392,7 @@ else if (type === 'recharge_card') {
             <option value="9mobile">9Mobile</option>
         </select>
         <input type="text" id="display_name" class="form-control mb-3" placeholder="Display Name (e.g., Usman Data)" value="Usman Data">
-        <input type="number" id="card_amount" class="form-control mb-3" placeholder="Amount (₦50 - ₦50,000)" min="50" max="50000">
+        <input type="number" id="card_amount" class="form-control mb-3" placeholder="Amount (₦100 - ₦50,000)" min="100" max="50000">
         <input type="number" id="card_quantity" class="form-control mb-3" placeholder="Quantity (1-50,000)" value="1" min="1" max="50000">
         <div class="alert alert-info">
             <i class="fas fa-info-circle"></i> Recharge card pins will be displayed after payment
@@ -1779,17 +1779,17 @@ window.executeTransaction = async () => {
         return;
     }
     
-    if (parseFloat(amount) < 50) {
-        alert("Minimum airtime amount is ₦50");
+    if (parseFloat(amount) < 100) {
+        alert("Minimum airtime amount is ₦100");
         btn.disabled = false;
         document.getElementById('srvLoader').style.display = "none";
         return;
     }
     
-    payload.network = network;
+    payload.network
     payload.phone = phone;
     payload.amount = amount;
-    costAmount = parseFloat(amount); // Add your ₦50 commission
+    costAmount = parseFloat(amount); // Adur ₦50 commission
 }
     else if (type === 'airtime_cash') {
         const network = document.getElementById('inp_network').value;
@@ -1871,8 +1871,8 @@ window.executeTransaction = async () => {
             return;
         }
         
-        if (parseFloat(amount) < 50) {
-            alert("Minimum amount is ₦50");
+        if (parseFloat(amount) < 500) {
+            alert("Minimum amount is ₦500");
             btn.disabled = false;
             document.getElementById('srvLoader').style.display = "none";
             return;
@@ -1889,7 +1889,7 @@ window.executeTransaction = async () => {
         payload.amount = amount;
         payload.quantity = quantity;
         payload.display_name = displayName;
-        costAmount = (parseFloat(amount) * parseInt(quantity)) + 50;
+        costAmount = (parseFloat(amount) * parseInt(quantity)) + 10;
     }
     else if (type === 'usd_card') {
         payload.brand = document.getElementById('card_brand').value;
